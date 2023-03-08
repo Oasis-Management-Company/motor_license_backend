@@ -1,4 +1,4 @@
-package com.app.IVAS.entity;
+package com.app.IVAS.entity.userManagement;
 
 
 import lombok.AllArgsConstructor;
@@ -11,8 +11,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "ZONE")
-public class Zone {
+@Table(name = "ZONAL_OFFICE")
+public class ZonalOffice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,11 @@ public class Zone {
     @Column(name = "NAME", nullable = false)
     private String name;
 
+    private String address;
+    private String head;
+    private String contact;
+
     @ManyToOne
-    @JoinColumn(name = "LGA", referencedColumnName = "id")
-    private Lga lga;
+    @JoinColumn(name = "ZONE", referencedColumnName = "id")
+    private Zone zone;
 }

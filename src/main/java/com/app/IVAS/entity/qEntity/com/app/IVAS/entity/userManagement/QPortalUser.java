@@ -22,7 +22,7 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public static final QPortalUser portalUser = new QPortalUser("portalUser");
 
-    public final QStatusEntity _super;
+    public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
 
     public final StringPath address = createString("address");
 
@@ -77,7 +77,7 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final StringPath preferredName = createString("preferredName");
 
-    public final QRole role;
+    public final com.app.IVAS.entity.userManagement.QRole role;
 
     public final BooleanPath setupComplete = createBoolean("setupComplete");
 

@@ -1,8 +1,7 @@
-package com.app.IVAS.entity;
+package com.app.IVAS.entity.userManagement;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.app.IVAS.entity.userManagement.Area;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -17,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QArea extends EntityPathBase<Area> {
 
-    private static final long serialVersionUID = 1130275075L;
+    private static final long serialVersionUID = -1474182889L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

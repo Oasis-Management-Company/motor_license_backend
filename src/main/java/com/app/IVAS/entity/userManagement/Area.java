@@ -1,4 +1,4 @@
-package com.app.IVAS.entity;
+package com.app.IVAS.entity.userManagement;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

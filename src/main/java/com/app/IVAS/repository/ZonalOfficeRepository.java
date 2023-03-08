@@ -1,7 +1,7 @@
 package com.app.IVAS.repository;
 
-import com.app.IVAS.entity.ZonalOffice;
-import com.app.IVAS.entity.Zone;
+import com.app.IVAS.entity.userManagement.ZonalOffice;
+import com.app.IVAS.entity.userManagement.Zone;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

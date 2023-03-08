@@ -10,23 +10,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "LGA")
-public class Lga {
-    @Id
+@Table(name = "PLATE_NUMBER_TYPE")
+public class PlateNumberType {
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "NAME", nullable = false)
     private String name;
-
-    @Column(name = "STATE_ID")
-    private Long stateId;
-
-    @Column(name = "CODE")
-    private String code;
-
-    @Column(name = "STATUS")
-    private String status;
-
 }

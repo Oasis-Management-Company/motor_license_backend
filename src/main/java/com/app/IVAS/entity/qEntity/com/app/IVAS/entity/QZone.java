@@ -2,6 +2,7 @@ package com.app.IVAS.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.app.IVAS.entity.userManagement.Zone;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
