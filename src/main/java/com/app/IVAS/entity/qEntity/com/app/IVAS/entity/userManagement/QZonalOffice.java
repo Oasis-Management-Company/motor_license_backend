@@ -1,4 +1,4 @@
-package com.app.IVAS.entity;
+package com.app.IVAS.entity.userManagement;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QZonalOffice extends EntityPathBase<ZonalOffice> {
 
-    private static final long serialVersionUID = 1834743914L;
+    private static final long serialVersionUID = -93562410L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

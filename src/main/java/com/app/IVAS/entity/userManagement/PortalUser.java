@@ -1,8 +1,5 @@
 package com.app.IVAS.entity.userManagement;
 
-import com.app.IVAS.entity.Area;
-import com.app.IVAS.entity.Lga;
-import com.app.IVAS.entity.ZonalOffice;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -96,12 +93,6 @@ public class PortalUser extends StatusEntity {
             length = 1024
     )
     private String displayName;
-    @Basic
-    @Column(
-            name = "setup_complete",
-            table = "portal_user"
-    )
-    private Boolean setupComplete;
     @Basic
     @Column(
             name = "email_verified",

@@ -4,7 +4,7 @@ import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.api_response.LoginResponse;
 import com.app.IVAS.dto.*;
-import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.Permission;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
@@ -12,7 +12,6 @@ import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.security.PasswordService;
 import com.app.IVAS.service.UserManagementService;
-import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

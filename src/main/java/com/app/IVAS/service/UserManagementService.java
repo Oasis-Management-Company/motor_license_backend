@@ -3,8 +3,7 @@ package com.app.IVAS.service;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.api_response.LoginResponse;
 import com.app.IVAS.dto.*;
-import com.app.IVAS.entity.Area;
-import com.app.IVAS.entity.Lga;
+import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 

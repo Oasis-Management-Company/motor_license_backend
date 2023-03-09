@@ -1,4 +1,4 @@
-package com.app.IVAS.entity;
+package com.app.IVAS.entity.userManagement;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QLga extends EntityPathBase<Lga> {
 
-    private static final long serialVersionUID = -1210455280L;
+    private static final long serialVersionUID = -186091396L;
 
     public static final QLga lga = new QLga("lga");
 

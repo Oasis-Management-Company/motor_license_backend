@@ -1,4 +1,4 @@
-package com.app.IVAS.entity;
+package com.app.IVAS.entity.userManagement;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -11,18 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QArea is a Querydsl query type for Area
+ * QZone is a Querydsl query type for Zone
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QArea extends EntityPathBase<Area> {
+public class QZone extends EntityPathBase<Zone> {
 
-    private static final long serialVersionUID = 1130275075L;
+    private static final long serialVersionUID = -1473440714L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QArea area = new QArea("area");
-
-    public final StringPath code = createString("code");
+    public static final QZone zone = new QZone("zone");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -30,23 +28,23 @@ public class QArea extends EntityPathBase<Area> {
 
     public final StringPath name = createString("name");
 
-    public QArea(String variable) {
-        this(Area.class, forVariable(variable), INITS);
+    public QZone(String variable) {
+        this(Zone.class, forVariable(variable), INITS);
     }
 
-    public QArea(Path<? extends Area> path) {
+    public QZone(Path<? extends Zone> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QArea(PathMetadata metadata) {
+    public QZone(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QArea(PathMetadata metadata, PathInits inits) {
-        this(Area.class, metadata, inits);
+    public QZone(PathMetadata metadata, PathInits inits) {
+        this(Zone.class, metadata, inits);
     }
 
-    public QArea(Class<? extends Area> type, PathMetadata metadata, PathInits inits) {
+    public QZone(Class<? extends Zone> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.lga = inits.isInitialized("lga") ? new QLga(forProperty("lga")) : null;
     }
