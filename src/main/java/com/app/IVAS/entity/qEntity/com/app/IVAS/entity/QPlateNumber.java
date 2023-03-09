@@ -47,7 +47,10 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
 
     public final StringPath number = createString("number");
 
-    public final EnumPath<com.app.IVAS.Enum.PlateNumberStatus> status = createEnum("status", com.app.IVAS.Enum.PlateNumberStatus.class);
+    public final EnumPath<com.app.IVAS.Enum.PlateNumberStatus> plateNumberStatus = createEnum("plateNumberStatus", com.app.IVAS.Enum.PlateNumberStatus.class);
+
+    //inherited
+    public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
     public final QPlateNumberType type;
 
@@ -77,6 +80,7 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
         this.id = _super.id;
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
+        this.status = _super.status;
         this.type = inits.isInitialized("type") ? new QPlateNumberType(forProperty("type")) : null;
     }
 

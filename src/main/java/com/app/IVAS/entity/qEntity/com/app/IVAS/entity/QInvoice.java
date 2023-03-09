@@ -55,7 +55,10 @@ public class QInvoice extends EntityPathBase<Invoice> {
 
     public final StringPath paymentRef = createString("paymentRef");
 
-    public final EnumPath<com.app.IVAS.Enum.PaymentStatus> status = createEnum("status", com.app.IVAS.Enum.PaymentStatus.class);
+    public final EnumPath<com.app.IVAS.Enum.PaymentStatus> paymentStatus = createEnum("paymentStatus", com.app.IVAS.Enum.PaymentStatus.class);
+
+    //inherited
+    public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
     public QInvoice(String variable) {
         this(Invoice.class, forVariable(variable), INITS);
@@ -84,6 +87,7 @@ public class QInvoice extends EntityPathBase<Invoice> {
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
         this.payer = inits.isInitialized("payer") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("payer"), inits.get("payer")) : null;
+        this.status = _super.status;
     }
 
 }

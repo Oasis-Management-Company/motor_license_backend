@@ -19,6 +19,10 @@ public class QPlateNumberType extends EntityPathBase<PlateNumberType> {
 
     public static final QPlateNumberType plateNumberType = new QPlateNumberType("plateNumberType");
 
+    public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final StringPath name = createString("name");
+
     public QPlateNumberType(String variable) {
         super(PlateNumberType.class, forVariable(variable));
     }

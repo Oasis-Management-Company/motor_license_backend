@@ -49,9 +49,12 @@ public class QWorkFlow extends EntityPathBase<WorkFlow> {
 
     public final QWorkFlowStage stage;
 
-    public final EnumPath<com.app.IVAS.Enum.WorkFlowApprovalStatus> status = createEnum("status", com.app.IVAS.Enum.WorkFlowApprovalStatus.class);
+    //inherited
+    public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
     public final EnumPath<com.app.IVAS.Enum.WorkFlowType> type = createEnum("type", com.app.IVAS.Enum.WorkFlowType.class);
+
+    public final EnumPath<com.app.IVAS.Enum.WorkFlowApprovalStatus> workFlowApprovalStatus = createEnum("workFlowApprovalStatus", com.app.IVAS.Enum.WorkFlowApprovalStatus.class);
 
     public QWorkFlow(String variable) {
         this(WorkFlow.class, forVariable(variable), INITS);
@@ -81,6 +84,7 @@ public class QWorkFlow extends EntityPathBase<WorkFlow> {
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
         this.stage = inits.isInitialized("stage") ? new QWorkFlowStage(forProperty("stage"), inits.get("stage")) : null;
+        this.status = _super.status;
     }
 
 }

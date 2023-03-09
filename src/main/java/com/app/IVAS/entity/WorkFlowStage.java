@@ -21,6 +21,7 @@ public class WorkFlowStage extends StatusEntity {
     @ManyToOne
     private PortalUser ApprovingOfficer;
 
+    @Enumerated(EnumType.STRING)
     private WorkFlowType type;
     private Boolean isFinalStage;
     private Boolean isSuperApprover;

@@ -5,18 +5,21 @@ import com.app.IVAS.Enum.WorkFlowApprovalStatus;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
 @Table(name = "PLATE_NUMBER_REQUEST")
 public class PlateNumberRequest extends StatusEntity {
-    private Long totalNumberRequested;
 
+    private Long totalNumberRequested;
+    private String trackingId;
     @ManyToOne
     private PlateNumberType plateNumberType;
 

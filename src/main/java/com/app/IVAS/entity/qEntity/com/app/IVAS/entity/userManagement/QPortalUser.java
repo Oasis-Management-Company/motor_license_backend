@@ -22,11 +22,11 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public static final QPortalUser portalUser = new QPortalUser("portalUser");
 
-    public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
+    public final QStatusEntity _super;
 
     public final StringPath address = createString("address");
 
-    public final com.app.IVAS.entity.QArea area;
+    public final QArea area;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
@@ -65,11 +65,11 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
     // inherited
     public final QPortalUser lastUpdatedBy;
 
-    public final com.app.IVAS.entity.QLga lga;
+    public final QLga lga;
 
     public final StringPath nationalIdentificationNumber = createString("nationalIdentificationNumber");
 
-    public final com.app.IVAS.entity.QZonalOffice office;
+    public final QZonalOffice office;
 
     public final StringPath otherNames = createString("otherNames");
 
@@ -77,9 +77,7 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final StringPath preferredName = createString("preferredName");
 
-    public final com.app.IVAS.entity.userManagement.QRole role;
-
-    public final BooleanPath setupComplete = createBoolean("setupComplete");
+    public final QRole role;
 
     public final NumberPath<Long> stateId = createNumber("stateId", Long.class);
 
@@ -109,7 +107,7 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
     public QPortalUser(Class<? extends PortalUser> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new QStatusEntity(type, metadata, inits);
-        this.area = inits.isInitialized("area") ? new com.app.IVAS.entity.QArea(forProperty("area"), inits.get("area")) : null;
+        this.area = inits.isInitialized("area") ? new QArea(forProperty("area"), inits.get("area")) : null;
         this.createdAt = _super.createdAt;
         this.createdBy = _super.createdBy;
         this.dateDeactivated = _super.dateDeactivated;
@@ -117,8 +115,8 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
         this.id = _super.id;
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
-        this.lga = inits.isInitialized("lga") ? new com.app.IVAS.entity.QLga(forProperty("lga")) : null;
-        this.office = inits.isInitialized("office") ? new com.app.IVAS.entity.QZonalOffice(forProperty("office"), inits.get("office")) : null;
+        this.lga = inits.isInitialized("lga") ? new QLga(forProperty("lga")) : null;
+        this.office = inits.isInitialized("office") ? new QZonalOffice(forProperty("office"), inits.get("office")) : null;
         this.role = inits.isInitialized("role") ? new QRole(forProperty("role")) : null;
         this.status = _super.status;
     }

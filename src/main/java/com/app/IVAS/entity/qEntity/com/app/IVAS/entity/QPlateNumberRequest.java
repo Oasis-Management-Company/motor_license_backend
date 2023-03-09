@@ -47,13 +47,18 @@ public class QPlateNumberRequest extends EntityPathBase<PlateNumberRequest> {
 
     public final QPlateNumberType plateNumberType;
 
-    public final EnumPath<com.app.IVAS.Enum.WorkFlowApprovalStatus> status = createEnum("status", com.app.IVAS.Enum.WorkFlowApprovalStatus.class);
+    //inherited
+    public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
     public final QPlateNumberSubType subType;
 
     public final NumberPath<Long> totalNumberRequested = createNumber("totalNumberRequested", Long.class);
 
+    public final StringPath trackingId = createString("trackingId");
+
     public final QWorkFlow workFlow;
+
+    public final EnumPath<com.app.IVAS.Enum.WorkFlowApprovalStatus> workFlowApprovalStatus = createEnum("workFlowApprovalStatus", com.app.IVAS.Enum.WorkFlowApprovalStatus.class);
 
     public QPlateNumberRequest(String variable) {
         this(PlateNumberRequest.class, forVariable(variable), INITS);
@@ -82,7 +87,8 @@ public class QPlateNumberRequest extends EntityPathBase<PlateNumberRequest> {
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
         this.plateNumberType = inits.isInitialized("plateNumberType") ? new QPlateNumberType(forProperty("plateNumberType")) : null;
-        this.subType = inits.isInitialized("subType") ? new QPlateNumberSubType(forProperty("subType")) : null;
+        this.status = _super.status;
+        this.subType = inits.isInitialized("subType") ? new QPlateNumberSubType(forProperty("subType"), inits.get("subType")) : null;
         this.workFlow = inits.isInitialized("workFlow") ? new QWorkFlow(forProperty("workFlow"), inits.get("workFlow")) : null;
     }
 
