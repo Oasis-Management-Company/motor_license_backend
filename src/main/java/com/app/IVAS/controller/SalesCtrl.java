@@ -32,7 +32,7 @@ public class SalesCtrl {
     private final PredicateExtractor predicateExtractor;
 
     @GetMapping(name = "/save/sales")
-    public ResponseEntity<?> SaveSales(@RequestBody Sales sales){
+    public ResponseEntity<?> SaveSales(@RequestBody SalesDto sales){
         return ResponseEntity.ok(new JsonResponse("Successful", service.SaveSales(sales)));
     }
 

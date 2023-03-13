@@ -1,9 +1,9 @@
 package com.app.IVAS.repository;
 
-import com.app.IVAS.entity.Sales;
+import com.app.IVAS.entity.Invoice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SalesRepository extends JpaRepository<Sales, Long> {
+public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 }

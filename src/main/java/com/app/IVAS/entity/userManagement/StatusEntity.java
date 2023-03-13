@@ -4,6 +4,7 @@ import com.app.IVAS.Enum.GenericStatusConstant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -41,7 +42,7 @@ public class StatusEntity implements Serializable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createdAt;
     @Basic
-    @CreationTimestamp
+    @UpdateTimestamp
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime lastUpdatedAt;
 

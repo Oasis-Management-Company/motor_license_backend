@@ -6,7 +6,7 @@ import com.app.IVAS.entity.Sales;
 import java.util.List;
 
 public interface SalesCtrlService {
-    Sales SaveSales(Sales sales);
+    Sales SaveSales(SalesDto sales);
 
     List<SalesDto> GetSales(List<Sales> results);
 }

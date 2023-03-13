@@ -65,6 +65,7 @@ public class PortalUser extends StatusEntity {
             length = 1024
     )
     private String generatedPassword;
+    private String asin;
     @Basic(
             optional = false
     )
