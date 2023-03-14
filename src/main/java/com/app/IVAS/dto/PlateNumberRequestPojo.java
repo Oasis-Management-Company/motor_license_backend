@@ -1,7 +1,15 @@
 package com.app.IVAS.dto;
 
+import com.app.IVAS.Enum.WorkFlowApprovalStatus;
 import lombok.Data;
 
 @Data
 public class PlateNumberRequestPojo {
+    private String trackingId;
+    private String createdAt;
+    private String plateNumberType;
+    private String PlateNumberSubType;
+    private String NumberOfPlates;
+    private WorkFlowApprovalStatus status;
+    private String currentApprovingOfficer;
 }

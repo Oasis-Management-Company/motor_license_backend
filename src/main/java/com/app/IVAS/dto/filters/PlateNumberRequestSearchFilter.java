@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 
-
 @Getter
 @Setter
 @NoArgsConstructor

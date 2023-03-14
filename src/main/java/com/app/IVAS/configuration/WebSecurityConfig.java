@@ -42,7 +42,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/login/**",
                         "/api/validate",
                         "/api/validate/**",
-                        "/api/verify/ucode/**"
+                        "/api/verify/ucode/**",
+                        "/api/user/login",
+                        "/api/user/login/**"
 
                 ).permitAll()
                 .anyRequest().authenticated()
