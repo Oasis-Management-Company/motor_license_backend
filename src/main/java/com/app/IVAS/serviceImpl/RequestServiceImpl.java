@@ -39,6 +39,13 @@ public class RequestServiceImpl implements RequestService {
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
         return requests.stream().map(request -> {
             PlateNumberRequestPojo pojo = new PlateNumberRequestPojo();
+            pojo.setTrackingId(request.getTrackingId());
+            pojo.setCreatedAt("");
+            pojo.setPlateNumberType(request.getPlateNumberType().getName());
+//            pojo.setPlateNumberSubType();
+            pojo.setNumberOfPlates(request.getTotalNumberRequested().toString());
+            pojo.setStatus(request.getWorkFlowApprovalStatus());
+            pojo.setCurrentApprovingOfficer(request.getWorkFlow().getStage().getApprovingOfficer().getDisplayName());
 
             return pojo;
         }).collect(Collectors.toList());

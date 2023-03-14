@@ -38,23 +38,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/configuration/**", 
                         "/swagger*/**", 
                         "/webjars/**",
-                        "/api/login",
-                        "/api/login/**",
-                        "/api/card/update",
-                        "/api/card/update/**",
-                        "/api/validate",
-                        "/api/validate/**",
-                        "/nimc/search-with-nin/**",
-                        "/nimc//create-token",
-                        "/api/nin/nin",
-                        "/api/home",
-                        "/api/manifest/get/news",
-                        "/api/manifest/get/news/**",
-                        "/api/update/user",
-                        "/api/get-user-by-tin/**",
-                        "/api/verify-code/**",
-                        "/api/test",
-                        "/api/verify/ucode/**"
+                        "/api/user/login",
+                        "/api/user/login/**"
 
                 ).permitAll()
                 .anyRequest().authenticated()
