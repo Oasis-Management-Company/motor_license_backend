@@ -18,7 +18,7 @@ import javax.persistence.*;
 public class PlateNumber extends StatusEntity {
 
     private String start;
-    private int number;
+    private Long number;
     private String end;
 
     @Enumerated(EnumType.STRING)
