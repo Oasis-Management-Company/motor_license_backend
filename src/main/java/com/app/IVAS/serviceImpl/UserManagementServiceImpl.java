@@ -155,6 +155,7 @@ public class UserManagementServiceImpl implements UserManagementService {
             pojo.setRole(user.getRole());
             pojo.setStatus(user.getStatus());
             pojo.setId(user.getId());
+            pojo.setPhoneNumber(user.getPhoneNumber());
 
             return pojo;
         }).collect(Collectors.toList());

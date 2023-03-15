@@ -2,6 +2,7 @@ package com.app.IVAS.entity;
 
 
 import com.app.IVAS.Enum.PlateNumberStatus;
+import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,11 +17,17 @@ import javax.persistence.*;
 @Table(name = "PLATE_NUMBER")
 public class PlateNumber extends StatusEntity {
 
-    private String number;
+    private String start;
+    private int number;
+    private String end;
 
     @Enumerated(EnumType.STRING)
     private PlateNumberStatus plateNumberStatus;
 
     @ManyToOne
     private PlateNumberType type;
+    @ManyToOne
+    private PortalUser agent;
+    @ManyToOne
+    private PortalUser owner;
 }
