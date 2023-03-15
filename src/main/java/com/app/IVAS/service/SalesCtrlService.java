@@ -1,5 +1,6 @@
 package com.app.IVAS.service;
 
+import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.entity.Sales;
 
@@ -9,4 +10,6 @@ public interface SalesCtrlService {
     Sales SaveSales(SalesDto sales);
 
     List<SalesDto> GetSales(List<Sales> results);
+
+    AsinDto ValidateAsin(String asin);
 }

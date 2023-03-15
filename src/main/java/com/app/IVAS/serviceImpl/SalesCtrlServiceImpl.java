@@ -1,8 +1,10 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.UserDto;
 import com.app.IVAS.entity.Sales;
+import com.app.IVAS.entity.UserDemographicIndividual;
 import com.app.IVAS.entity.Vehicle;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
@@ -13,8 +15,13 @@ import com.app.IVAS.service.UserManagementService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +36,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final InvoiceRepository invoiceRepository;
     private final JwtService jwtService;
     private final RoleRepository roleRepository;
+    @Value("${asin_verification}")
+    private String asinVerification;
+
 
     @Override
     public Sales SaveSales(SalesDto sales) {
@@ -70,5 +80,40 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         }).collect(Collectors.toList());
 
+    }
+
+    @Override
+    public AsinDto ValidateAsin(String asin) {
+
+        AsinDto asinDto = new AsinDto();
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        ResponseEntity<UserDemographicIndividual> responseRC = null;
+        UserDemographicIndividual userinfo1 = null;
+
+        String url = asinVerification + asin;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+
+        try {
+            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographicIndividual.class);
+
+
+            userinfo1 = responseRC.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assert userinfo1 != null;
+        asinDto.setAsin(userinfo1.getAsin());
+        asinDto.setAddress(userinfo1.getAddress());
+        asinDto.setEmail(userinfo1.getEmail());
+        asinDto.setPhoneNumber(userinfo1.getPhoneNumber());
+        asinDto.setName(userinfo1.getName());
+        asinDto.setPhoto(userinfo1.getPhoto());
+        return asinDto;
     }
 }
