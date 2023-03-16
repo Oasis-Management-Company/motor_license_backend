@@ -3,9 +3,8 @@ package com.app.IVAS.controller;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.SalesDto;
+import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QSales;
-import com.app.IVAS.entity.Sales;
-import com.app.IVAS.entity.UserDemographicIndividual;
 import com.app.IVAS.filter.SalesSearchFilter;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.response.JsonResponse;
@@ -27,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 5600)
 @RequiredArgsConstructor
@@ -72,9 +72,21 @@ public class SalesCtrl {
     }
 
     @GetMapping("/validate-asin")
-    public ResponseEntity<?> ValidateAsin(@RequestParam String asin){
+    public ResponseEntity<AsinDto> ValidateAsin(@RequestParam String asin){
         AsinDto dto = service.ValidateAsin(asin);
-        return ResponseEntity.ok(new JsonResponse("Successful",dto ));
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/vehicle-make")
+    public ResponseEntity<List<VehicleMake>> getVehicleMake(){
+        List<VehicleMake> dto = service.getVehicleMake();
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/vehicle-model")
+    public ResponseEntity<List<VehicleModel>> getVehicleModel(@RequestParam long id){
+        List<VehicleModel> dto = service.getVehicleModel(id);
+        return ResponseEntity.ok(dto);
     }
 
 }

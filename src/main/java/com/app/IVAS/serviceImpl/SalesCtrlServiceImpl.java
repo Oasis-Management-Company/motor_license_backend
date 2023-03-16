@@ -3,9 +3,7 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.UserDto;
-import com.app.IVAS.entity.Sales;
-import com.app.IVAS.entity.UserDemographicIndividual;
-import com.app.IVAS.entity.Vehicle;
+import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
@@ -38,6 +36,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final RoleRepository roleRepository;
     @Value("${asin_verification}")
     private String asinVerification;
+    private final VehicleMakeRepository vehicleMakeRepository;
+    private final VehicleModelRepository vehicleModelRepository;
 
 
     @Override
@@ -101,7 +101,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         try {
             responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographicIndividual.class);
 
-
             userinfo1 = responseRC.getBody();
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,6 +113,19 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         asinDto.setPhoneNumber(userinfo1.getPhoneNumber());
         asinDto.setName(userinfo1.getName());
         asinDto.setPhoto(userinfo1.getPhoto());
+        asinDto.setFirstname(userinfo1.getFirstname());
+        asinDto.setLastname(userinfo1.getLastname());
         return asinDto;
+    }
+
+    @Override
+    public List<VehicleMake> getVehicleMake() {
+        return vehicleMakeRepository.findAll();
+    }
+
+    @Override
+    public List<VehicleModel> getVehicleModel(Long id) {
+        VehicleMake make = vehicleMakeRepository.findById(id).get();
+        return vehicleModelRepository.findAllByVehicleMake(make);
     }
 }
