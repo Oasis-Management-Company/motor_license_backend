@@ -1,5 +1,7 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.GenericStatusConstant;
+import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.UserDto;
@@ -38,6 +40,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private String asinVerification;
     private final VehicleMakeRepository vehicleMakeRepository;
     private final VehicleModelRepository vehicleModelRepository;
+    private final PlateNumberRepository plateNumberRepository;
+    private final PlateNumberTypeRepository plateNumberTypeRepository;
+    private final VehicleCategoryRepository vehicleCategoryRepository;
 
 
     @Override
@@ -45,15 +50,48 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
+        Invoice invoice = new Invoice();
 
+
+
+//        VehicleMake make = vehicleMakeRepository.findById(sales.getVehicleMake()).get();
+//        PlateNumberType type = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
+        VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
+        PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
+        VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
+
+        dto.setAddress(sales.getAddress());
+        dto.setEmail(sales.getEmail());
+        dto.setFirstName(sales.getFirstname());
+        dto.setLastName(sales.getAddress());
+        dto.setLga(73L);
+        dto.setPhoneNumber(sales.getPhone_number());
+        dto.setPassword("password");
+        dto.setRole("GENERAL_USER");
+        dto.setArea(67L);
 
         Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
         PortalUser portalUser = userManagementService.createUser(dto, jwtService.user, role);
 
         vehicle.setUser(portalUser);
+        vehicle.setColor(sales.getColor());
+        vehicle.setVehicleModel(model);
+        vehicle.setChasisNumber(sales.getChasis());
+        vehicle.setEngineNumber(sales.getEngine());
+        vehicle.setVehicleCategory(category);
+        vehicle.setPassengers(sales.getPassengers());
+        vehicle.setPlateNumber(number);
+        vehicle.setCreatedBy(jwtService.user);
+        vehicle.setPolicySector(sales.getPolicy());
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
+        invoice.setPayer(portalUser);
+
         sales1.setVehicle(savedVehicle);
+        sales1.setInvoice(invoice);
+        sales1.setCreatedBy(jwtService.user);
+        sales1.setStatus(GenericStatusConstant.ACTIVE);
+
         Sales savedSales = salesRepository.save(sales1);
 
 
@@ -65,7 +103,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         return results.stream().map(sales -> {
             SalesDto dto = new SalesDto();
-            dto.setFn(sales.getVehicle().getUser().getDisplayName());
+            dto.setFirstname(sales.getVehicle().getUser().getDisplayName());
             dto.setAddress(sales.getVehicle().getUser().getAddress());
             dto.setAsin(sales.getVehicle().getUser().getAsin());
             dto.setEmail(sales.getVehicle().getUser().getEmail());
@@ -127,5 +165,22 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     public List<VehicleModel> getVehicleModel(Long id) {
         VehicleMake make = vehicleMakeRepository.findById(id).get();
         return vehicleModelRepository.findAllByVehicleMake(make);
+    }
+
+    @Override
+    public List<PlateNumber> getUserPlateNumbers(Long id) {
+        PlateNumberType type = plateNumberTypeRepository.findById(id).get();
+        List<PlateNumber> plateNumbers = plateNumberRepository.findAllByAgentAndPlateNumberStatusAndTypeAndOwnerIsNull(jwtService.user, PlateNumberStatus.ASSIGNED,type);
+        return plateNumbers;
+    }
+
+    @Override
+    public List<PlateNumberType> getUserPlateNumberTypes() {
+        return plateNumberTypeRepository.findAll();
+    }
+
+    @Override
+    public List<VehicleCategory> getVehicleCategory() {
+        return vehicleCategoryRepository.findAll();
     }
 }

@@ -24,4 +24,5 @@ public class PlateNumberController {
 //    public ResponseEntity<?> generatePlateNumber(@RequestBody PlateNumberDto dto){
 //       String response
 //    }
+
 }

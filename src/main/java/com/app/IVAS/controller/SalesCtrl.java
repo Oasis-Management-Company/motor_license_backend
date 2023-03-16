@@ -88,5 +88,22 @@ public class SalesCtrl {
         List<VehicleModel> dto = service.getVehicleModel(id);
         return ResponseEntity.ok(dto);
     }
+    @GetMapping("/vehicle-category")
+    public ResponseEntity<List<VehicleCategory>> getVehicleCategory(){
+        List<VehicleCategory> dto = service.getVehicleCategory();
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/user-plate")
+    public ResponseEntity<List<PlateNumber>> getUserPlateNumbers(@RequestParam Long id){
+        List<PlateNumber> dto = service.getUserPlateNumbers(id);
+        return ResponseEntity.ok(dto);
+    }
+    @GetMapping("/plate-number/type")
+    public ResponseEntity<List<PlateNumberType>> getUserPlateNumberTypes(){
+        List<PlateNumberType> dto = service.getUserPlateNumberTypes();
+        return ResponseEntity.ok(dto);
+    }
+
 
 }

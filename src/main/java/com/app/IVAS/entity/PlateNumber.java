@@ -4,6 +4,7 @@ package com.app.IVAS.entity;
 import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.StatusEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,17 +18,25 @@ import javax.persistence.*;
 @Table(name = "PLATE_NUMBER")
 public class PlateNumber extends StatusEntity {
 
-    private String start;
+    private String startCode;
     private Long number;
-    private String end;
+    private String endCode;
 
     @Enumerated(EnumType.STRING)
     private PlateNumberStatus plateNumberStatus;
 
     @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "TYPE_ID", referencedColumnName = "id")
     private PlateNumberType type;
+
+    @JsonIgnore
+    @JoinColumn(name = "AGENT_ID", referencedColumnName = "id")
     @ManyToOne
     private PortalUser agent;
+
+    @JsonIgnore
+    @JoinColumn(name = "OWNER_ID", referencedColumnName = "id")
     @ManyToOne
     private PortalUser owner;
 }

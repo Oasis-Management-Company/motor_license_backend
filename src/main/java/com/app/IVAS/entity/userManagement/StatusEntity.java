@@ -27,7 +27,7 @@ public class StatusEntity implements Serializable {
             nullable = false
     )
     @Enumerated(EnumType.STRING)
-    protected GenericStatusConstant status;
+    protected GenericStatusConstant status = GenericStatusConstant.ACTIVE;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private PortalUser deactivatedBy;
