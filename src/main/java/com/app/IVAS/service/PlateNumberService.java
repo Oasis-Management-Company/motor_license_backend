@@ -5,5 +5,5 @@ import com.app.IVAS.dto.PlateNumberDto;
 
 public interface PlateNumberService {
 
-    String generatePlateNumbers(PlateNumberDto dto);
+    String createStock(PlateNumberDto dto);
 }

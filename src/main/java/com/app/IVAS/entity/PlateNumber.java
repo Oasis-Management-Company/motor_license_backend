@@ -17,9 +17,9 @@ import javax.persistence.*;
 @Table(name = "PLATE_NUMBER")
 public class PlateNumber extends StatusEntity {
 
-    private String start;
+    private String startCode;
     private Long number;
-    private String end;
+    private String endCode;
 
     @Enumerated(EnumType.STRING)
     private PlateNumberStatus plateNumberStatus;
@@ -27,7 +27,11 @@ public class PlateNumber extends StatusEntity {
     @ManyToOne
     private PlateNumberType type;
     @ManyToOne
+    private PlateNumberSubType subType;
+    @ManyToOne
     private PortalUser agent;
     @ManyToOne
     private PortalUser owner;
+    @ManyToOne
+    private Stock stock;
 }
