@@ -20,9 +20,11 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QPlateNumber plateNumber = new QPlateNumber("plateNumber");
+    public static final QPlateNumber plateNumber1 = new QPlateNumber("plateNumber1");
 
     public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
+
+    public final com.app.IVAS.entity.userManagement.QPortalUser agent;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
@@ -45,12 +47,18 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser lastUpdatedBy;
 
-    public final StringPath number = createString("number");
+    public final com.app.IVAS.entity.userManagement.QPortalUser owner;
+
+    public final StringPath plateNumber = createString("plateNumber");
 
     public final EnumPath<com.app.IVAS.Enum.PlateNumberStatus> plateNumberStatus = createEnum("plateNumberStatus", com.app.IVAS.Enum.PlateNumberStatus.class);
 
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
+
+    public final QStock stock;
+
+    public final QPlateNumberSubType subType;
 
     public final QPlateNumberType type;
 
@@ -73,6 +81,7 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
     public QPlateNumber(Class<? extends PlateNumber> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new com.app.IVAS.entity.userManagement.QStatusEntity(type, metadata, inits);
+        this.agent = inits.isInitialized("agent") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("agent"), inits.get("agent")) : null;
         this.createdAt = _super.createdAt;
         this.createdBy = _super.createdBy;
         this.dateDeactivated = _super.dateDeactivated;
@@ -80,7 +89,10 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
         this.id = _super.id;
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
+        this.owner = inits.isInitialized("owner") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("owner"), inits.get("owner")) : null;
         this.status = _super.status;
+        this.stock = inits.isInitialized("stock") ? new QStock(forProperty("stock"), inits.get("stock")) : null;
+        this.subType = inits.isInitialized("subType") ? new QPlateNumberSubType(forProperty("subType"), inits.get("subType")) : null;
         this.type = inits.isInitialized("type") ? new QPlateNumberType(forProperty("type")) : null;
     }
 

@@ -3,6 +3,8 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.dto.PlateNumberDto;
+import com.app.IVAS.dto.PlateNumberPojo;
+import com.app.IVAS.dto.StockPojo;
 import com.app.IVAS.entity.PlateNumber;
 import com.app.IVAS.entity.PlateNumberType;
 import com.app.IVAS.entity.QStock;
@@ -16,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -63,14 +67,50 @@ public class PlateNumberServiceImpl implements PlateNumberService {
        }
     }
 
+    @Override
+    public List<PlateNumberPojo> getPlateNumbers(List<PlateNumber> plateNumbers) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+        return plateNumbers.stream().map(plateNumber -> {
+            PlateNumberPojo pojo = new PlateNumberPojo();
+            pojo.setId(plateNumber.getId());
+            pojo.setPlateNumber(plateNumber.getPlateNumber());
+            pojo.setType(plateNumber.getType().getName());
+            pojo.setSubType(plateNumber.getSubType() != null ? plateNumber.getSubType().getName() : null);
+            pojo.setDateCreated(plateNumber.getCreatedAt().format(df));
+            pojo.setStatus(plateNumber.getPlateNumberStatus());
+            pojo.setAgent(plateNumber.getAgent() != null ? plateNumber.getAgent().getDisplayName() : null);
+            pojo.setOwner(plateNumber.getOwner() != null ? plateNumber.getOwner().getDisplayName() : null);
+            return pojo;
+
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StockPojo> getStock(List<Stock> stocks) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+        return stocks.stream().map(stock -> {
+            StockPojo pojo = new StockPojo();
+            pojo.setId(stock.getId());
+            pojo.setLga(stock.getLga().getCode());
+            pojo.setRange(stock.getStartRange() + " - " + stock.getEndRange());
+            pojo.setEndCode(stock.getEndCode());
+            pojo.setType(stock.getType().getName());
+            pojo.setSubType(stock.getSubType() != null ? stock.getSubType().getName() : null);
+            pojo.setDateCreated(stock.getCreatedAt().format(df));
+            pojo.setQuantity(String.valueOf(stock.getQuantity()));
+            pojo.setCreatedBy(stock.getCreatedBy().getDisplayName());
+            pojo.setInitialQuantity(String.valueOf(stock.getEndRange() - stock.getStartRange()));
+            return pojo;
+
+        }).collect(Collectors.toList());
+    }
+
 
     private void generatePlateNumbers(Stock stock){
         for (int i = 0; i<=stock.getQuantity().intValue(); i++){
 
             PlateNumber plateNumber = new PlateNumber();
-            plateNumber.setStartCode(stock.getLga().getCode());
-            plateNumber.setNumber(stock.getStartRange() + i);
-            plateNumber.setEndCode(stock.getEndCode());
+            plateNumber.setPlateNumber(stock.getLga().getCode() + (stock.getStartRange() + i) + stock.getEndCode());
             plateNumber.setPlateNumberStatus(PlateNumberStatus.UNASSIGNED);
             plateNumber.setType(stock.getType());
             if (stock.getSubType() != null){

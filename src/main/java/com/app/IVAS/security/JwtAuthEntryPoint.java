@@ -22,7 +22,7 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException e) 
                         		 throws IOException, ServletException {
     	
-        logger.error("Unauthorized error. MonieMessage - {}", e.getMessage());
+        logger.error("Unauthorized error - {}", e.getMessage());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error -> Unauthorized");
     }
 }
