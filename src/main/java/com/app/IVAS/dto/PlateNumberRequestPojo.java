@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class PlateNumberRequestPojo {
+    private  Long id;
     private String trackingId;
     private String createdAt;
     private String plateNumberType;

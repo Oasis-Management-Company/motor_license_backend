@@ -60,23 +60,12 @@ public class MasterRecordsLoader {
         dto.setPassword("password");
 
         createSuperAdminUser(dto, role);
-
-//        UserDto adminDto = new UserDto();
-//        adminDto.setFirstName("CRO");
-//        adminDto.setLastName("Admin");
-//        adminDto.setPhoneNumber("+2349088394985");
-//        adminDto.setEmail("cro@oasismgt.net");
-//        adminDto.setPassword("password");
-//        adminDto.setLga(74L);
-//        adminDto.setArea(290L);
-//
-//        createAdminUser(adminDto, role3);
     }
 
     private void createSuperAdminUser(UserDto dto, Role role) {
         portalUserRepository.findByUsernameIgnoreCaseAndStatus(dto.getEmail(), GenericStatusConstant.ACTIVE)
                 .orElseGet(() -> {
-                    log.info("===========CREATING SUPER_ADMIN {} ============", dto.getEmail());
+                    log.info("=========== CREATING SUPER_ADMIN {} ============", dto.getEmail());
                     try {
                        PortalUser portalUser = userManagementService.createUser(dto, null, role);
                     } catch (Exception e) {
@@ -85,17 +74,4 @@ public class MasterRecordsLoader {
                     return null;
                 });
     }
-
-//    private void createAdminUser(UserDto dto, Role role) {
-//        portalUserRepository.findByUsernameIgnoreCaseAndStatus(dto.getEmail(), GenericStatusConstant.ACTIVE)
-//                .orElseGet(() -> {
-//                    log.info("===========CREATING ADMIN {} ============", dto.getEmail());
-//                    try {
-//                        PortalUser portalUser = userManagementService.createUser(dto, null, role);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    return null;
-//                });
-//    }
 }

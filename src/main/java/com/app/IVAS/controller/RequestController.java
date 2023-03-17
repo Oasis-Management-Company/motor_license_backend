@@ -58,10 +58,8 @@ public class RequestController {
     @PostMapping("/create/plate-number-request")
     @Transactional
     public ResponseEntity<?> createPlateNumberRequest(@RequestBody PlateNumberRequestDto dto){
-
         requestService.CreatePlateNumberRequest(dto);
         return ResponseEntity.ok("Plate Number Request was created successfully");
-
     }
 
 //    @PostMapping("/update/plate-number-request")
