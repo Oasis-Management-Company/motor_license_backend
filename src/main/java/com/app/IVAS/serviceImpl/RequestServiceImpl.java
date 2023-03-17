@@ -37,12 +37,14 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+
         return requests.stream().map(request -> {
             PlateNumberRequestPojo pojo = new PlateNumberRequestPojo();
             pojo.setTrackingId(request.getTrackingId());
-            pojo.setCreatedAt("");
+            pojo.setCreatedAt(request.getCreatedAt().format(df));
             pojo.setPlateNumberType(request.getPlateNumberType().getName());
-//            pojo.setPlateNumberSubType();
+            pojo.setPlateNumberSubType(request.getSubType() != null ? request.getSubType().getName() : null);
             pojo.setNumberOfPlates(request.getTotalNumberRequested().toString());
             pojo.setStatus(request.getWorkFlowApprovalStatus());
             pojo.setCurrentApprovingOfficer(request.getWorkFlow().getStage().getApprovingOfficer().getDisplayName());

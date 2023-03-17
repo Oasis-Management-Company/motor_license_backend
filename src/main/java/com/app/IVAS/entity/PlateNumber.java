@@ -35,8 +35,16 @@ public class PlateNumber extends StatusEntity {
     @ManyToOne
     private PortalUser agent;
 
+    @ManyToOne
+    private PlateNumberSubType subType;
+
     @JsonIgnore
     @JoinColumn(name = "OWNER_ID", referencedColumnName = "id")
     @ManyToOne
     private PortalUser owner;
+
+    @JsonIgnore
+    @JoinColumn(name = "STOCK_ID", referencedColumnName = "id")
+    @ManyToOne
+    private Stock stock;
 }

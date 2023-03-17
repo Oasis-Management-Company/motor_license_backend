@@ -33,6 +33,11 @@ public class Stock {
     private Long quantity;
 
     @ManyToOne
+    private PlateNumberType type;
+    @ManyToOne
+    private PlateNumberSubType subType;
+
+    @ManyToOne
     private PortalUser createdBy;
 
     @Basic

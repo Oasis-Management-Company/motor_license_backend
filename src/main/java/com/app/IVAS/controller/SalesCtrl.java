@@ -41,9 +41,9 @@ public class SalesCtrl {
 
     private final PredicateExtractor predicateExtractor;
 
-    @GetMapping(name = "/save/sales")
-    public ResponseEntity<?> SaveSales(@RequestBody SalesDto sales){
-        return ResponseEntity.ok(new JsonResponse("Successful", service.SaveSales(sales)));
+    @PostMapping("/save/sales")
+    public ResponseEntity<SalesDto> SaveSales(@RequestBody SalesDto sales){
+        return ResponseEntity.ok(service.SaveSales(sales));
     }
 
     @PostMapping("/get/sales")
@@ -56,17 +56,17 @@ public class SalesCtrl {
                 .limit(filter.getLimit().orElse(10));
 
 
-//        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
-//            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
-//            userJPAQuery.where(QSales.sales.approvalDate.goe(startDate.atStartOfDay()));
-//        }
-//        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
-//            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
-//            userJPAQuery.where(QSales.sales.approvalDate.loe(endDate.atTime(LocalTime.MAX)));
-//
-//        }
+        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
+            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
+            userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
+        }
+        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
+            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
+            userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
 
-        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("approvalDate"), QSales.sales);
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
         QueryResults<Sales> userQueryResults = userJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(service.GetSales(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
     }

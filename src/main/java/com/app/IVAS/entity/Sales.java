@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Table(name = "SALES_TABLE")
 public class Sales extends StatusEntity {
 
-    private String reference_no = "IVS" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607);
+    private String reference_no = "IVS-RF-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607);
 
     @ManyToOne
     @JoinColumn(name = "VEHICLE_ID", referencedColumnName = "id")

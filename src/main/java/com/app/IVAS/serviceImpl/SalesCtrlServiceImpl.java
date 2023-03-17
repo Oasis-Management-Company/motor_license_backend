@@ -1,11 +1,13 @@
 package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.Enum.GenericStatusConstant;
+import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.UserDto;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,14 +46,17 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final PlateNumberRepository plateNumberRepository;
     private final PlateNumberTypeRepository plateNumberTypeRepository;
     private final VehicleCategoryRepository vehicleCategoryRepository;
+    private final LgaRepository lgaRepository;
 
 
     @Override
-    public Sales SaveSales(SalesDto sales) {
+    public SalesDto SaveSales(SalesDto sales) {
+        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
         Invoice invoice = new Invoice();
+        SalesDto salesDto = new SalesDto();
 
 
 
@@ -59,16 +65,16 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
+        Lga lga = lgaRepository.findFirstByCode(number.getStartCode());
 
         dto.setAddress(sales.getAddress());
         dto.setEmail(sales.getEmail());
         dto.setFirstName(sales.getFirstname());
-        dto.setLastName(sales.getAddress());
-        dto.setLga(73L);
+        dto.setLastName(sales.getLastname());
+//        dto.setLga(lga.getId());
         dto.setPhoneNumber(sales.getPhone_number());
         dto.setPassword("password");
         dto.setRole("GENERAL_USER");
-        dto.setArea(67L);
 
         Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
         PortalUser portalUser = userManagementService.createUser(dto, jwtService.user, role);
@@ -86,16 +92,22 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
         invoice.setPayer(portalUser);
+        invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
+        invoice.setInvoiceNumber("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        Invoice savedInvoice = invoiceRepository.save(invoice);
 
         sales1.setVehicle(savedVehicle);
-        sales1.setInvoice(invoice);
+        sales1.setInvoice(savedInvoice);
         sales1.setCreatedBy(jwtService.user);
-        sales1.setStatus(GenericStatusConstant.ACTIVE);
+
+        number.setOwner(portalUser);
+        number.setPlateNumberStatus(PlateNumberStatus.SOLD);
+        plateNumberRepository.save(number);
 
         Sales savedSales = salesRepository.save(sales1);
 
 
-        return savedSales;
+        return sales;
     }
 
     @Override
@@ -113,7 +125,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setModel(sales.getVehicle().getVehicleModel().getName());
             dto.setMake(sales.getVehicle().getVehicleModel().getVehicleMake().getName());
             dto.setCategory(sales.getVehicle().getVehicleCategory().getName());
-
+            dto.setPlate(sales.getVehicle().getPlateNumber().getStartCode() + "-" +sales.getVehicle().getPlateNumber().getNumber() + "-" + sales.getVehicle().getPlateNumber().getEndCode() );
+            dto.setMla(sales.getCreatedBy().getDisplayName());
+            dto.setDate(sales.getCreatedAt());
+            dto.setAmount(sales.getInvoice().getAmount());
+            dto.setStatus(sales.getInvoice().getPaymentStatus());
             return dto;
 
         }).collect(Collectors.toList());

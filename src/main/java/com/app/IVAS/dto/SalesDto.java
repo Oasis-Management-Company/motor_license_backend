@@ -1,6 +1,9 @@
 package com.app.IVAS.dto;
 
+import com.app.IVAS.Enum.PaymentStatus;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class SalesDto {
@@ -33,5 +36,10 @@ public class SalesDto {
     private Long vehicleMake;
     private Long vehicleModel;
     private String year;
+    private String plate;
+    private String mla;
+    private LocalDateTime date;
+    private Double amount;
+    private PaymentStatus status;
 
 }

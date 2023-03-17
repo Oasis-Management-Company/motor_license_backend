@@ -19,10 +19,14 @@ public class PlateNumberController {
 
     private final PlateNumberService plateNumberService;
 
-
 //    @PostMapping("/generate")
 //    public ResponseEntity<?> generatePlateNumber(@RequestBody PlateNumberDto dto){
 //       String response
 //    }
 
+    @PostMapping("/upload-stock")
+    public ResponseEntity<?> uploadStock(@RequestBody PlateNumberDto dto){
+       String response = plateNumberService.createStock(dto);
+       return ResponseEntity.ok(response);
+    }
 }
