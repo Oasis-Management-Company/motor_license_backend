@@ -65,13 +65,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
-        Lga lga = lgaRepository.findFirstByCode(number.getStartCode());
 
         dto.setAddress(sales.getAddress());
         dto.setEmail(sales.getEmail());
         dto.setFirstName(sales.getFirstname());
         dto.setLastName(sales.getLastname());
-//        dto.setLga(lga.getId());
         dto.setPhoneNumber(sales.getPhone_number());
         dto.setPassword("password");
         dto.setRole("GENERAL_USER");
@@ -125,7 +123,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setModel(sales.getVehicle().getVehicleModel().getName());
             dto.setMake(sales.getVehicle().getVehicleModel().getVehicleMake().getName());
             dto.setCategory(sales.getVehicle().getVehicleCategory().getName());
-            dto.setPlate(sales.getVehicle().getPlateNumber().getStartCode() + "-" +sales.getVehicle().getPlateNumber().getNumber() + "-" + sales.getVehicle().getPlateNumber().getEndCode() );
+            dto.setPlate(sales.getVehicle().getPlateNumber().getPlateNumber());
             dto.setMla(sales.getCreatedBy().getDisplayName());
             dto.setDate(sales.getCreatedAt());
             dto.setAmount(sales.getInvoice().getAmount());
