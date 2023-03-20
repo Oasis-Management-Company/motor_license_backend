@@ -31,4 +31,5 @@ public class Vehicle extends StatusEntity {
     private VehicleCategory vehicleCategory;
     private String policySector;
     private Long passengers;
+    private String color;
 }

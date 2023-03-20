@@ -19,6 +19,7 @@ public class VehicleModel {
     @Column(name = "ID")
     private Long id;
 
+    private String name;
     private String year;
 
     @ManyToOne

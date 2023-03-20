@@ -10,4 +10,6 @@ public interface LgaRepository extends JpaRepository<Lga, Long> {
 
     @Query(value="SELECT * FROM lga p  where p.state_id = 6  ORDER BY name ASC ", nativeQuery = true)
     List<Lga> findAllByStateId();
+
+    Lga findFirstByCode(String startCode);
 }

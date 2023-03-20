@@ -38,7 +38,7 @@ public class PlateNumberServiceImpl implements PlateNumberService {
     public String createStock(PlateNumberDto dto) {
         Lga lga = lgaRepository.findById(dto.getLgaId()).orElseThrow(RuntimeException::new);
 
-       List<Stock>  findStock = appRepository.startJPAQuery(QStock.stock)
+       List<Stock> findStock = appRepository.startJPAQuery(QStock.stock)
                 .where(QStock.stock.lga.eq(lga))
                 .where(QStock.stock.endCode.equalsIgnoreCase(dto.getEndCode()))
                 .where((QStock.stock.startRange.loe(dto.getFirstNumber()).and(QStock.stock.endRange.goe(dto.getFirstNumber()))).or
