@@ -13,11 +13,15 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 public class PlateNumberSearchFilter extends BaseSearchDto implements QuerydslBinderCustomizer<QPlateNumber> {
     private String createdAfter;
     private String createdBefore;
+    private boolean isAgent;
 
     @Override
     public void customize(QuerydslBindings bindings, QPlateNumber root){
         bindings.bind(root.plateNumberStatus).as("status").first((path, value) -> path.eq(value));
         bindings.bind(root.plateNumber).as("plateNumber").first((path, value) -> path.equalsIgnoreCase(value));
-        bindings.including(root.plateNumberStatus, root.plateNumber);
+        bindings.bind(root.stock.id).as("id").first((path, value) -> path.eq(value));
+        bindings.bind(root.plateNumber).as("lga").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.type.id).as("type").first((path, value) -> path.eq(value));
+        bindings.including(root.plateNumberStatus, root.plateNumber, root.stock, root.agent, root.type);
     }
 }

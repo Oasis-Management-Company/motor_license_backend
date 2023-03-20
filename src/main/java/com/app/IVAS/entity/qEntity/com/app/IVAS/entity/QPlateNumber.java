@@ -56,11 +56,11 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
-    public final QStock stock;
+    public final com.app.IVAS.entity.QStock stock;
 
-    public final QPlateNumberSubType subType;
+    public final com.app.IVAS.entity.QPlateNumberSubType subType;
 
-    public final QPlateNumberType type;
+    public final com.app.IVAS.entity.QPlateNumberType type;
 
     public QPlateNumber(String variable) {
         this(PlateNumber.class, forVariable(variable), INITS);

@@ -9,13 +9,12 @@ import com.app.IVAS.dto.PasswordDto;
 import com.app.IVAS.dto.PortalUserPojo;
 import com.app.IVAS.dto.UserDto;
 import com.app.IVAS.dto.filters.PortalUserSearchFilter;
-import com.app.IVAS.entity.userManagement.Lga;
-import com.app.IVAS.entity.userManagement.PortalUser;
-//import com.app.IVAS.entity.userManagement.QPortalUser;
+import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.entity.userManagement.QPortalUser;
-import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.PortalUserRepository;
 import com.app.IVAS.repository.RoleRepository;
+import com.app.IVAS.repository.ZonalOfficeRepository;
+import com.app.IVAS.repository.ZoneRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.UserManagementService;
@@ -48,6 +47,8 @@ public class UserController {
     private final PredicateExtractor predicateExtractor;
     private final JwtService jwtService;
     private final PortalUserRepository portalUserRepository;
+    private final ZoneRepository zoneRepository;
+    private final ZonalOfficeRepository zonalOfficeRepository;
 
 
     @GetMapping("/search")
@@ -114,10 +115,10 @@ public class UserController {
         return userManagementService.getLGAs();
     }
 
-//    @GetMapping("/area")
-//    public List<Areas> getAreas(@RequestParam Long id){
-//        return userManagementService.getAreas(id);
-//    }
+    @GetMapping("/area")
+    public List<Area> getAreas(@RequestParam Long id){
+        return userManagementService.getAreas(id);
+    }
 
 
     @PostMapping("/create-roles")
@@ -150,6 +151,17 @@ public class UserController {
     public HttpStatus resetPasswordMobile(@RequestBody PasswordDto dto) throws Exception {
         userManagementService.resetPasswordMobile(dto);
         return HttpStatus.OK;
+    }
+
+    @GetMapping("/report/zones")
+    public List<Zone> getZones(){
+        return  zoneRepository.findAll();
+    }
+
+    @GetMapping("/report/office")
+    public List<ZonalOffice> getZonalOffice(@RequestParam Long id) {
+        Zone zone = zoneRepository.findById(id).get();
+        return  zonalOfficeRepository.findByZone(zone);
     }
 
 }

@@ -13,6 +13,7 @@ import com.app.IVAS.entity.QStock;
 import com.app.IVAS.repository.PlateNumberSubTypeRepository;
 import com.app.IVAS.repository.PlateNumberTypeRepository;
 import com.app.IVAS.repository.app.AppRepository;
+import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.PlateNumberService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -40,6 +41,7 @@ public class PlateNumberController {
     private final PredicateExtractor predicateExtractor;
     private final PlateNumberTypeRepository plateNumberTypeRepository;
     private final PlateNumberSubTypeRepository plateNumberSubTypeRepository;
+    private final JwtService jwtService;
 
     @GetMapping("/search/stock")
     @Transactional
@@ -73,6 +75,10 @@ public class PlateNumberController {
                 .where(predicateExtractor.getPredicate(filter))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
+
+        if (filter.isAgent()){
+            plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.eq(jwtService.user));
+        }
 
         if (filter.getCreatedAfter() != null){
             plateNumberJPAQuery.where(QPlateNumber.plateNumber1.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));

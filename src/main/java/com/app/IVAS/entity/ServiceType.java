@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @AllArgsConstructor
@@ -17,4 +18,7 @@ import javax.persistence.Table;
 public class ServiceType extends StatusEntity {
     private String name;
     private Double price;
+
+    @ManyToOne
+    private VehicleCategory category;
 }

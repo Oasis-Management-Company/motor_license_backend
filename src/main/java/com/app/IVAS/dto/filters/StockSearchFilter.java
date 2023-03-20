@@ -17,6 +17,8 @@ public class StockSearchFilter extends BaseSearchDto implements QuerydslBinderCu
     @Override
     public void customize(QuerydslBindings bindings, QStock root){
         bindings.bind(root.lga.id).as("lga").first((path, value) -> path.eq(value));
-        bindings.including(root.lga);
+        bindings.bind(root.type.id).as("type").first((path, value) -> path.eq(value));
+        bindings.bind(root.endCode).as("endCode").first((path, value) -> path.equalsIgnoreCase(value));
+        bindings.including(root.lga, root.type, root.endCode);
     }
 }

@@ -3,6 +3,7 @@ package com.app.IVAS.service;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.api_response.LoginResponse;
 import com.app.IVAS.dto.*;
+import com.app.IVAS.entity.userManagement.Area;
 import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
@@ -37,7 +38,7 @@ public interface UserManagementService {
 
     List<Lga> getLGAs();
 
-//    List<Area> getAreas(Long id);
+    List<Area> getAreas(Long id);
 
     void resetPassword(PasswordDto dto) throws Exception;
 

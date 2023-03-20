@@ -4,10 +4,7 @@ import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.api_response.LoginResponse;
 import com.app.IVAS.dto.*;
-import com.app.IVAS.entity.userManagement.Lga;
-import com.app.IVAS.entity.userManagement.Permission;
-import com.app.IVAS.entity.userManagement.PortalUser;
-import com.app.IVAS.entity.userManagement.Role;
+import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.security.PasswordService;
@@ -172,11 +169,11 @@ public class UserManagementServiceImpl implements UserManagementService {
         return lgaRepository.findAll();
     }
 
-//    @Override
-//    public List<Area> getAreas(Long id) {
-//        JPAQuery<>
-//        return areaRepository.findByLgaId(id);
-//    }
+    @Override
+    public List<Area> getAreas(Long id) {
+        Lga lga = lgaRepository.findById(id).get();
+        return areaRepository.findByLga(lga);
+    }
 
     @Override
     public void resetPassword(PasswordDto dto) throws Exception {

@@ -6,7 +6,6 @@ import com.app.IVAS.dto.PlateNumberDto;
 import com.app.IVAS.dto.PlateNumberPojo;
 import com.app.IVAS.dto.StockPojo;
 import com.app.IVAS.entity.PlateNumber;
-import com.app.IVAS.entity.PlateNumberType;
 import com.app.IVAS.entity.QStock;
 import com.app.IVAS.entity.Stock;
 import com.app.IVAS.entity.userManagement.Lga;
