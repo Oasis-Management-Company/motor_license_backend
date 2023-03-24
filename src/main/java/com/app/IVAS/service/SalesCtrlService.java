@@ -34,4 +34,6 @@ public interface SalesCtrlService {
     List<VehicleDto> searchAllVehicles(List<Vehicle> results);
 
     SalesDto AddVehicle(SalesDto sales);
+
+    List<ServiceType> getServiceTypeByCategory(Long categoryId);
 }

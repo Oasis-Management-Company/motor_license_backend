@@ -172,4 +172,9 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.AddVehicle(sales));
     }
 
+    @PostMapping("/get/serviceType")
+    public ResponseEntity<List<ServiceType>> getServiceTypeByCategory(@RequestParam Long categoryId){
+        return ResponseEntity.ok(service.getServiceTypeByCategory(categoryId));
+    }
+
 }

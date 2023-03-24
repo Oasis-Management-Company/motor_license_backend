@@ -130,6 +130,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setAmount(sales.getInvoice().getAmount());
             dto.setStatus(sales.getInvoice().getPaymentStatus());
             dto.setApprovalStatus(sales.getApprovalStatus());
+            dto.setCategoryId(sales.getVehicle().getVehicleCategory().getId());
             return dto;
 
         }).collect(Collectors.toList());
@@ -329,5 +330,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         return sales;
 
+    }
+
+    @Override
+    public List<ServiceType> getServiceTypeByCategory(Long categoryId) {
+        VehicleCategory vehicleCategory = vehicleCategoryRepository.findById(categoryId).get();
+        List<ServiceType> types = serviceTypeRepository.findAllByCategory(vehicleCategory);
+        return types;
     }
 }
