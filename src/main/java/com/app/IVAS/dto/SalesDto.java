@@ -1,5 +1,6 @@
 package com.app.IVAS.dto;
 
+import com.app.IVAS.Enum.ApprovalStatus;
 import com.app.IVAS.Enum.PaymentStatus;
 import lombok.Data;
 
@@ -41,5 +42,6 @@ public class SalesDto {
     private LocalDateTime date;
     private Double amount;
     private PaymentStatus status;
+    private ApprovalStatus approvalStatus;
 
 }
