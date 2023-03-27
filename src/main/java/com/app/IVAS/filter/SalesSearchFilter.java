@@ -1,5 +1,6 @@
 package com.app.IVAS.filter;
 
+import com.app.IVAS.Enum.ApprovalStatus;
 import com.app.IVAS.dto.filters.BaseSearchDto;
 import com.app.IVAS.entity.QSales;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class SalesSearchFilter extends BaseSearchDto implements QuerydslBinderCu
 
     private String after;
     private String before;
+    private ApprovalStatus approvalStatus;
 
 
     @Override

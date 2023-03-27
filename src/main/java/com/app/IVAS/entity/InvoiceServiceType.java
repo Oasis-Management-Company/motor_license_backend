@@ -3,8 +3,11 @@ package com.app.IVAS.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,4 +26,7 @@ public class InvoiceServiceType {
 
     @ManyToOne
     private ServiceType serviceType;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime PaymentDate;
 }
