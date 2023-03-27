@@ -8,6 +8,7 @@ public class PlateNumberRequestPojo {
     private  Long id;
     private String trackingId;
     private String createdAt;
+    private String createdBy;
     private String plateNumberType;
     private String PlateNumberSubType;
     private String NumberOfPlates;

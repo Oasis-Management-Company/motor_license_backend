@@ -23,26 +23,33 @@ public class PlateNumber extends StatusEntity {
     @Enumerated(EnumType.STRING)
     private PlateNumberStatus plateNumberStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "TYPE_ID", referencedColumnName = "id")
     private PlateNumberType type;
 
     @JsonIgnore
     @JoinColumn(name = "AGENT_ID", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private PortalUser agent;
 
-    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "SUB_TYPE_ID", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private PlateNumberSubType subType;
 
     @JsonIgnore
     @JoinColumn(name = "OWNER_ID", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private PortalUser owner;
 
     @JsonIgnore
     @JoinColumn(name = "STOCK_ID", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Stock stock;
+
+    @JsonIgnore
+    @JoinColumn(name = "REQUEST_ID", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private PlateNumberRequest request;
 }

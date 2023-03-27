@@ -28,7 +28,9 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -99,9 +101,8 @@ public class PlateNumberController {
 //    }
 
     @PostMapping("/upload-stock")
-    public ResponseEntity<?> uploadStock(@RequestBody PlateNumberDto dto){
-       String response = plateNumberService.createStock(dto);
-       return ResponseEntity.ok(response);
+    public ResponseEntity<Map<String,Object>> uploadStock(@RequestBody PlateNumberDto dto){ ;
+       return ResponseEntity.ok(plateNumberService.createStock(dto));
     }
 
     @GetMapping("/get-plate-number-type")
@@ -113,5 +114,15 @@ public class PlateNumberController {
     public List<PlateNumberSubType> getPlateNumberSub(@RequestParam Long id){
         PlateNumberType type = plateNumberTypeRepository.findById(id).get();
         return plateNumberSubTypeRepository.findByType(type);
+    }
+
+    @PostMapping("/assign-plate-number")
+    @Transactional
+    public ResponseEntity<?> assignPlateNumber(@RequestParam List<Long> plateNumbers,
+                                               @RequestParam Long mlaId,
+                                               @RequestParam Long requestId){
+
+        plateNumberService.assignPlateNumbers(plateNumbers, mlaId, requestId);
+        return ResponseEntity.ok("");
     }
 }

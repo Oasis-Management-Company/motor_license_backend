@@ -11,10 +11,7 @@ import com.app.IVAS.dto.UserDto;
 import com.app.IVAS.dto.filters.PortalUserSearchFilter;
 import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.entity.userManagement.QPortalUser;
-import com.app.IVAS.repository.PortalUserRepository;
-import com.app.IVAS.repository.RoleRepository;
-import com.app.IVAS.repository.ZonalOfficeRepository;
-import com.app.IVAS.repository.ZoneRepository;
+import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.UserManagementService;
@@ -49,6 +46,7 @@ public class UserController {
     private final PortalUserRepository portalUserRepository;
     private final ZoneRepository zoneRepository;
     private final ZonalOfficeRepository zonalOfficeRepository;
+    private final PermissionRepository permissionRepository;
 
 
     @GetMapping("/search")
@@ -108,6 +106,11 @@ public class UserController {
     @GetMapping("/roles")
     public List<String> getRoles(){
         return userManagementService.getRoles();
+    }
+
+    @GetMapping("/permissions")
+    public List<Permission> getPermissions(@RequestParam String roleName){
+        return permissionRepository.findAllByRole(roleRepository.findByNameIgnoreCase(roleName).get());
     }
 
     @GetMapping("/lga")

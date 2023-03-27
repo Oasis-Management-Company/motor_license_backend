@@ -1,14 +1,13 @@
 package com.app.IVAS.serviceImpl;
+import com.app.IVAS.dto.*;
+import com.app.IVAS.entity.PlateNumberRequest;
+import com.app.IVAS.entity.VehicleCategory;
+import com.app.IVAS.entity.userManagement.PortalUser;
 
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.WorkFlowApprovalStatus;
 import com.app.IVAS.Enum.WorkFlowType;
-import com.app.IVAS.dto.PlateNumberRequestDto;
-import com.app.IVAS.dto.PlateNumberRequestPojo;
-import com.app.IVAS.entity.PlateNumberRequest;
-import com.app.IVAS.entity.PlateNumberType;
-import com.app.IVAS.entity.PreferredPlate;
-import com.app.IVAS.entity.WorkFlow;
+import com.app.IVAS.entity.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.RequestService;
@@ -34,6 +33,10 @@ public class RequestServiceImpl implements RequestService {
     private final WorkFlowStageRepository workFlowStageRepository;
     private final PlateNumberRequestRepository plateNumberRequestRepository;
     private final PreferredPlateRepository preferredPlateRepository;
+    private final PortalUserRepository portalUserRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
+    private final VehicleCategoryRepository vehicleCategoryRepository;
+    private final WorkFlowLogRepository workFlowLogRepository;
 
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
@@ -44,6 +47,7 @@ public class RequestServiceImpl implements RequestService {
             pojo.setId(request.getId());
             pojo.setTrackingId(request.getTrackingId());
             pojo.setCreatedAt(request.getCreatedAt().format(df));
+            pojo.setCreatedBy(request.getCreatedBy().getDisplayName());
             pojo.setPlateNumberType(request.getPlateNumberType().getName());
             pojo.setPlateNumberSubType(request.getSubType() != null ? request.getSubType().getName() : null);
             pojo.setNumberOfPlates(request.getTotalNumberRequested().toString());
@@ -55,13 +59,33 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    public List<ServiceTypePojo> getServiceTYpe(List<ServiceType> serviceTypes) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+        return serviceTypes.stream().map(serviceType -> {
+            ServiceTypePojo pojo = new ServiceTypePojo();
+            pojo.setName(serviceType.getName());
+            pojo.setPrice(serviceType.getPrice());
+            pojo.setDurationInMonth(serviceType.getDurationInMonth());
+            pojo.setCategoryName(serviceType.getCategory().getName());
+            pojo.setCreatedAt(serviceType.getCreatedAt().format(df));
+            pojo.setCreatedBy(serviceType.getCreatedBy().getDisplayName());
+            return pojo;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorkFLowStagePojo> getWorkFlowStage(List<WorkFlowStage> workFlowStages) {
+        return null;
+    }
+
+    @Override
     @Transactional
     public void CreatePlateNumberRequest(PlateNumberRequestDto dto) {
         DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("ddMMyyHHmmss");
         String trackingId = "PNR-" + LocalDateTime.now().format(formatter2);
 
         WorkFlow workFlow = new WorkFlow();
-        workFlow.setStage(workFlowStageRepository.findByTypeAndStep(WorkFlowType.PLATE_NUMBER_REQUEST, 1L));
+        workFlow.setStage(workFlowStageRepository.findByTypeAndStep(WorkFlowType.PLATE_NUMBER_REQUEST, 1L).get());
         workFlow.setType(WorkFlowType.PLATE_NUMBER_REQUEST);
         workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.PENDING);
         workFlow.setStatus(GenericStatusConstant.ACTIVE);
@@ -91,5 +115,60 @@ public class RequestServiceImpl implements RequestService {
             });
         }
 
+    }
+
+    @Override
+    public void CreateWorkFlowStage(WorkFlowStageDto dto) {
+        WorkFlowStage stage = workFlowStageRepository.findByTypeAndStep(dto.getType(), dto.getStep()).orElseGet(() ->{
+            WorkFlowStage newStage = new WorkFlowStage();
+            newStage.setStep(dto.getStep());
+            newStage.setApprovingOfficer(portalUserRepository.findById(dto.getApprovingOfficer()).get());
+            newStage.setType(WorkFlowType.PLATE_NUMBER_REQUEST);
+            newStage.setIsFinalStage(dto.getIsFinalStage());
+            newStage.setIsSuperApprover(dto.getIsSuperApprover());
+            newStage.setStatus(GenericStatusConstant.ACTIVE);
+            newStage.setCreatedBy(jwtService.user);
+            return workFlowStageRepository.save(newStage);
+        });
+    }
+
+    @Override
+    public void CreateServiceType(ServiceTypeDto dto) {
+        ServiceType serviceType = serviceTypeRepository.findByName(dto.getName()).orElseGet(() -> {
+            ServiceType type = new ServiceType();
+            type.setName(dto.getName());
+            type.setPrice(dto.getPrice());
+            type.setDurationInMonth(dto.getDurationInMonth());
+            type.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
+            type.setStatus(GenericStatusConstant.ACTIVE);
+            type.setCreatedBy(jwtService.user);
+            return serviceTypeRepository.save(type);
+        });
+    }
+
+    @Override
+    public void UpdatePlateNumberRequest(Long requestId, String action) {
+        PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
+
+        WorkFLowLog log = new WorkFLowLog();
+        log.setAction(action);
+        log.setCreatedBy(jwtService.user);
+        log.setRequest(request);
+        workFlowLogRepository.save(log);
+
+        WorkFlow workFlow = request.getWorkFlow();
+        if ((!workFlow.getStage().getIsFinalStage() || !workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")){
+            workFlow.setStage(workFlowStageRepository.findByTypeAndStep(workFlow.getType(), workFlow.getStage().getStep() + 1).get());
+        } else if (action.equalsIgnoreCase("DISAPPROVED")) {
+            workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
+            workFlow.setFinalApprover(jwtService.user);
+
+        } else if ((workFlow.getStage().getIsFinalStage() || workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")){
+            workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
+            workFlow.setFinalApprover(jwtService.user);
+        }
+
+        workFlow.setLastUpdatedBy(jwtService.user);
+        workFlowRepository.save(workFlow);
     }
 }
