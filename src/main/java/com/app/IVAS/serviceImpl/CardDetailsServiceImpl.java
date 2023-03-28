@@ -38,28 +38,80 @@ public class CardDetailsServiceImpl implements CardDetailsService {
 
             /** Individual Details **/
 
-            cardDetailsDto.setImage(portalUser.getImage());
-            cardDetailsDto.setLga(lgaRepository.findById(portalUser.getLga().getId()).get().getName());
-            cardDetailsDto.setArea(areaRepository.findById(portalUser.getArea().getId()).get().getName());
-            cardDetailsDto.setFirstName(portalUser.getFirstName());
-            cardDetailsDto.setLastName(portalUser.getLastName());
-            cardDetailsDto.setAsin(portalUser.getAsin());
-            cardDetailsDto.setEmail(portalUser.getEmail());
-            cardDetailsDto.setPhoneNumber(portalUser.getPhoneNumber());
+            if(portalUser.getImage() != null){
+                cardDetailsDto.setImage(portalUser.getImage());
+            }
 
+            if(portalUser.getLga() != null) {
+                cardDetailsDto.setLga(lgaRepository.findById(portalUser.getLga().getId()).get().getName());
+            }
+
+            if(portalUser.getArea() != null) {
+                cardDetailsDto.setArea(areaRepository.findById(portalUser.getArea().getId()).get().getName());
+            }
+
+            if(portalUser.getFirstName()!= null) {
+                cardDetailsDto.setFirstName(portalUser.getFirstName());
+            }
+
+            if(portalUser.getLastName() != null) {
+                cardDetailsDto.setLastName(portalUser.getLastName());
+            }
+
+            if(portalUser.getAsin() != null) {
+                cardDetailsDto.setAsin(portalUser.getAsin());
+            }
+
+            if(portalUser.getEmail() != null) {
+                cardDetailsDto.setEmail(portalUser.getEmail());
+            }
+
+            if(portalUser.getPhoneNumber() != null) {
+                cardDetailsDto.setPhoneNumber(portalUser.getPhoneNumber());
+            }
 
             /**   Vehicle Details **/
 
-            cardDetailsDto.setChasisNumber(vehicle.getChasisNumber());
-            cardDetailsDto.setEngineNumber(vehicle.getEngineNumber());
-            cardDetailsDto.setPlateNumber(vehicle.getPlateNumber().getPlateNumber());
-            cardDetailsDto.setVehicleModel(vehicle.getVehicleModel().getName());
-            cardDetailsDto.setVehicleCategory(vehicle.getVehicleCategory().getName());
-            cardDetailsDto.setPolicySector(vehicle.getPolicySector());
-            cardDetailsDto.setPassengers(vehicle.getPassengers());
-            cardDetailsDto.setColor(vehicle.getColor());
-            cardDetailsDto.setVehicleYear(vehicle.getVehicleModel().getYear());
-            cardDetailsDto.setWeight(vehicle.getVehicleCategory().getWeight());
+
+            if(vehicle.getChasisNumber() != null) {
+                cardDetailsDto.setChasisNumber(vehicle.getChasisNumber());
+            }
+
+            if(vehicle.getEngineNumber() != null) {
+                cardDetailsDto.setEngineNumber(vehicle.getEngineNumber());
+            }
+
+            if(vehicle.getPlateNumber() != null) {
+                cardDetailsDto.setPlateNumber(vehicle.getPlateNumber().getPlateNumber());
+            }
+
+            if(vehicle.getVehicleModel() != null) {
+                cardDetailsDto.setVehicleModel(vehicle.getVehicleModel().getName());
+            }
+
+            if(vehicle.getVehicleCategory() != null) {
+                cardDetailsDto.setVehicleCategory(vehicle.getVehicleCategory().getName());
+            }
+
+            if(vehicle.getPolicySector() != null) {
+                cardDetailsDto.setPolicySector(vehicle.getPolicySector());
+            }
+
+            if(vehicle.getPassengers() != null) {
+                cardDetailsDto.setPassengers(vehicle.getPassengers());
+            }
+
+            if(vehicle.getColor() != null) {
+                cardDetailsDto.setColor(vehicle.getColor());
+            }
+
+            if(vehicle.getVehicleModel().getYear() != null) {
+                cardDetailsDto.setVehicleYear(vehicle.getVehicleModel().getYear());
+            }
+
+            if(vehicle.getVehicleCategory().getWeight() != null) {
+                cardDetailsDto.setWeight(vehicle.getVehicleCategory().getWeight());
+            }
 
         }else {
             return null;
