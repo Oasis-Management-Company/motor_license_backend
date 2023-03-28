@@ -1,7 +1,5 @@
 package com.app.IVAS.entity;
 
-
-import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,15 +10,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "SERVICE_TYPE")
-public class ServiceType extends StatusEntity {
+@Table(name = "OTHER_SERVICE_TYPE")
+public class OtherServiceType {
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "ID")
+    private Long id;
+
     private String name;
     private Double price;
 
     @ManyToOne
     private VehicleCategory category;
-
-    @ManyToOne
-    @JoinColumn(name = "plate_number_type_id", referencedColumnName = "ID")
-    private PlateNumberType plateNumberType;
 }
