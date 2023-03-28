@@ -1,11 +1,12 @@
 package com.app.IVAS.controller;
 
 import com.app.IVAS.Utils.PredicateExtractor;
-import com.app.IVAS.dto.PlateNumberRequestDto;
-import com.app.IVAS.dto.PlateNumberRequestPojo;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.dto.filters.PlateNumberRequestSearchFilter;
-import com.app.IVAS.entity.PlateNumberRequest;
+import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QPlateNumberRequest;
+import com.app.IVAS.entity.QServiceType;
+import com.app.IVAS.entity.QWorkFlowStage;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.RequestService;
 import com.querydsl.core.QueryResults;
@@ -62,7 +63,72 @@ public class RequestController {
         return ResponseEntity.ok("Plate Number Request was created successfully");
     }
 
-//    @PostMapping("/update/plate-number-request")
-//    @Transactional
-//    public
+    @PostMapping("/create-work-flow")
+    @Transactional
+    public ResponseEntity<?> createWorkFlowStages(@RequestBody WorkFlowStageDto dto){
+        requestService.CreateWorkFlowStage(dto);
+        return ResponseEntity.ok("created successfully");
+    }
+
+    @PostMapping("/create-service")
+    @Transactional
+    public ResponseEntity<?> createServiceType(@RequestBody ServiceTypeDto dto){
+       requestService.CreateServiceType(dto);
+       return ResponseEntity.ok("");
+    }
+
+    @PostMapping("/update/plate-number-request")
+    @Transactional
+    public ResponseEntity<?> UpdatePlateNumberRequest(@RequestParam Long requestId,
+                                                      @RequestParam String action){
+        requestService.UpdatePlateNumberRequest(requestId, action);
+        return ResponseEntity.ok("");
+    }
+
+    @GetMapping("/search/service-type")
+    @Transactional
+    public QueryResults<ServiceTypePojo> searchServiceType(PlateNumberRequestSearchFilter filter){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        JPAQuery<ServiceType> serviceTypeJPAQuery = appRepository.startJPAQuery(QServiceType.serviceType)
+                .where(predicateExtractor.getPredicate(filter))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        if (filter.getCreatedAfter() != null){
+            serviceTypeJPAQuery.where(QServiceType.serviceType.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+        }
+
+        if (filter.getCreatedBefore() != null){
+            serviceTypeJPAQuery.where(QServiceType.serviceType.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QServiceType.serviceType);
+        QueryResults<ServiceType> serviceTypeQueryResults = serviceTypeJPAQuery.select(QServiceType.serviceType).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(requestService.getServiceTYpe(serviceTypeQueryResults.getResults()), serviceTypeQueryResults.getLimit(), serviceTypeQueryResults.getOffset(), serviceTypeQueryResults.getTotal());
+    }
+
+    @GetMapping("/search/work-flow-stage")
+    @Transactional
+    public QueryResults<WorkFLowStagePojo> searchWorkFlowStage(PlateNumberRequestSearchFilter filter){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        JPAQuery<WorkFlowStage> workFlowStageJPAQuery = appRepository.startJPAQuery(QWorkFlowStage.workFlowStage)
+                .where(predicateExtractor.getPredicate(filter))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        if (filter.getCreatedAfter() != null){
+            workFlowStageJPAQuery.where(QWorkFlowStage.workFlowStage.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+        }
+
+        if (filter.getCreatedBefore() != null){
+            workFlowStageJPAQuery.where(QWorkFlowStage.workFlowStage.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QWorkFlowStage.workFlowStage);
+        QueryResults<WorkFlowStage> workFlowStageQueryResults = workFlowStageJPAQuery.select(QWorkFlowStage.workFlowStage).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(requestService.getWorkFlowStage(workFlowStageQueryResults.getResults()), workFlowStageQueryResults.getLimit(), workFlowStageQueryResults.getOffset(), workFlowStageQueryResults.getTotal());
+    }
+
 }

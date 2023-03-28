@@ -1,6 +1,7 @@
 package com.app.IVAS.service;
 
 import com.app.IVAS.dto.AsinDto;
+import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.entity.*;
@@ -36,4 +37,6 @@ public interface SalesCtrlService {
     SalesDto AddVehicle(SalesDto sales);
 
     List<ServiceType> getServiceTypeByCategory(Long categoryId);
+
+    InvoiceDto VehicleInvoice(Long id);
 }

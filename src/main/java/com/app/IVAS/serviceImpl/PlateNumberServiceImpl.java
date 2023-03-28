@@ -6,19 +6,26 @@ import com.app.IVAS.dto.PlateNumberDto;
 import com.app.IVAS.dto.PlateNumberPojo;
 import com.app.IVAS.dto.StockPojo;
 import com.app.IVAS.entity.PlateNumber;
+import com.app.IVAS.entity.PlateNumberRequest;
 import com.app.IVAS.entity.QStock;
 import com.app.IVAS.entity.Stock;
 import com.app.IVAS.entity.userManagement.Lga;
+import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
+import com.app.IVAS.response.JsonResponse;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.PlateNumberService;
+import com.google.inject.internal.ErrorsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,9 +40,12 @@ public class PlateNumberServiceImpl implements PlateNumberService {
     private final PlateNumberRepository plateNumberRepository;
     private final PlateNumberTypeRepository plateNumberTypeRepository;
     private final PlateNumberSubTypeRepository plateNumberSubTypeRepository;
+    private final PortalUserRepository portalUserRepository;
+    private final PlateNumberRequestRepository plateNumberRequestRepository;
 
     @Override
-    public String createStock(PlateNumberDto dto) {
+    public Map<String,Object> createStock(PlateNumberDto dto) {
+        Map<String,Object> body = new HashMap<>();
         Lga lga = lgaRepository.findById(dto.getLgaId()).orElseThrow(RuntimeException::new);
 
        List<Stock> findStock = appRepository.startJPAQuery(QStock.stock)
@@ -55,15 +65,17 @@ public class PlateNumberServiceImpl implements PlateNumberService {
            }
            stock.setStartRange(dto.getFirstNumber());
            stock.setEndRange(dto.getLastNumber());
-           stock.setQuantity(dto.getLastNumber() - dto.getFirstNumber());
+           stock.setQuantity(dto.getLastNumber() - dto.getFirstNumber() + 1);
            stock.setCreatedBy(jwtService.user);
            generatePlateNumbers(stockRepository.save(stock));
 
-           return "Stock created successfully";
+
+           body.put("Message", "Stock created successfully");
 
        } else {
-           return "Stock already exists";
+           body.put("Error", "Stock already exists");
        }
+        return body;
     }
 
     @Override
@@ -98,10 +110,24 @@ public class PlateNumberServiceImpl implements PlateNumberService {
             pojo.setDateCreated(stock.getCreatedAt().format(df));
             pojo.setQuantity(String.valueOf(stock.getQuantity()));
             pojo.setCreatedBy(stock.getCreatedBy().getDisplayName());
-            pojo.setInitialQuantity(String.valueOf(stock.getEndRange() - stock.getStartRange()));
+            pojo.setInitialQuantity(String.valueOf(stock.getEndRange() - stock.getStartRange() + 1));
             return pojo;
 
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void assignPlateNumbers(List<Long> plateNumbers, Long mlaId, Long requestId) {
+        PortalUser mla = portalUserRepository.findById(mlaId).get();
+        PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
+        for (Long id:plateNumbers){
+            PlateNumber plateNumber = plateNumberRepository.findById(id).get();
+            plateNumber.setAgent(mla);
+            plateNumber.setRequest(request);
+            plateNumber.setPlateNumberStatus(PlateNumberStatus.ASSIGNED);
+            plateNumber.setLastUpdatedBy(jwtService.user);
+            plateNumberRepository.save(plateNumber);
+        }
     }
 
 

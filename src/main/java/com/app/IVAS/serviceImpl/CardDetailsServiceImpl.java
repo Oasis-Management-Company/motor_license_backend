@@ -2,7 +2,6 @@ package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.dto.CardDetailsDto;
 import com.app.IVAS.entity.Invoice;
-import com.app.IVAS.entity.UserDemographicIndividual;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.AreaRepository;
 import com.app.IVAS.repository.InvoiceRepository;
@@ -53,16 +52,13 @@ public class CardDetailsServiceImpl implements CardDetailsService {
 
 
 
-
-
-
-
         }else {
             return null;
         }
 
 
 
-
+    return null;
     }
+
 }

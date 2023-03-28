@@ -3,10 +3,7 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.ApprovalStatus;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.PlateNumberStatus;
-import com.app.IVAS.dto.AsinDto;
-import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.UserDto;
-import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
@@ -337,5 +334,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleCategory vehicleCategory = vehicleCategoryRepository.findById(categoryId).get();
         List<ServiceType> types = serviceTypeRepository.findAllByCategory(vehicleCategory);
         return types;
+    }
+
+    @Override
+    public InvoiceDto VehicleInvoice(Long id) {
+        return null;
     }
 }
