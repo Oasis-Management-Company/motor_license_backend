@@ -19,6 +19,7 @@ public class ServiceType extends StatusEntity {
     private Double price;
     private Long durationInMonth;
 
+    @Enumerated(EnumType.STRING)
     private RegType type;
 
     @ManyToOne
