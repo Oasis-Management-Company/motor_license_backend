@@ -13,6 +13,7 @@ public class UserDto {
     private Long lga;
     private Long area;
     private String nin;
+    private String asin;
     private String password;
     private String role;
     private Long zonalOffice;

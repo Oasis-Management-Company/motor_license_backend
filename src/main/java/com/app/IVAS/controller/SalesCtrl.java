@@ -186,7 +186,7 @@ public class SalesCtrl {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<PortalUser> createUser(@RequestBody @Valid UserDto dto) {
+    public ResponseEntity<PortalUser> createNewUser(@RequestBody @Valid UserDto dto) {
         return ResponseEntity.ok(service.createUser(dto));
     }
 }
