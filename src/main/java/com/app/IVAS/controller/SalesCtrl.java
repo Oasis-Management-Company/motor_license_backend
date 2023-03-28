@@ -3,11 +3,15 @@ package com.app.IVAS.controller;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.AsinDto;
+import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.filters.PortalUserSearchFilter;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.QVehicle;
+import com.app.IVAS.entity.userManagement.PortalUser;
+import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.filter.SalesSearchFilter;
 import com.app.IVAS.filter.VehicleSerachFilter;
 import com.app.IVAS.repository.app.AppRepository;
@@ -168,6 +172,7 @@ public class SalesCtrl {
         return new QueryResults<>(service.searchAllVehicles(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
     }
 
+
     @PostMapping("/add/vehicle")
     public ResponseEntity<SalesDto> AddVehicle(@RequestBody SalesDto sales){
         return ResponseEntity.ok(service.AddVehicle(sales));
@@ -177,5 +182,11 @@ public class SalesCtrl {
     public ResponseEntity<List<ServiceType>> getServiceTypeByCategory(@RequestParam Long categoryId){
         return ResponseEntity.ok(service.getServiceTypeByCategory(categoryId));
     }
+
+    @GetMapping("/vehicle/invoice/{id}")
+    public ResponseEntity<InvoiceDto> VehicleInvoice(@RequestParam Long id){
+        return ResponseEntity.ok(service.VehicleInvoice(id));
+    }
+
 
 }

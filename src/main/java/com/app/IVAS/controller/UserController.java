@@ -72,7 +72,7 @@ public class UserController {
         QueryResults<PortalUser> portalUserQueryResults = portalUserJPAQuery.select(QPortalUser.portalUser).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(userManagementService.get(portalUserQueryResults.getResults()), portalUserQueryResults.getLimit(), portalUserQueryResults.getOffset(), portalUserQueryResults.getTotal());
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequestDto dto) throws Exception {
         LoginResponse response = userManagementService.authenticateUser(dto);
@@ -166,5 +166,30 @@ public class UserController {
         Zone zone = zoneRepository.findById(id).get();
         return  zonalOfficeRepository.findByZone(zone);
     }
+
+    @GetMapping("/search/others")
+    @Transactional
+    public QueryResults<PortalUserPojo> searchOtherUsers(PortalUserSearchFilter filter){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        JPAQuery<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QPortalUser.portalUser.role.name.equalsIgnoreCase("GENERAL_USER"))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        if (filter.getCreatedAfter() != null){
+            portalUserJPAQuery.where(QPortalUser.portalUser.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+        }
+
+        if (filter.getCreatedBefore() != null){
+            portalUserJPAQuery.where(QPortalUser.portalUser.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QPortalUser.portalUser);
+        QueryResults<PortalUser> portalUserQueryResults = portalUserJPAQuery.select(QPortalUser.portalUser).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(userManagementService.searchOtherUsers(portalUserQueryResults.getResults()), portalUserQueryResults.getLimit(), portalUserQueryResults.getOffset(), portalUserQueryResults.getTotal());
+    }
+
 
 }

@@ -257,4 +257,23 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     }
 
+
+    @Override
+    public List<PortalUserPojo> searchOtherUsers(List<PortalUser> users) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+        return users.stream().map(user -> {
+
+            PortalUserPojo pojo = new PortalUserPojo();
+            pojo.setName(user.getDisplayName());
+            pojo.setEmail(user.getEmail());
+            pojo.setDateCreated(user.getCreatedAt().format(df));
+            pojo.setRole(user.getRole());
+            pojo.setStatus(user.getStatus());
+            pojo.setId(user.getId());
+            pojo.setPhoneNumber(user.getPhoneNumber());
+
+            return pojo;
+        }).collect(Collectors.toList());
+    }
+
 }

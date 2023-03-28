@@ -31,4 +31,9 @@ public class Invoice extends StatusEntity {
 
     private Double amount;
     private LocalDateTime paymentDate;
+
+    @JsonIgnore
+    @JoinColumn(name = "VEHICLE_ID", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Vehicle vehicle;
 }

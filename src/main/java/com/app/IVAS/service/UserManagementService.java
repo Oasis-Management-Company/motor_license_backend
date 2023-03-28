@@ -45,4 +45,6 @@ public interface UserManagementService {
     PortalUserPojo UpdateUser(Long id,UserDto user, PortalUser updatedBy);
 
     void resetPasswordMobile(PasswordDto dto) throws Exception;
+
+    List<PortalUserPojo>  searchOtherUsers(List<PortalUser> results);
 }
