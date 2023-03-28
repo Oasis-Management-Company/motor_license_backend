@@ -1,6 +1,7 @@
 package com.app.IVAS.entity;
 
 
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,13 +19,14 @@ public class ServiceType extends StatusEntity {
     private Double price;
     private Long durationInMonth;
 
+    private RegType type;
+
     @ManyToOne
+    @JoinColumn(name = "vehicle_category_id", referencedColumnName = "ID")
     private VehicleCategory category;
 
-<<<<<<< HEAD
     @ManyToOne
     @JoinColumn(name = "plate_number_type_id", referencedColumnName = "ID")
     private PlateNumberType plateNumberType;
-=======
->>>>>>> ce3f2697037dcac6c65b86cce5ea5602e25c2c80
+
 }
