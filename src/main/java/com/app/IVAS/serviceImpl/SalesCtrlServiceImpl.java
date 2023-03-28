@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.sound.sampled.Port;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -339,5 +340,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Override
     public InvoiceDto VehicleInvoice(Long id) {
         return null;
+    }
+
+    @Override
+    public PortalUser createUser(UserDto dto) {
+        Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
+        PortalUser user = userManagementService.createUser(dto, jwtService.user, role);
+        return user;
     }
 }

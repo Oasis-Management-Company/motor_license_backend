@@ -1,10 +1,8 @@
 package com.app.IVAS.service;
 
-import com.app.IVAS.dto.AsinDto;
-import com.app.IVAS.dto.InvoiceDto;
-import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.userManagement.PortalUser;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,4 +37,6 @@ public interface SalesCtrlService {
     List<ServiceType> getServiceTypeByCategory(Long categoryId);
 
     InvoiceDto VehicleInvoice(Long id);
+
+    PortalUser createUser(UserDto dto);
 }

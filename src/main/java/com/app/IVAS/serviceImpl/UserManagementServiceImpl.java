@@ -36,7 +36,6 @@ public class UserManagementServiceImpl implements UserManagementService {
     @Override
     @Transactional
     public PortalUser createUser(UserDto user, PortalUser createdBy, Role role) {
-        System.out.println(user);
         PortalUser portalUser = new PortalUser();
         portalUser.setCreatedAt(LocalDateTime.now());
         portalUser.setEmail(user.getEmail());
