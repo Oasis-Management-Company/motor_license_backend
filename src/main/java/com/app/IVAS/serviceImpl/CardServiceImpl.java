@@ -196,6 +196,7 @@ public class CardServiceImpl implements CardService {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return cards.stream().map(card -> {
             CardDto dto = new CardDto();
+            dto.setId(card.getId());
             dto.setOwner(card.getVehicle().getPortalUser().getDisplayName());
             dto.setType(card.getCardType());
             dto.setStatusConstant(card.getCardStatus());
@@ -205,7 +206,7 @@ public class CardServiceImpl implements CardService {
             dto.setZonalOffice(card.getCreatedBy().getOffice().getName());
             dto.setExpiryDate(card.getExpiryDate().format(df));
             dto.setCreatedBy(card.getCreatedBy().getDisplayName());
-            dto.setInvoiceNumber(card.getInvoice().getInvoiceNumber());
+            dto.setPlateNumber(card.getVehicle().getPlateNumber().getPlateNumber());
 
             return dto;
         }).collect(Collectors.toList());

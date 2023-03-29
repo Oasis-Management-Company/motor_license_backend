@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class CardDto {
+    private Long id;
     private String owner;
     private CardTypeConstant type;
     private CardStatusConstant statusConstant;
@@ -13,5 +14,5 @@ public class CardDto {
     private String zonalOffice;
     private String expiryDate;
     private String createdBy;
-    private String invoiceNumber;
+    private String plateNumber;
 }
