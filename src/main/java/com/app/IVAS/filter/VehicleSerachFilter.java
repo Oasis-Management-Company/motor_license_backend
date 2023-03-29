@@ -1,7 +1,6 @@
 package com.app.IVAS.filter;
 
 import com.app.IVAS.dto.filters.BaseSearchDto;
-import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.QVehicle;
 import lombok.Data;
 import lombok.NoArgsConstructor;

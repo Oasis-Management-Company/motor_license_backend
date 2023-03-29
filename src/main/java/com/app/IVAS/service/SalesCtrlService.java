@@ -34,9 +34,11 @@ public interface SalesCtrlService {
 
     SalesDto AddVehicle(SalesDto sales);
 
-    List<ServiceType> getServiceTypeByCategory(Long categoryId);
+    List<InvoiceServiceType> getServiceTypeByCategory(Long salesId);
 
     InvoiceDto VehicleInvoice(Long id);
 
     PortalUser createUser(UserDto dto);
+
+    List<InvoiceServiceType> getServiceTypeByInvoiceId(Long invoiceId);
 }
