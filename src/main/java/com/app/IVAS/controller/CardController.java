@@ -19,7 +19,7 @@ public class CardController {
         return ResponseEntity.ok(cardService.getCardDetails(invoiceNumber));
     }
 
-    @PostMapping("/update_by_payment/{invoiceNumber}/{amount}")
+    @PostMapping("/update_cards_by_payment/{invoiceNumber}/{amount}")
     public ResponseEntity<?> updateCardByPayment(@PathVariable String invoiceNumber, @PathVariable Double amount){
 
         return ResponseEntity.ok(cardService.updateCardByPayment(invoiceNumber, amount));

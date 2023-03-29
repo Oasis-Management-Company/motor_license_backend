@@ -5,6 +5,7 @@ import com.app.IVAS.entity.Card;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Vehicle;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CardService {
@@ -13,5 +14,5 @@ public interface CardService {
 
     Card createCard(Invoice invoice, Vehicle vehicle);
 
-    Card updateCardByPayment(String invoiceNumber, Double amount);
+    List<Card> updateCardByPayment(String invoiceNumber, Double amount);
 }
