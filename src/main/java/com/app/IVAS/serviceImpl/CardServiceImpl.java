@@ -13,6 +13,7 @@ import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.CardService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -156,15 +157,15 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<Card> updateCardByPayment(String invoiceNumber, Double amount) {
+    public List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount) {
         Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberIgnoreCase(invoiceNumber);
 
 
         if (invoice.isPresent()) {
             if (amount >= invoice.get().getAmount()) {
                 Optional<List<Card>> cards = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.get().getInvoiceNumber());
-    /*Update cards **/
 
+    /*Update cards **/
                 if (cards.isPresent()) {
                     for (Card card: cards.get()) {
 
