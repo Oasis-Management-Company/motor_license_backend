@@ -1,6 +1,7 @@
 package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.Enum.CardStatusConstant;
+import com.app.IVAS.Enum.CardTypeConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.dto.CardDetailsDto;
 import com.app.IVAS.dto.CardDto;
@@ -12,9 +13,11 @@ import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.CardService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -133,42 +136,52 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card createCard(Invoice invoice, Vehicle vehicle) {
-        Card card = new Card();
+    public Card createCard(@NonNull Invoice invoice, @NonNull Vehicle vehicle) {
+        Card card1 = new Card();
+        Card card2;
 
-        card.setCreatedAt(LocalDateTime.now());
-        card.setLastUpdatedAt(LocalDateTime.now());
+        card1.setLastUpdatedAt(LocalDateTime.now());
+        card1.setCardType(CardTypeConstant.CARD);
         /* to be updated after payment **/
-        card.setStatus(GenericStatusConstant.INACTIVE);
-        card.setCardStatus(CardStatusConstant.NOT_PAID);
+        card1.setStatus(GenericStatusConstant.INACTIVE);
+        card1.setCardStatus(CardStatusConstant.NOT_PAID);
         /* **/
-        card.setCreatedBy(jwtService.user);
-        card.setLastUpdatedBy(jwtService.user);
-        card.setInvoice(invoice);
-        card.setVehicle(vehicle);
+        card1.setCreatedBy(jwtService.user);
+        card1.setLastUpdatedBy(jwtService.user);
+        card1.setInvoice(invoice);
+        card1.setVehicle(vehicle);
 
-        cardRepository.save(card);
+        card2 = card1;
 
-        return card;
+        card2.setCardType(CardTypeConstant.STICKER);
+
+        cardRepository.save(card1);
+        cardRepository.save(card2);
+
+        return card2;
     }
 
     @Override
-    public Card updateCardByPayment(String invoiceNumber, Double amount) {
+    public List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount) {
         Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberIgnoreCase(invoiceNumber);
 
 
         if (invoice.isPresent()) {
             if (amount >= invoice.get().getAmount()) {
-                Optional<Card> card = cardRepository.findByInvoiceInvoiceNumberIgnoreCase(invoice.get().getInvoiceNumber());
-/*Update card **/
-                if (card.isPresent()) {
-                    card.get().setStatus(GenericStatusConstant.ACTIVE);
-                    card.get().setCardStatus(CardStatusConstant.NOT_PRINTED);
-                    card.get().setExpiryDate(LocalDateTime.now().plusYears(1));
+                Optional<List<Card>> cards = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.get().getInvoiceNumber());
 
-                    cardRepository.save(card.get());
+    /*Update cards **/
+                if (cards.isPresent()) {
+                    for (Card card: cards.get()) {
 
-                    return card.get();
+                        card.setStatus(GenericStatusConstant.ACTIVE);
+                        card.setCardStatus(CardStatusConstant.NOT_PRINTED);
+                        card.setExpiryDate(LocalDateTime.now().plusYears(1));
+
+                        cardRepository.save(card);
+                    }
+
+                    return cards.get();
                 }
 
             }
