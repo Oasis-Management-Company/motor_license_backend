@@ -29,4 +29,7 @@ public class InvoiceServiceType {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime PaymentDate;
+
+    private String reference;
+    private String revenuecode;
 }
