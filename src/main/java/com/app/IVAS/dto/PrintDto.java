@@ -1,11 +1,10 @@
-package com.app.AIRS.dto;
+package com.app.IVAS.dto;
 
-
-import com.app.AIRS.Enum.CardType;
+import com.app.IVAS.Enum.CardTypeConstant;
 import lombok.Data;
 
 @Data
 public class PrintDto {
     private Long id;
-    private CardType type;
+    private CardTypeConstant type;
 }

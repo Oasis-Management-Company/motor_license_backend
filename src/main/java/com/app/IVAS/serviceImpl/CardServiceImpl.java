@@ -3,6 +3,8 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.CardStatusConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.dto.CardDetailsDto;
+import com.app.IVAS.dto.CardDto;
+import com.app.IVAS.dto.PrintDto;
 import com.app.IVAS.entity.Card;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Vehicle;
@@ -11,10 +13,14 @@ import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.CardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -170,5 +176,30 @@ public class CardServiceImpl implements CardService {
         }
         return null;
 
+    }
+
+    @Override
+    public List<CardDto> get(List<Card> cards) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+        return cards.stream().map(card -> {
+            CardDto dto = new CardDto();
+            dto.setOwner(card.getVehicle().getPortalUser().getDisplayName());
+            dto.setType(card.getCardType());
+            dto.setStatusConstant(card.getCardStatus());
+            if (card.getCardStatus() != CardStatusConstant.NOT_PAID){
+                dto.setDateActivated(card.getLastUpdatedAt().format(df));
+            }
+            dto.setZonalOffice(card.getCreatedBy().getOffice().getName());
+            dto.setExpiryDate(card.getExpiryDate().format(df));
+            dto.setCreatedBy(card.getCreatedBy().getDisplayName());
+            dto.setInvoiceNumber(card.getInvoice().getInvoiceNumber());
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Resource printCard(List<PrintDto> dtos) throws Exception {
+        return null;
     }
 }
