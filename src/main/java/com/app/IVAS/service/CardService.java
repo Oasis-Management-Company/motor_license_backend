@@ -18,8 +18,6 @@ public interface CardService {
 
     Card createCard(@NonNull Invoice invoice, @NonNull Vehicle vehicle);
 
-    Card updateCardByPayment(String invoiceNumber, Double amount);
-
     List<CardDto> get(List<Card> cards);
 
     Resource printCard(List<PrintDto> dtos) throws Exception;
