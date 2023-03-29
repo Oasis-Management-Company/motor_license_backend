@@ -3,6 +3,7 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.ApprovalStatus;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.PlateNumberStatus;
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -22,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.sound.sampled.Port;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,8 +47,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final PlateNumberRepository plateNumberRepository;
     private final PlateNumberTypeRepository plateNumberTypeRepository;
     private final VehicleCategoryRepository vehicleCategoryRepository;
-    private final LgaRepository lgaRepository;
     private final ServiceTypeRepository serviceTypeRepository;
+    private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
+    private final PortalUserRepository portalUserRepository;
 
 
     @Override
@@ -56,27 +59,40 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         UserDto dto = new UserDto();
         Invoice invoice = new Invoice();
         SalesDto salesDto = new SalesDto();
-
+        List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
+        Double totalAmount = 0.0;
 
 
 //        VehicleMake make = vehicleMakeRepository.findById(sales.getVehicleMake()).get();
-//        PlateNumberType type = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
+        PlateNumberType types = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
+        Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndType(category, types, RegType.REGISTRATION);
+        PortalUser portalUser = null;
 
-        dto.setAddress(sales.getAddress());
-        dto.setEmail(sales.getEmail());
-        dto.setFirstName(sales.getFirstname());
-        dto.setLastName(sales.getLastname());
-        dto.setPhoneNumber(sales.getPhone_number());
-        dto.setPassword("password");
-        dto.setRole("GENERAL_USER");
+        PortalUser user = portalUserRepository.findByPhoneNumber(sales.getPhone_number());
+        if (foundVehicle != null){
+            return null;
+        }
 
-        Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
-        PortalUser portalUser = userManagementService.createUser(dto, jwtService.user, role);
+        if (user == null){
+            dto.setAddress(sales.getAddress());
+            dto.setEmail(sales.getEmail());
+            dto.setFirstName(sales.getFirstname());
+            dto.setLastName(sales.getLastname());
+            dto.setPhoneNumber(sales.getPhone_number());
+            dto.setPassword("password");
+            dto.setRole("GENERAL_USER");
 
-        vehicle.setUser(portalUser);
+            Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
+            portalUser = userManagementService.createUser(dto, jwtService.user, role);
+        }else{
+            portalUser = user;
+        }
+
+        vehicle.setPortalUser(portalUser);
         vehicle.setColor(sales.getColor());
         vehicle.setVehicleModel(model);
         vehicle.setChasisNumber(sales.getChasis());
@@ -86,12 +102,33 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setPlateNumber(number);
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
+        vehicle.setYear(sales.getYear());
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
+
+
+        for (ServiceType type : serviceTypes) {
+            totalAmount += type.getPrice();
+        }
 
         invoice.setPayer(portalUser);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
-        invoice.setInvoiceNumber("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setInvoiceNumber("166-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setAmount(totalAmount);
+        invoice.setVehicle(savedVehicle);
         Invoice savedInvoice = invoiceRepository.save(invoice);
+
+
+        for (ServiceType type : serviceTypes) {
+            InvoiceServiceType serviceType = new InvoiceServiceType();
+            serviceType.setServiceType(type);
+            serviceType.setInvoice(savedInvoice);
+            serviceType.setReference("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+            serviceType.setRevenuecode("2000787-7888900");
+
+            invoiceServiceTypeArrayList.add(serviceType);
+        }
+        invoiceServiceTypeRepository.saveAll(invoiceServiceTypeArrayList);
+
 
         sales1.setVehicle(savedVehicle);
         sales1.setInvoice(savedInvoice);
@@ -101,7 +138,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         number.setPlateNumberStatus(PlateNumberStatus.SOLD);
         plateNumberRepository.save(number);
 
-        Sales savedSales = salesRepository.save(sales1);
+        salesRepository.save(sales1);
 
 
         return sales;
@@ -112,10 +149,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         return results.stream().map(sales -> {
             SalesDto dto = new SalesDto();
-            dto.setFirstname(sales.getVehicle().getUser().getDisplayName());
-            dto.setAddress(sales.getVehicle().getUser().getAddress());
-            dto.setAsin(sales.getVehicle().getUser().getAsin());
-            dto.setEmail(sales.getVehicle().getUser().getEmail());
+            dto.setFirstname(sales.getVehicle().getPortalUser().getDisplayName());
+            dto.setAddress(sales.getVehicle().getPortalUser().getAddress());
+            dto.setAsin(sales.getVehicle().getPortalUser().getAsin());
+            dto.setEmail(sales.getVehicle().getPortalUser().getEmail());
             dto.setChasis(sales.getVehicle().getChasisNumber());
             dto.setEngine(sales.getVehicle().getEngineNumber());
             dto.setColor(sales.getVehicle().getColor());
@@ -230,10 +267,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     public List<SalesDto> searchAllForVIO(List<Sales> results) {
         return results.stream().map(sales -> {
             SalesDto dto = new SalesDto();
-            dto.setFirstname(sales.getVehicle().getUser().getDisplayName());
-            dto.setAddress(sales.getVehicle().getUser().getAddress());
-            dto.setAsin(sales.getVehicle().getUser().getAsin());
-            dto.setEmail(sales.getVehicle().getUser().getEmail());
+            dto.setFirstname(sales.getVehicle().getPortalUser().getDisplayName());
+            dto.setAddress(sales.getVehicle().getPortalUser().getAddress());
+            dto.setAsin(sales.getVehicle().getPortalUser().getAsin());
+            dto.setEmail(sales.getVehicle().getPortalUser().getEmail());
             dto.setChasis(sales.getVehicle().getChasisNumber());
             dto.setEngine(sales.getVehicle().getEngineNumber());
             dto.setColor(sales.getVehicle().getColor());
@@ -302,7 +339,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         PlateNumber plateNumber = plateNumberRepository.save(number);
 
-        vehicle.setUser(portalUser);
+        vehicle.setPortalUser(portalUser);
         vehicle.setColor(sales.getColor());
         vehicle.setVehicleModel(model);
         vehicle.setChasisNumber(sales.getChasis());
