@@ -75,7 +75,19 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<WorkFLowStagePojo> getWorkFlowStage(List<WorkFlowStage> workFlowStages) {
-        return null;
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+        return  workFlowStages.stream().map(workFlowStage -> {
+            WorkFLowStagePojo pojo = new WorkFLowStagePojo();
+            pojo.setStep(workFlowStage.getStep());
+            pojo.setApprovingOfficer(workFlowStage.getApprovingOfficer().getDisplayName());
+            pojo.setType(workFlowStage.getType());
+            pojo.setIsFinalStage(workFlowStage.getIsFinalStage());
+            pojo.setIsSuperApprover(workFlowStage.getIsSuperApprover());
+            pojo.setCreatedAt(workFlowStage.getCreatedAt().format(df));
+            pojo.setCreatedBy(workFlowStage.getCreatedBy().getDisplayName());
+
+            return pojo;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -119,17 +131,21 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void CreateWorkFlowStage(WorkFlowStageDto dto) {
-        WorkFlowStage stage = workFlowStageRepository.findByTypeAndStep(dto.getType(), dto.getStep()).orElseGet(() ->{
-            WorkFlowStage newStage = new WorkFlowStage();
-            newStage.setStep(dto.getStep());
-            newStage.setApprovingOfficer(portalUserRepository.findById(dto.getApprovingOfficer()).get());
-            newStage.setType(WorkFlowType.PLATE_NUMBER_REQUEST);
-            newStage.setIsFinalStage(dto.getIsFinalStage());
-            newStage.setIsSuperApprover(dto.getIsSuperApprover());
-            newStage.setStatus(GenericStatusConstant.ACTIVE);
-            newStage.setCreatedBy(jwtService.user);
-            return workFlowStageRepository.save(newStage);
-        });
+        List<WorkFlowStage> stages = workFlowStageRepository.findByType(dto.getType());
+
+        WorkFlowStage newStage = new WorkFlowStage();
+        if (stages.isEmpty()){
+            newStage.setStep(1L);
+        } else {
+            newStage.setStep(stages.size() + 1L);
+        }
+        newStage.setApprovingOfficer(portalUserRepository.findById(dto.getApprovingOfficer()).get());
+        newStage.setType(dto.getType());
+        newStage.setIsFinalStage(dto.getIsFinalStage());
+        newStage.setIsSuperApprover(dto.getIsSuperApprover());
+        newStage.setStatus(GenericStatusConstant.ACTIVE);
+        newStage.setCreatedBy(jwtService.user);
+        workFlowStageRepository.save(newStage);
     }
 
     @Override
@@ -139,7 +155,13 @@ public class RequestServiceImpl implements RequestService {
             type.setName(dto.getName());
             type.setPrice(dto.getPrice());
             type.setDurationInMonth(dto.getDurationInMonth());
-            type.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
+
+            if (dto.getCategory() != null){
+                type.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
+                type.setType(dto.getType());
+                type.setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
+            }
+
             type.setStatus(GenericStatusConstant.ACTIVE);
             type.setCreatedBy(jwtService.user);
             return serviceTypeRepository.save(type);

@@ -1,6 +1,7 @@
 package com.app.IVAS.controller;
 
 
+import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.api_response.LoginResponse;
@@ -148,6 +149,11 @@ public class UserController {
     @GetMapping("/get-user/{id}")
     public PortalUser getPortalUser(@PathVariable Long id){
         return portalUserRepository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
+    @GetMapping("/get-user")
+    public PortalUser getPortalUserByEmail(@RequestParam String email){
+        return portalUserRepository.findByUsernameIgnoreCaseAndStatus(email, GenericStatusConstant.ACTIVE).orElseThrow(RuntimeException::new);
     }
 
     @PostMapping("/reset-password/mobile")

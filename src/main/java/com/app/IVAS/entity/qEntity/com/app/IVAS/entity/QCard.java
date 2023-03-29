@@ -26,6 +26,8 @@ public class QCard extends EntityPathBase<Card> {
 
     public final EnumPath<com.app.IVAS.Enum.CardStatusConstant> cardStatus = createEnum("cardStatus", com.app.IVAS.Enum.CardStatusConstant.class);
 
+    public final EnumPath<com.app.IVAS.Enum.CardTypeConstant> cardType = createEnum("cardType", com.app.IVAS.Enum.CardTypeConstant.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
 

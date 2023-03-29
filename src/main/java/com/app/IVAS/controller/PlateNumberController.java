@@ -95,11 +95,6 @@ public class PlateNumberController {
         return new QueryResults<>(plateNumberService.getPlateNumbers(plateNumberQueryResults.getResults()), plateNumberQueryResults.getLimit(), plateNumberQueryResults.getOffset(), plateNumberQueryResults.getTotal());
     }
 
-//    @PostMapping("/generate")
-//    public ResponseEntity<?> generatePlateNumber(@RequestBody PlateNumberDto dto){
-//       String response
-//    }
-
     @PostMapping("/upload-stock")
     public ResponseEntity<Map<String,Object>> uploadStock(@RequestBody PlateNumberDto dto){ ;
        return ResponseEntity.ok(plateNumberService.createStock(dto));

@@ -4,6 +4,7 @@ package com.app.IVAS.entity;
 import com.app.IVAS.Enum.WorkFlowType;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.StatusEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,11 +19,14 @@ import javax.persistence.*;
 public class WorkFlowStage extends StatusEntity {
 
     private Long step;
-    @ManyToOne
+
+    @JsonIgnore
+    @ManyToOne()
     private PortalUser ApprovingOfficer;
 
     @Enumerated(EnumType.STRING)
     private WorkFlowType type;
+
     private Boolean isFinalStage;
     private Boolean isSuperApprover;
 }
