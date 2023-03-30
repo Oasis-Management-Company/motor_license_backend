@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InvoiceServiceTypeRepository extends JpaRepository<InvoiceServiceType, Long> {
     List<InvoiceServiceType> findByInvoice(Invoice invoice);
+    Optional<List<InvoiceServiceType>> findAllByInvoice(Invoice invoice);
 }

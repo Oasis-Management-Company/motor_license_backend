@@ -10,6 +10,7 @@ import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.service.CardService;
 import com.app.IVAS.service.SalesCtrlService;
 import com.app.IVAS.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final ServiceTypeRepository serviceTypeRepository;
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
     private final PortalUserRepository portalUserRepository;
+    private final CardService cardService;
 
 
     @Override
@@ -63,7 +65,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Double totalAmount = 0.0;
 
 
-//        VehicleMake make = vehicleMakeRepository.findById(sales.getVehicleMake()).get();
         PlateNumberType types = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
@@ -112,7 +113,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         invoice.setPayer(portalUser);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
-        invoice.setInvoiceNumber("166-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setInvoiceNumber("AIRS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
         invoice.setAmount(totalAmount);
         invoice.setVehicle(savedVehicle);
         Invoice savedInvoice = invoiceRepository.save(invoice);
@@ -139,6 +140,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         plateNumberRepository.save(number);
 
         salesRepository.save(sales1);
+
+        cardService.createCard(savedInvoice, savedVehicle);
 
 
         return sales;
