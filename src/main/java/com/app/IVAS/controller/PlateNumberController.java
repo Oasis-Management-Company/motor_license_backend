@@ -1,6 +1,7 @@
 package com.app.IVAS.controller;
 
 
+import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.PlateNumberDto;
 import com.app.IVAS.dto.PlateNumberPojo;
@@ -10,6 +11,7 @@ import com.app.IVAS.dto.filters.StockSearchFilter;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.QStock;
+import com.app.IVAS.repository.PlateNumberRepository;
 import com.app.IVAS.repository.PlateNumberSubTypeRepository;
 import com.app.IVAS.repository.PlateNumberTypeRepository;
 import com.app.IVAS.repository.app.AppRepository;
@@ -43,6 +45,7 @@ public class PlateNumberController {
     private final PredicateExtractor predicateExtractor;
     private final PlateNumberTypeRepository plateNumberTypeRepository;
     private final PlateNumberSubTypeRepository plateNumberSubTypeRepository;
+    private final PlateNumberRepository plateNumberRepository;
     private final JwtService jwtService;
 
     @GetMapping("/search/stock")
@@ -78,8 +81,11 @@ public class PlateNumberController {
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
-        if (filter.isAgent()){
-            plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.eq(jwtService.user));
+        if (filter.getIsAgent() != null){
+            if (filter.getIsAgent().equalsIgnoreCase("true")){
+                plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.isNotNull());
+                plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.username.equalsIgnoreCase(jwtService.user.getUsername()));
+            }
         }
 
         if (filter.getCreatedAfter() != null){
@@ -109,6 +115,12 @@ public class PlateNumberController {
     public List<PlateNumberSubType> getPlateNumberSub(@RequestParam Long id){
         PlateNumberType type = plateNumberTypeRepository.findById(id).get();
         return plateNumberSubTypeRepository.findByType(type);
+    }
+
+    @GetMapping("/assign/get-plate-number")
+    public List<PlateNumber> getPlateNumber(@RequestParam String plateNumberType){
+        PlateNumberType type = plateNumberTypeRepository.findByName(plateNumberType);
+        return plateNumberRepository.findByTypeAndPlateNumberStatus(type, PlateNumberStatus.UNASSIGNED);
     }
 
     @PostMapping("/assign-plate-number")

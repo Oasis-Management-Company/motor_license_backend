@@ -60,14 +60,14 @@ public class RequestController {
     @Transactional
     public ResponseEntity<?> createPlateNumberRequest(@RequestBody PlateNumberRequestDto dto){
         requestService.CreatePlateNumberRequest(dto);
-        return ResponseEntity.ok("Plate Number Request was created successfully");
+        return ResponseEntity.ok("");
     }
 
     @PostMapping("/create-work-flow")
     @Transactional
     public ResponseEntity<?> createWorkFlowStages(@RequestBody WorkFlowStageDto dto){
         requestService.CreateWorkFlowStage(dto);
-        return ResponseEntity.ok("created successfully");
+        return ResponseEntity.ok("");
     }
 
     @PostMapping("/create-service")
