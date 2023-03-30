@@ -166,6 +166,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setStatus(sales.getInvoice().getPaymentStatus());
             dto.setApprovalStatus(sales.getApprovalStatus());
             dto.setCategoryId(sales.getVehicle().getVehicleCategory().getId());
+            dto.setId(sales.getId());
             return dto;
 
         }).collect(Collectors.toList());
@@ -283,6 +284,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setAmount(sales.getInvoice().getAmount());
             dto.setStatus(sales.getInvoice().getPaymentStatus());
             dto.setApprovalStatus(sales.getApprovalStatus());
+            dto.setId(sales.getId());
             return dto;
 
         }).collect(Collectors.toList());
@@ -368,10 +370,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
     @Override
-    public List<ServiceType> getServiceTypeByCategory(Long categoryId) {
-        VehicleCategory vehicleCategory = vehicleCategoryRepository.findById(categoryId).get();
-        List<ServiceType> types = serviceTypeRepository.findAllByCategory(vehicleCategory);
-        return types;
+    public List<InvoiceServiceType> getServiceTypeByCategory(Long salesId) {
+        Sales sales = salesRepository.findById(salesId).get();
+        List<InvoiceServiceType> invoiceServiceType = invoiceServiceTypeRepository.findByInvoice(sales.getInvoice());
+        return invoiceServiceType;
     }
 
     @Override
@@ -384,5 +386,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
         PortalUser user = userManagementService.createUser(dto, jwtService.user, role);
         return user;
+    }
+
+    @Override
+    public List<InvoiceServiceType> getServiceTypeByInvoiceId(Long invoiceId) {
+        Invoice invoice = invoiceRepository.findById(invoiceId).get();
+        List<InvoiceServiceType> invoiceServiceType = invoiceServiceTypeRepository.findByInvoice(invoice);
+        return invoiceServiceType;
     }
 }

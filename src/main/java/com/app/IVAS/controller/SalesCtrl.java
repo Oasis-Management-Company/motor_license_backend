@@ -1,5 +1,6 @@
 package com.app.IVAS.controller;
 
+import com.app.IVAS.Enum.ApprovalStatus;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
@@ -128,6 +129,7 @@ public class SalesCtrl {
 
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
+                .where(QSales.sales.approvalStatus.eq(ApprovalStatus.PENDING))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
@@ -176,8 +178,13 @@ public class SalesCtrl {
     }
 
     @PostMapping("/get/serviceType")
-    public ResponseEntity<List<ServiceType>> getServiceTypeByCategory(@RequestParam Long categoryId){
-        return ResponseEntity.ok(service.getServiceTypeByCategory(categoryId));
+    public ResponseEntity<List<InvoiceServiceType>> getServiceTypeByCategory(@RequestParam Long salesId){
+        return ResponseEntity.ok(service.getServiceTypeByCategory(salesId));
+    }
+
+    @PostMapping("/get/serviceType/invoice")
+    public ResponseEntity<List<InvoiceServiceType>> getServiceTypeByInvoiceId(@RequestParam Long invoiceId){
+        return ResponseEntity.ok(service.getServiceTypeByInvoiceId(invoiceId));
     }
 
     @GetMapping("/vehicle/invoice")

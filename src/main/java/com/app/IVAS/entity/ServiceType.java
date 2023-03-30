@@ -3,6 +3,7 @@ package com.app.IVAS.entity;
 
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.entity.userManagement.StatusEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,10 +23,12 @@ public class ServiceType extends StatusEntity {
     @Enumerated(EnumType.STRING)
     private RegType type;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "vehicle_category_id", referencedColumnName = "ID")
     private VehicleCategory category;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "plate_number_type_id", referencedColumnName = "ID")
     private PlateNumberType plateNumberType;
