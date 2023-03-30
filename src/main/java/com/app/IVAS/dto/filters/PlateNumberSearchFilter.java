@@ -19,7 +19,7 @@ public class PlateNumberSearchFilter extends BaseSearchDto implements QuerydslBi
     @Override
     public void customize(QuerydslBindings bindings, QPlateNumber root){
         bindings.bind(root.plateNumberStatus).as("status").first((path, value) -> path.eq(value));
-        bindings.bind(root.plateNumber).as("plateNumber").first((path, value) -> path.equalsIgnoreCase(value));
+        bindings.bind(root.plateNumber).as("plateNumber").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.stock.id).as("id").first((path, value) -> path.eq(value));
         bindings.bind(root.plateNumber).as("lga").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.type.id).as("type").first((path, value) -> path.eq(value));
