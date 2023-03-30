@@ -43,5 +43,6 @@ public class SalesDto {
     private Double amount;
     private PaymentStatus status;
     private ApprovalStatus approvalStatus;
+    private Long id;
 
 }

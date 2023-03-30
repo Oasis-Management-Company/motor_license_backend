@@ -1,6 +1,7 @@
 package com.app.IVAS.entity;
 
 
+import com.app.IVAS.Enum.AssignmentStatusConstant;
 import com.app.IVAS.Enum.WorkFlowApprovalStatus;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.AllArgsConstructor;
@@ -31,4 +32,7 @@ public class PlateNumberRequest extends StatusEntity {
 
     @Enumerated(EnumType.STRING)
     private WorkFlowApprovalStatus workFlowApprovalStatus;
+
+    @Enumerated(EnumType.STRING)
+    private AssignmentStatusConstant assignmentStatus;
 }

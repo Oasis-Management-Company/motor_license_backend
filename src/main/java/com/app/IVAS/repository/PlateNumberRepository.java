@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface PlateNumberRepository extends JpaRepository<PlateNumber, Long> {
     List<PlateNumber> findAllByAgentAndPlateNumberStatusAndTypeAndOwnerIsNull(PortalUser user, PlateNumberStatus assigned, PlateNumberType type);
+
+    List<PlateNumber> findByTypeAndPlateNumberStatus(PlateNumberType type, PlateNumberStatus status);
 }

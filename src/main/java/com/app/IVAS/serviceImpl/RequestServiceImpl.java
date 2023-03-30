@@ -1,4 +1,5 @@
 package com.app.IVAS.serviceImpl;
+import com.app.IVAS.Enum.AssignmentStatusConstant;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.PlateNumberRequest;
 import com.app.IVAS.entity.VehicleCategory;
@@ -45,6 +46,7 @@ public class RequestServiceImpl implements RequestService {
         return requests.stream().map(request -> {
             PlateNumberRequestPojo pojo = new PlateNumberRequestPojo();
             pojo.setId(request.getId());
+            pojo.setMlaId(request.getCreatedBy().getId());
             pojo.setTrackingId(request.getTrackingId());
             pojo.setCreatedAt(request.getCreatedAt().format(df));
             pojo.setCreatedBy(request.getCreatedBy().getDisplayName());
@@ -52,6 +54,7 @@ public class RequestServiceImpl implements RequestService {
             pojo.setPlateNumberSubType(request.getSubType() != null ? request.getSubType().getName() : null);
             pojo.setNumberOfPlates(request.getTotalNumberRequested().toString());
             pojo.setStatus(request.getWorkFlowApprovalStatus());
+            pojo.setAssignmentStatus(request.getAssignmentStatus());
             pojo.setCurrentApprovingOfficer(request.getWorkFlow().getStage().getApprovingOfficer().getDisplayName());
 
             return pojo;
@@ -114,6 +117,7 @@ public class RequestServiceImpl implements RequestService {
         request.setWorkFlow(workFlowRepository.save(workFlow));
         request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.PENDING);
         request.setStatus(GenericStatusConstant.ACTIVE);
+        request.setAssignmentStatus(AssignmentStatusConstant.NOT_ASSIGNED);
         request.setCreatedBy(jwtService.user);
         plateNumberRequestRepository.save(request);
 
@@ -179,15 +183,22 @@ public class RequestServiceImpl implements RequestService {
         workFlowLogRepository.save(log);
 
         WorkFlow workFlow = request.getWorkFlow();
-        if ((!workFlow.getStage().getIsFinalStage() || !workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")){
+        if ((!workFlow.getStage().getIsFinalStage() && !workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")){
             workFlow.setStage(workFlowStageRepository.findByTypeAndStep(workFlow.getType(), workFlow.getStage().getStep() + 1).get());
         } else if (action.equalsIgnoreCase("DISAPPROVED")) {
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
             workFlow.setFinalApprover(jwtService.user);
 
+            request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
+            plateNumberRequestRepository.save(request);
+
         } else if ((workFlow.getStage().getIsFinalStage() || workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")){
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             workFlow.setFinalApprover(jwtService.user);
+
+            request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
+            plateNumberRequestRepository.save(request);
+
         }
 
         workFlow.setLastUpdatedBy(jwtService.user);

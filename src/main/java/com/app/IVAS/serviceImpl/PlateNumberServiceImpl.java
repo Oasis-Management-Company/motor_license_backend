@@ -1,5 +1,6 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.AssignmentStatusConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.dto.PlateNumberDto;
@@ -128,6 +129,8 @@ public class PlateNumberServiceImpl implements PlateNumberService {
             plateNumber.setLastUpdatedBy(jwtService.user);
             plateNumberRepository.save(plateNumber);
         }
+        request.setAssignmentStatus(AssignmentStatusConstant.ASSIGNED);
+        plateNumberRequestRepository.save(request);
     }
 
 
