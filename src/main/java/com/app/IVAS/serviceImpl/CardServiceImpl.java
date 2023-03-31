@@ -156,7 +156,9 @@ public class CardServiceImpl implements CardService {
 
         card1.setLastUpdatedAt(LocalDateTime.now());
         card1.setCardType(CardTypeConstant.CARD);
-        card1.setStatus(GenericStatusConstant.INACTIVE);
+        /* to be updated after payment **/
+        card1.setStatus(GenericStatusConstant.ACTIVE);
+
         card1.setCardStatus(CardStatusConstant.NOT_PAID);
         card1.setCreatedBy(jwtService.user);
         card1.setLastUpdatedBy(jwtService.user);

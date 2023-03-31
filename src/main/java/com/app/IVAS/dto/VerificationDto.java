@@ -15,12 +15,24 @@ public class VerificationDto {
     String email;
     String asin;
 
-    String invoiceNumber;
-    LocalDateTime paymentDate;
-    Double amount;
-    String paymentStatus;
+    private String invoiceNumber;
+    private LocalDateTime paymentDate;
+    private Double amount;
+    private String paymentStatus;
 
-    List<InvoiceServiceTypeDto> invoiceServices;
+    private List<InvoiceServiceTypeDto> invoiceServices;
+
+    private LocalDateTime expiryDate;
+
+    private String chasis;
+    private String engine;
+    private String category;
+    private String weight;
+    private  String make;
+    private String model;
+    private String year;
+    private String color;
+    private String plate;
 
 
 }
