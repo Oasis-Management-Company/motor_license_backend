@@ -56,6 +56,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public SalesDto SaveSales(SalesDto sales) {
+        System.out.println("Salessss");
+        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
@@ -73,7 +75,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndType(category, types, RegType.REGISTRATION);
         PortalUser portalUser = null;
 
-        PortalUser user = portalUserRepository.findByPhoneNumber(sales.getPhone_number());
+        PortalUser user = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
         if (foundVehicle != null){
             return null;
         }

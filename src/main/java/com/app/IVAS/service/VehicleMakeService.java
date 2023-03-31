@@ -1,6 +1,8 @@
 package com.app.IVAS.service;
 
+import com.app.IVAS.dto.VehicleMakeDto;
+
 public interface VehicleMakeService {
 
-    Void createVehicleMake( );
+    void createVehicleMake(VehicleMakeDto vehicleMakeDto);
 }
