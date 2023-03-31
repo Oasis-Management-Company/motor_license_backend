@@ -1,7 +1,5 @@
 package com.app.IVAS.entity;
 
-
-import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +23,7 @@ public class Stock {
     private Long id;
 
     @ManyToOne
-    private Lga lga;
+    private Prefix startCode;
 
     private String endCode;
     private Long startRange;

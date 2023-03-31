@@ -176,41 +176,41 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     }
 
-    @Override
-    public AsinDto ValidateAsin(String asin) {
-
-        AsinDto asinDto = new AsinDto();
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-
-        ResponseEntity<UserDemographicIndividual> responseRC = null;
-        UserDemographicIndividual userinfo1 = null;
-
-        String url = asinVerification + asin;
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
-
-        try {
-            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographicIndividual.class);
-
-            userinfo1 = responseRC.getBody();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        assert userinfo1 != null;
-        asinDto.setAsin(userinfo1.getAsin());
-        asinDto.setAddress(userinfo1.getAddress());
-        asinDto.setEmail(userinfo1.getEmail());
-        asinDto.setPhoneNumber(userinfo1.getPhoneNumber());
-        asinDto.setName(userinfo1.getName());
-        asinDto.setPhoto(userinfo1.getPhoto());
-        asinDto.setFirstname(userinfo1.getFirstname());
-        asinDto.setLastname(userinfo1.getLastname());
-        return asinDto;
-    }
+//    @Override
+//    public AsinDto ValidateAsin(String asin) {
+//
+//        AsinDto asinDto = new AsinDto();
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+//        HttpEntity<String> entity = new HttpEntity<String>(headers);
+//
+//        ResponseEntity<UserDemographicIndividual> responseRC = null;
+//        UserDemographicIndividual userinfo1 = null;
+//
+//        String url = asinVerification + asin;
+//        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+//
+//        try {
+//            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographicIndividual.class);
+//
+//            userinfo1 = responseRC.getBody();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        assert userinfo1 != null;
+//        asinDto.setAsin(userinfo1.getAsin());
+//        asinDto.setAddress(userinfo1.getAddress());
+//        asinDto.setEmail(userinfo1.getEmail());
+//        asinDto.setPhoneNumber(userinfo1.getPhoneNumber());
+//        asinDto.setName(userinfo1.getName());
+//        asinDto.setPhoto(userinfo1.getPhoto());
+//        asinDto.setFirstname(userinfo1.getFirstname());
+//        asinDto.setLastname(userinfo1.getLastname());
+//        return asinDto;
+//    }
 
     @Override
     public List<VehicleMake> getVehicleMake() {

@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PlateNumberDto {
-    private Long lgaId;
+    private Long startCode;
     private String endCode;
     private Long firstNumber;
     private Long lastNumber;
