@@ -23,8 +23,9 @@ public class PlateNumberSearchFilter extends BaseSearchDto implements QuerydslBi
         bindings.bind(root.stock.id).as("id").first((path, value) -> path.eq(value));
         bindings.bind(root.plateNumber).as("lga").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.type.id).as("type").first((path, value) -> path.eq(value));
-        bindings.bind(root.type.name).as("name").first((path, value) -> path.equalsIgnoreCase(value));
-        bindings.bind(root.subType.name).as("subType").first((path, value) -> path.equalsIgnoreCase(value));
+        if (root.subType != null){
+            bindings.bind(root.subType.id).as("subType").first((path, value) -> path.eq(value));
+        }
         bindings.including(root.plateNumberStatus, root.plateNumber, root.stock, root.agent, root.type, root.subType);
     }
 }
