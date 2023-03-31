@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface InvoiceServiceTypeRepository extends JpaRepository<InvoiceServiceType, Long> {
     Optional<List<InvoiceServiceType>> findAllByInvoice(Invoice invoice);
     List<InvoiceServiceType> findByInvoice(Invoice invoice);
+
 }
