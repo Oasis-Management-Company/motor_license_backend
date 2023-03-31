@@ -52,6 +52,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
     private final PortalUserRepository portalUserRepository;
     private final CardService cardService;
+    private final InsuranceRepository insuranceRepository;
+
 
 
     @Override
@@ -72,6 +74,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
+        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndType(category, types, RegType.REGISTRATION);
         PortalUser portalUser = null;
 
@@ -88,6 +91,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setPhoneNumber(sales.getPhone_number());
             dto.setPassword("password");
             dto.setRole("GENERAL_USER");
+            dto.setAsin(sales.getAsin());
 
             Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
             portalUser = userManagementService.createUser(dto, jwtService.user, role);
@@ -106,6 +110,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
         vehicle.setYear(sales.getYear());
+        vehicle.setInsurance(insuranceCompany);
+        vehicle.setInsuranceNumber(sales.getInsuranceNumber());
+        vehicle.setLoad(sales.getLoad());
+        vehicle.setCapacity(sales.getCapacity());
+
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
 
@@ -188,14 +197,14 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
-        ResponseEntity<UserDemographicIndividual> responseRC = null;
-        UserDemographicIndividual userinfo1 = null;
+        ResponseEntity<UserDemographyDto> responseRC = null;
+        UserDemographyDto userinfo1 = null;
 
         String url = asinVerification + asin;
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
 
         try {
-            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographicIndividual.class);
+            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographyDto.class);
 
             userinfo1 = responseRC.getBody();
         } catch (Exception e) {
@@ -398,5 +407,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         List<InvoiceServiceType> invoiceServiceType = invoiceServiceTypeRepository.findByInvoice(invoice);
         return invoiceServiceType;
+    }
+
+    @Override
+    public List<InsuranceCompany> getInsurance() {
+        return insuranceRepository.findAll();
     }
 }

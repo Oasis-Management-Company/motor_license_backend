@@ -196,4 +196,8 @@ public class SalesCtrl {
     public ResponseEntity<PortalUser> createNewUser(@RequestBody @Valid UserDto dto) {
         return ResponseEntity.ok(service.createUser(dto));
     }
+    @GetMapping("/insurance")
+    public ResponseEntity<List<InsuranceCompany>> getInsurance() {
+        return ResponseEntity.ok(service.getInsurance());
+    }
 }
