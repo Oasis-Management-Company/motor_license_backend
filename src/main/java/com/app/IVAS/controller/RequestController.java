@@ -131,4 +131,12 @@ public class RequestController {
         return new QueryResults<>(requestService.getWorkFlowStage(workFlowStageQueryResults.getResults()), workFlowStageQueryResults.getLimit(), workFlowStageQueryResults.getOffset(), workFlowStageQueryResults.getTotal());
     }
 
+    @PostMapping("/check-approver")
+    @Transactional
+    public Boolean checkApprover(@RequestParam String name,
+                                 @RequestParam Long requestId){
+
+        return requestService.canApproveRequest(name, requestId);
+    }
+
 }

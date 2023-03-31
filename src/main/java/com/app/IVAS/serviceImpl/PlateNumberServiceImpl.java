@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.xhtmlrenderer.css.style.derived.StringValue;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -109,9 +110,11 @@ public class PlateNumberServiceImpl implements PlateNumberService {
             pojo.setType(stock.getType().getName());
             pojo.setSubType(stock.getSubType() != null ? stock.getSubType().getName() : null);
             pojo.setDateCreated(stock.getCreatedAt().format(df));
-            pojo.setQuantity(String.valueOf(stock.getQuantity()));
+            pojo.setQuantity(stock.getQuantity());
             pojo.setCreatedBy(stock.getCreatedBy().getDisplayName());
-            pojo.setInitialQuantity(String.valueOf(stock.getEndRange() - stock.getStartRange() + 1));
+            pojo.setInitialQuantity(stock.getEndRange() - stock.getStartRange() + 1);
+            pojo.setAssigned((long) plateNumberRepository.findByStockAndPlateNumberStatus(stock, PlateNumberStatus.ASSIGNED).size());
+            pojo.setSold(pojo.getInitialQuantity() - pojo.getQuantity());
             return pojo;
 
         }).collect(Collectors.toList());
@@ -135,10 +138,10 @@ public class PlateNumberServiceImpl implements PlateNumberService {
 
 
     private void generatePlateNumbers(Stock stock){
-        for (int i = 0; i<=stock.getQuantity().intValue(); i++){
+        for (int i = 0; i<=(stock.getQuantity().intValue() - 1); i++){
 
             PlateNumber plateNumber = new PlateNumber();
-            plateNumber.setPlateNumber(stock.getLga().getCode() + (stock.getStartRange() + i) + stock.getEndCode());
+            plateNumber.setPlateNumber(stock.getLga().getCode() + (stock.getStartRange() < 10 ? "0":"") + (stock.getStartRange() + i) + stock.getEndCode());
             plateNumber.setPlateNumberStatus(PlateNumberStatus.UNASSIGNED);
             plateNumber.setType(stock.getType());
             if (stock.getSubType() != null){
