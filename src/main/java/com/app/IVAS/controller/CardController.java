@@ -81,6 +81,7 @@ public class CardController {
     @PostMapping("/card/print")
     @Transactional
     public ResponseEntity<Resource> printCard(@RequestBody List<PrintDto> dtos, HttpServletRequest request) throws Exception {
+        System.out.println(dtos);
         Resource resource = cardService.printCard(dtos);
         String contentType = null;
         try {

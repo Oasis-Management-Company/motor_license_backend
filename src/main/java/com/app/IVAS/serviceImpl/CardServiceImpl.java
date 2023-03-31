@@ -3,26 +3,32 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.CardStatusConstant;
 import com.app.IVAS.Enum.CardTypeConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
-import com.app.IVAS.dto.CardDetailsDto;
-import com.app.IVAS.dto.CardDto;
-import com.app.IVAS.dto.PrintDto;
+import com.app.IVAS.Utils.HtmlToPdfCreator;
+import com.app.IVAS.Utils.PDFRenderToMultiplePages;
+import com.app.IVAS.configuration.AppConfigurationProperties;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.Card;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Vehicle;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.security.QrCodeServices;
 import com.app.IVAS.service.CardService;
+import com.itextpdf.text.DocumentException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,9 +39,17 @@ public class CardServiceImpl implements CardService {
     private final PortalUserRepository portalUserRepository;
     private final LgaRepository lgaRepository;
     private final AreaRepository areaRepository;
+    private final HtmlToPdfCreator htmlToPdfCreator;
+    private final PDFRenderToMultiplePages pdfRenderToMultiplePages;
+    private final AppConfigurationProperties appConfigurationProperties;
     private final VehicleRepository vehicleRepository;
     private final JwtService jwtService;
     private final CardRepository cardRepository;
+
+    @Value("${asin_verify}")
+    private String asin_verify;
+    @Autowired
+    QrCodeServices qrCodeServices;
 
 
     @Override
@@ -138,27 +152,29 @@ public class CardServiceImpl implements CardService {
     @Override
     public Card createCard(@NonNull Invoice invoice, @NonNull Vehicle vehicle) {
         Card card1 = new Card();
-        Card card2;
+        Card card2 = new Card();
 
         card1.setLastUpdatedAt(LocalDateTime.now());
         card1.setCardType(CardTypeConstant.CARD);
-        /* to be updated after payment **/
         card1.setStatus(GenericStatusConstant.INACTIVE);
         card1.setCardStatus(CardStatusConstant.NOT_PAID);
-        /* **/
         card1.setCreatedBy(jwtService.user);
         card1.setLastUpdatedBy(jwtService.user);
         card1.setInvoice(invoice);
         card1.setVehicle(vehicle);
+        cardRepository.save(card1);
 
-        card2 = card1;
 
         card2.setCardType(CardTypeConstant.STICKER);
+        card2.setLastUpdatedAt(LocalDateTime.now());
+        card2.setStatus(GenericStatusConstant.INACTIVE);
+        card2.setCardStatus(CardStatusConstant.NOT_PAID);
+        card2.setCreatedBy(jwtService.user);
+        card2.setLastUpdatedBy(jwtService.user);
+        card2.setInvoice(invoice);
+        card2.setVehicle(vehicle);
+        return cardRepository.save(card2);
 
-        cardRepository.save(card1);
-        cardRepository.save(card2);
-
-        return card2;
     }
 
     @Override
@@ -203,8 +219,8 @@ public class CardServiceImpl implements CardService {
             if (card.getCardStatus() != CardStatusConstant.NOT_PAID){
                 dto.setDateActivated(card.getLastUpdatedAt().format(df));
             }
-            dto.setZonalOffice(card.getCreatedBy().getOffice().getName());
-            dto.setExpiryDate(card.getExpiryDate().format(df));
+//            dto.setZonalOffice(card.getCreatedBy().getOffice().getName());
+//            dto.setExpiryDate(card.getExpiryDate().format(df));
             dto.setCreatedBy(card.getCreatedBy().getDisplayName());
             dto.setPlateNumber(card.getVehicle().getPlateNumber().getPlateNumber());
 
@@ -214,6 +230,58 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public Resource printCard(List<PrintDto> dtos) throws Exception {
-        return null;
+        List<PdfDto> pdfDtos = dtos.stream().map(printDto -> {
+            Card card = cardRepository.findById(printDto.getId()).orElseThrow(RuntimeException::new);
+
+            Map<String, Object> extraParameter = new TreeMap<>();
+            String templateName = getTemplate(printDto.getType());
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
+
+            String dataValue = asin_verify+"="+card.getInvoice().getInvoiceNumber();
+            String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
+
+
+
+
+            PdfDto pojo = new PdfDto();
+            pojo.setTemplateName(templateName);
+            pojo.setExtraParameter(extraParameter);
+            pojo.setCard(card);
+
+            return pojo;
+
+        }).collect(Collectors.toList());
+
+        List<String> templates = new ArrayList();
+
+        pdfDtos.forEach(pdfPojo -> {
+            try {
+                templates.add(htmlToPdfCreator.createPDFString(pdfPojo.getTemplateName(), htmlToPdfCreator.getContext(pdfPojo.getCard(), pdfPojo.getExtraParameter())));
+            } catch (IllegalAccessException | IOException | DocumentException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+        String fileName = pdfRenderToMultiplePages.multiPage(templates);
+
+        if (StringUtils.isBlank(fileName)) {
+            throw new Exception("file not found");
+        }
+
+        return pdfRenderToMultiplePages.loadFileAsResource(appConfigurationProperties.getPrintDirectory() +"/"+ fileName);
+    }
+
+    private String getTemplate(CardTypeConstant type){
+        String templateName = "";
+
+        switch (type) {
+            case CARD:
+                return templateName = "card";
+            case STICKER:
+                return templateName = "sticker";
+            default:
+                throw new IllegalStateException("Unexpected value: " + type);
+        }
     }
 }
