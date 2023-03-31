@@ -32,9 +32,9 @@ public class QStock extends EntityPathBase<Stock> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final com.app.IVAS.entity.userManagement.QLga lga;
-
     public final NumberPath<Long> quantity = createNumber("quantity", Long.class);
+
+    public final QPrefix startCode;
 
     public final NumberPath<Long> startRange = createNumber("startRange", Long.class);
 
@@ -61,7 +61,7 @@ public class QStock extends EntityPathBase<Stock> {
     public QStock(Class<? extends Stock> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.createdBy = inits.isInitialized("createdBy") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("createdBy"), inits.get("createdBy")) : null;
-        this.lga = inits.isInitialized("lga") ? new com.app.IVAS.entity.userManagement.QLga(forProperty("lga")) : null;
+        this.startCode = inits.isInitialized("startCode") ? new QPrefix(forProperty("startCode")) : null;
         this.subType = inits.isInitialized("subType") ? new QPlateNumberSubType(forProperty("subType"), inits.get("subType")) : null;
         this.type = inits.isInitialized("type") ? new QPlateNumberType(forProperty("type")) : null;
     }

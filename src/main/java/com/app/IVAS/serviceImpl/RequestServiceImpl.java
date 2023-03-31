@@ -20,6 +20,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,7 +39,6 @@ public class RequestServiceImpl implements RequestService {
     private final ServiceTypeRepository serviceTypeRepository;
     private final VehicleCategoryRepository vehicleCategoryRepository;
     private final WorkFlowLogRepository workFlowLogRepository;
-
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
@@ -116,19 +116,23 @@ public class RequestServiceImpl implements RequestService {
             request.setSubType(plateNumberSubTypeRepository.findByName(dto.getPlateSubType()));
         }
 
+        if(request.getPlateNumberType().getName().toUpperCase().contains("CUSTOM")){
+            request.setFancyPlate(dto.getFancyPlate());
+        }
+
         request.setWorkFlow(workFlowRepository.save(workFlow));
         request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.PENDING);
         request.setStatus(GenericStatusConstant.ACTIVE);
         request.setAssignmentStatus(AssignmentStatusConstant.NOT_ASSIGNED);
         request.setCreatedBy(jwtService.user);
-        plateNumberRequestRepository.save(request);
+        PlateNumberRequest plateNumberRequest = plateNumberRequestRepository.save(request);
 
-        if (dto.getPlateSubType().equalsIgnoreCase("PREFERRED")){
+        if (!dto.getPreferredPlates().isEmpty()){
             dto.getPreferredPlates().forEach(preferredPlateDto -> {
                 PreferredPlate preferredPlate = new PreferredPlate();
                 preferredPlate.setCode(preferredPlate.getCode());
                 preferredPlate.setNumberOfPlates(preferredPlateDto.getNumberOfPlates());
-                preferredPlate.setRequest(plateNumberRequestRepository.findByTrackingId(request.getTrackingId()));
+                preferredPlate.setRequest(plateNumberRequest);
                 preferredPlateRepository.save(preferredPlate);
             });
         }
@@ -194,7 +198,7 @@ public class RequestServiceImpl implements RequestService {
             request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
             plateNumberRequestRepository.save(request);
 
-        } else if ((workFlow.getStage().getIsFinalStage() || workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")){
+        } else if ((workFlow.getStage().getIsFinalStage() || canApproveRequest()) && action.equalsIgnoreCase("APPROVED")){
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             workFlow.setFinalApprover(jwtService.user);
 
@@ -208,17 +212,14 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Boolean canApproveRequest(String name, Long requestId) {
-        PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
-
+    public Boolean canApproveRequest() {
         List<WorkFlowStage> stages = workFlowStageRepository.findByType(WorkFlowType.PLATE_NUMBER_REQUEST);
 
-//        stages.stream().filter(stage -> {
-//            if (stage.getIsSuperApprover()){
-//               return stage.getApprovingOfficer().getDisplayName().equalsIgnoreCase(name);
-//            }
-//        });
-
-        return null;
+        return stages.stream().anyMatch(stage -> {
+            if (stage.getIsSuperApprover()){
+               return stage.getApprovingOfficer().getDisplayName().equalsIgnoreCase(jwtService.user.getDisplayName());
+            }
+            return false;
+        });
     }
 }
