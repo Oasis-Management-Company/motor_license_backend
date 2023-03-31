@@ -51,7 +51,9 @@ public class RequestServiceImpl implements RequestService {
             pojo.setCreatedAt(request.getCreatedAt().format(df));
             pojo.setCreatedBy(request.getCreatedBy().getDisplayName());
             pojo.setPlateNumberType(request.getPlateNumberType().getName());
+            pojo.setTypeId(request.getPlateNumberType().getId());
             pojo.setPlateNumberSubType(request.getSubType() != null ? request.getSubType().getName() : null);
+            pojo.setSubTypeId(request.getSubType() != null ? request.getSubType().getId() : null);
             pojo.setNumberOfPlates(request.getTotalNumberRequested().toString());
             pojo.setStatus(request.getWorkFlowApprovalStatus());
             pojo.setAssignmentStatus(request.getAssignmentStatus());
@@ -69,7 +71,7 @@ public class RequestServiceImpl implements RequestService {
             pojo.setName(serviceType.getName());
             pojo.setPrice(serviceType.getPrice());
             pojo.setDurationInMonth(serviceType.getDurationInMonth());
-            pojo.setCategoryName(serviceType.getCategory().getName());
+            pojo.setCategoryName(serviceType.getCategory() != null ? serviceType.getCategory().getName(): "");
             pojo.setCreatedAt(serviceType.getCreatedAt().format(df));
             pojo.setCreatedBy(serviceType.getCreatedBy().getDisplayName());
             return pojo;
@@ -203,5 +205,12 @@ public class RequestServiceImpl implements RequestService {
 
         workFlow.setLastUpdatedBy(jwtService.user);
         workFlowRepository.save(workFlow);
+    }
+
+    @Override
+    public Boolean canApproveRequest(String name, Long requestId) {
+        PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
+
+        return null;
     }
 }

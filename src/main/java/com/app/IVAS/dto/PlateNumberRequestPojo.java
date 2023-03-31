@@ -8,6 +8,8 @@ import lombok.Data;
 public class PlateNumberRequestPojo {
     private  Long id;
     private Long mlaId;
+    private Long typeId;
+    private Long subTypeId;
     private String trackingId;
     private String createdAt;
     private String createdBy;

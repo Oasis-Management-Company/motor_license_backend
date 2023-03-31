@@ -122,7 +122,10 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     public Role updateRole(String name, List<PermissionTypeConstant> permissionTypeConstants, String action) {
-        return null;
+        Role role = roleRepository.findByNameIgnoreCase(name).get();
+        deletePermission(role);
+        createPermission(permissionTypeConstants, role);
+        return role;
     }
 
     @Override
@@ -232,6 +235,11 @@ public class UserManagementServiceImpl implements UserManagementService {
             permission.setRole(role);
             permissionRepository.save(permission);
         });
+    }
+
+    private void deletePermission(Role role) {
+        List<Permission> permissions = permissionRepository.findAllByRole(role);
+        permissionRepository.deleteAll(permissions);
     }
 
     private List<PermissionTypeConstant> getPermission(Role role){

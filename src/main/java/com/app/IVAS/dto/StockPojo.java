@@ -11,7 +11,9 @@ public class StockPojo {
     private String type;
     private String subType;
     private String dateCreated;
-    private String quantity;
-    private String initialQuantity;
+    private Long quantity;
+    private Long initialQuantity;
     private String createdBy;
+    private Long assigned;
+    private Long sold;
 }
