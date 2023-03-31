@@ -58,8 +58,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public SalesDto SaveSales(SalesDto sales) {
-        System.out.println("Salessss");
-        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();

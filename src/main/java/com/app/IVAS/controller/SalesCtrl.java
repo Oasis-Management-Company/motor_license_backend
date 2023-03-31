@@ -130,7 +130,6 @@ public class SalesCtrl {
 
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QSales.sales.approvalStatus.eq(ApprovalStatus.PENDING))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
