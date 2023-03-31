@@ -211,6 +211,14 @@ public class RequestServiceImpl implements RequestService {
     public Boolean canApproveRequest(String name, Long requestId) {
         PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
 
+        List<WorkFlowStage> stages = workFlowStageRepository.findByType(WorkFlowType.PLATE_NUMBER_REQUEST);
+
+//        stages.stream().filter(stage -> {
+//            if (stage.getIsSuperApprover()){
+//               return stage.getApprovingOfficer().getDisplayName().equalsIgnoreCase(name);
+//            }
+//        });
+
         return null;
     }
 }
