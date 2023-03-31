@@ -9,5 +9,6 @@ public class PlateNumberRequestDto {
     private Long numberOfPlates;
     private String plateType;
     private String plateSubType;
+    private String fancyPlate;
     private List<PreferredPlateDto> preferredPlates;
 }

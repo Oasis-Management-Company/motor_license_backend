@@ -21,6 +21,7 @@ public class PlateNumberRequest extends StatusEntity {
 
     private Long totalNumberRequested;
     private String trackingId;
+    private String fancyPlate;
     @ManyToOne
     private PlateNumberType plateNumberType;
 

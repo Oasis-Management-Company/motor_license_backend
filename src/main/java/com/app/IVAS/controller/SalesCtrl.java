@@ -74,8 +74,9 @@ public class SalesCtrl {
 
     @GetMapping("/validate-asin")
     public ResponseEntity<AsinDto> ValidateAsin(@RequestParam String asin){
-        AsinDto dto = service.ValidateAsin(asin);
-        return ResponseEntity.ok(dto);
+//        AsinDto dto = service.ValidateAsin(asin);
+//        return ResponseEntity.ok(dto);
+        return null;
     }
 
     @GetMapping("/vehicle-make")

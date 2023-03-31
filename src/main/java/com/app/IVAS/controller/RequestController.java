@@ -7,6 +7,8 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.QWorkFlowStage;
+import com.app.IVAS.entity.userManagement.Lga;
+import com.app.IVAS.repository.PrefixRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.RequestService;
 import com.querydsl.core.QueryResults;
@@ -22,6 +24,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -32,6 +35,7 @@ public class RequestController {
     private final AppRepository appRepository;
     private final PredicateExtractor predicateExtractor;
     private final RequestService requestService;
+    private final PrefixRepository prefixRepository;
 
     @GetMapping("/search/plate-number-request")
     @Transactional
@@ -133,10 +137,13 @@ public class RequestController {
 
     @PostMapping("/check-approver")
     @Transactional
-    public Boolean checkApprover(@RequestParam String name,
-                                 @RequestParam Long requestId){
+    public Boolean checkApprover(){
+        return requestService.canApproveRequest();
+    }
 
-        return requestService.canApproveRequest(name, requestId);
+    @GetMapping("/prefix")
+    public List<Prefix> getStartCodes(){
+        return prefixRepository.findAll();
     }
 
 }
