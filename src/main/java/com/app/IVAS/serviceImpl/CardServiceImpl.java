@@ -233,6 +233,8 @@ public class CardServiceImpl implements CardService {
         List<PdfDto> pdfDtos = dtos.stream().map(printDto -> {
             Card card = cardRepository.findById(printDto.getId()).orElseThrow(RuntimeException::new);
 
+            System.out.println(card);
+
             Map<String, Object> extraParameter = new TreeMap<>();
             String templateName = getTemplate(printDto.getType());
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
