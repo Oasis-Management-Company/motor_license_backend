@@ -135,7 +135,7 @@ public class PlateNumberServiceImpl implements PlateNumberService {
         for (int i = 0; i<=(stock.getQuantity().intValue() - 1); i++){
 
             PlateNumber plateNumber = new PlateNumber();
-            plateNumber.setPlateNumber(stock.getStartCode().getCode() + (stock.getStartRange() < 10 ? "0":"") + (stock.getStartRange() + i) + stock.getEndCode());
+            plateNumber.setPlateNumber(stock.getStartCode().getCode() +  ((stock.getStartRange() + i) < 10 ? "0" + (stock.getStartRange() + i) : stock.getStartRange() + i) + stock.getEndCode());
             plateNumber.setPlateNumberStatus(PlateNumberStatus.UNASSIGNED);
             plateNumber.setType(stock.getType());
             if (stock.getSubType() != null){

@@ -160,7 +160,8 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void CreateServiceType(ServiceTypeDto dto) {
-        ServiceType serviceType = serviceTypeRepository.findByName(dto.getName()).orElseGet(() -> {
+        ServiceType serviceType = serviceTypeRepository.findByName(dto.getName()).orElseThrow(RuntimeException::new);
+        if (serviceType == null) {
             ServiceType type = new ServiceType();
             type.setName(dto.getName());
             type.setPrice(dto.getPrice());
@@ -174,8 +175,30 @@ public class RequestServiceImpl implements RequestService {
 
             type.setStatus(GenericStatusConstant.ACTIVE);
             type.setCreatedBy(jwtService.user);
-            return serviceTypeRepository.save(type);
-        });
+            serviceTypeRepository.save(type);
+        } else {
+            if(dto.getName() != null){
+                serviceType.setName(dto.getName());
+            }
+            if(dto.getPrice() != null){
+                serviceType.setPrice(dto.getPrice());
+            }
+            if(dto.getDurationInMonth() != null){
+                serviceType.setDurationInMonth(dto.getDurationInMonth());
+            }
+
+            if (dto.getCategory() != null){
+                serviceType.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
+            }
+
+            if(dto.getType() != null){
+                serviceType.setType(dto.getType());
+            }
+
+            if(dto.getPlateNumberType() != null){
+                serviceType.setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
+            }
+        }
     }
 
     @Override
@@ -222,4 +245,8 @@ public class RequestServiceImpl implements RequestService {
             return false;
         });
     }
+
+//    private PlateNumber createCustomPlate(){
+//
+//    }
 }
