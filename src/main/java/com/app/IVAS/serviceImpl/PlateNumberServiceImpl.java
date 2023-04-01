@@ -6,23 +6,16 @@ import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.dto.PlateNumberDto;
 import com.app.IVAS.dto.PlateNumberPojo;
 import com.app.IVAS.dto.StockPojo;
-import com.app.IVAS.entity.PlateNumber;
-import com.app.IVAS.entity.PlateNumberRequest;
+import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QStock;
-import com.app.IVAS.entity.Stock;
-import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
-import com.app.IVAS.response.JsonResponse;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.PlateNumberService;
-import com.google.inject.internal.ErrorsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.xhtmlrenderer.css.style.derived.StringValue;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -35,7 +28,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlateNumberServiceImpl implements PlateNumberService {
 
-    private final LgaRepository lgaRepository;
     private final JwtService jwtService;
     private final StockRepository stockRepository;
     private final AppRepository appRepository;
@@ -44,14 +36,16 @@ public class PlateNumberServiceImpl implements PlateNumberService {
     private final PlateNumberSubTypeRepository plateNumberSubTypeRepository;
     private final PortalUserRepository portalUserRepository;
     private final PlateNumberRequestRepository plateNumberRequestRepository;
+    private final PrefixRepository prefixRepository;
 
     @Override
     public Map<String,Object> createStock(PlateNumberDto dto) {
         Map<String,Object> body = new HashMap<>();
-        Lga lga = lgaRepository.findById(dto.getLgaId()).orElseThrow(RuntimeException::new);
+
+        Prefix startCode = prefixRepository.findById(dto.getStartCode()).orElseThrow(RuntimeException::new);
 
        List<Stock> findStock = appRepository.startJPAQuery(QStock.stock)
-                .where(QStock.stock.lga.eq(lga))
+                .where(QStock.stock.startCode.eq(startCode))
                 .where(QStock.stock.endCode.equalsIgnoreCase(dto.getEndCode()))
                 .where((QStock.stock.startRange.loe(dto.getFirstNumber()).and(QStock.stock.endRange.goe(dto.getFirstNumber()))).or
                         (QStock.stock.endRange.goe(dto.getLastNumber()).and(QStock.stock.startRange.loe(dto.getLastNumber()))))
@@ -59,7 +53,7 @@ public class PlateNumberServiceImpl implements PlateNumberService {
 
        if (findStock.isEmpty()){
            Stock stock = new Stock();
-           stock.setLga(lga);
+           stock.setStartCode(startCode);
            stock.setEndCode(dto.getEndCode());
            stock.setType(plateNumberTypeRepository.findById(dto.getType()).orElseThrow(RuntimeException::new));
            if(dto.getSubType() != null){
@@ -104,7 +98,7 @@ public class PlateNumberServiceImpl implements PlateNumberService {
         return stocks.stream().map(stock -> {
             StockPojo pojo = new StockPojo();
             pojo.setId(stock.getId());
-            pojo.setLga(stock.getLga().getCode());
+            pojo.setLga(stock.getStartCode().getCode());
             pojo.setRange(stock.getStartRange() + " - " + stock.getEndRange());
             pojo.setEndCode(stock.getEndCode());
             pojo.setType(stock.getType().getName());
@@ -141,7 +135,7 @@ public class PlateNumberServiceImpl implements PlateNumberService {
         for (int i = 0; i<=(stock.getQuantity().intValue() - 1); i++){
 
             PlateNumber plateNumber = new PlateNumber();
-            plateNumber.setPlateNumber(stock.getLga().getCode() + (stock.getStartRange() < 10 ? "0":"") + (stock.getStartRange() + i) + stock.getEndCode());
+            plateNumber.setPlateNumber(stock.getStartCode().getCode() +  ((stock.getStartRange() + i) < 10 ? "0" + (stock.getStartRange() + i) : stock.getStartRange() + i) + stock.getEndCode());
             plateNumber.setPlateNumberStatus(PlateNumberStatus.UNASSIGNED);
             plateNumber.setType(stock.getType());
             if (stock.getSubType() != null){

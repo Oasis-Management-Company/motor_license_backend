@@ -12,7 +12,7 @@ public interface SalesCtrlService {
 
     List<SalesDto> GetSales(List<Sales> results);
 
-    AsinDto ValidateAsin(String asin);
+//    AsinDto ValidateAsin(String asin);
 
     List<VehicleMake> getVehicleMake();
 

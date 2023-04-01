@@ -24,5 +24,5 @@ public interface RequestService {
 
     void UpdatePlateNumberRequest(Long requestId, String action);
 
-    Boolean canApproveRequest(String name, Long requestId);
+    Boolean canApproveRequest();
 }

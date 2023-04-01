@@ -9,6 +9,4 @@ import java.util.List;
 
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
-
-    List<Stock> findByLgaAndStartRangeAndEndCode(Lga lga, Long start, String endCode);
 }
