@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelService {
     private final VehicleMakeRepository vehicleMakeRepository;
@@ -37,6 +40,7 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
             Optional<VehicleMake> vehicleMakeOptional2 = vehicleMakeRepository.findByNameIgnoreCase(vehicleMakeDto.getMakeName());
 
             vehicleModel.setVehicleMake(vehicleMakeOptional2.get());
+            vehicleModelRepository.save(vehicleModel);
 
             return vehicleMakeDto;
 
@@ -51,6 +55,9 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
                 vehicleModel.setYear(vehicleMakeDto.getModelYear());
                 vehicleModel.setVehicleMake(vehicleMakeOptional.get());
 
+                vehicleModelRepository.save(vehicleModel);
+
+
                 return vehicleMakeDto;
 
             }
@@ -59,4 +66,17 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
 
         return null;
     }
+
+    @Override
+    public List<VehicleMake> get(List<VehicleMake> vehicleMakes) {
+
+        return vehicleMakes;
+    }
+
+    @Override
+    public List<VehicleModel> getVehicleModels(List<VehicleModel> vehicleModels) {
+        return vehicleModels;
+    }
+
+
 }
