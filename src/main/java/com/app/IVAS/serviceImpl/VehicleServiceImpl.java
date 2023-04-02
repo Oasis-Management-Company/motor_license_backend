@@ -1,8 +1,11 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.entity.Invoice;
+import com.app.IVAS.entity.PlateNumber;
+import com.app.IVAS.entity.ServiceType;
 import com.app.IVAS.entity.Vehicle;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
@@ -21,6 +24,8 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     private final InvoiceRepository invoiceRepository;
     private final PortalUserRepository portalUserRepository;
+    private final PlateNumberRepository plateNumberRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
 
 
     @Override
@@ -57,5 +62,29 @@ public class VehicleServiceImpl implements VehicleService {
         dto.setPhonenumber(user.getPhoneNumber());
         dto.setEmail(user.getEmail());
         return dto;
+    }
+
+    @Override
+    public VehicleDto getVehicleDetailsByPlate(String plate) {
+        PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
+        Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+
+        VehicleDto vehicleDto = new VehicleDto();
+        vehicleDto.setVehicle(vehicle);
+        vehicleDto.setFirstname(vehicle.getPortalUser().getFirstName() + " " + vehicle.getPortalUser().getLastName());
+        vehicleDto.setEmail(vehicle.getPortalUser().getEmail());
+        vehicleDto.setAddress(vehicle.getPortalUser().getAddress());
+        vehicleDto.setPhonenumber(vehicle.getPortalUser().getPhoneNumber());
+
+        return vehicleDto;
+    }
+
+    @Override
+    public List<ServiceType> getServiceTypeByPlate(String plate) {
+        PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
+        Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndRegTypeAndPlateNumberTypeOrCategoryAndPlateNumberTypeIsNull(vehicle.getVehicleCategory(), RegType.RENEWAL, plateNumber.getType(), vehicle.getVehicleCategory());
+        return serviceTypes;
     }
 }

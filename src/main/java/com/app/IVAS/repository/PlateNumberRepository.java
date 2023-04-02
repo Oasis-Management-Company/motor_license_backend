@@ -17,4 +17,6 @@ public interface PlateNumberRepository extends JpaRepository<PlateNumber, Long> 
     List<PlateNumber> findByTypeAndPlateNumberStatus(PlateNumberType type, PlateNumberStatus status);
 
     List<PlateNumber> findByStockAndPlateNumberStatus(Stock stock, PlateNumberStatus status);
+
+    PlateNumber findFirstByPlateNumberIgnoreCase(String plate);
 }

@@ -21,7 +21,7 @@ public class ServiceType extends StatusEntity {
     private Long durationInMonth;
 
     @Enumerated(EnumType.STRING)
-    private RegType type;
+    private RegType regType;
 
     @JsonIgnore
     @ManyToOne

@@ -30,7 +30,6 @@ public class Vehicle extends StatusEntity {
     @ManyToOne
     private PortalUser portalUser;
 
-    @JsonIgnore
     @ManyToOne
     private InsuranceCompany insurance;
 

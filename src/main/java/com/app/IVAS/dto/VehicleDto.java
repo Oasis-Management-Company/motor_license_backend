@@ -22,6 +22,9 @@ public class VehicleDto {
     private LocalDateTime date;
     private List<Invoice> invoices;
     private Vehicle vehicle;
+    private String insurance;
+    private String company;
+
 
     private String firstname;
     private String lastname;

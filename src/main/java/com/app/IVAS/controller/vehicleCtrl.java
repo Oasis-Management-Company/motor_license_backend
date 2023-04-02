@@ -2,6 +2,7 @@ package com.app.IVAS.controller;
 
 import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.entity.ServiceType;
 import com.app.IVAS.entity.VehicleMake;
 import com.app.IVAS.service.VehicleService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,17 @@ public class vehicleCtrl {
     @GetMapping("/get/all/vehicle-details")
     public ResponseEntity<VehicleDto> getVehicleDetails(@RequestParam String chasis){
         VehicleDto dto = vehicleService.getVehicleDetails(chasis);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/get/all/vehicle-details/plate-number")
+    public ResponseEntity<VehicleDto> getVehicleDetailsByPlate(@RequestParam String plate){
+        VehicleDto dto = vehicleService.getVehicleDetailsByPlate(plate);
+        return ResponseEntity.ok(dto);
+    }
+    @PostMapping("/get/all/service-type/plate-number")
+    public ResponseEntity<List<ServiceType>> getServiceTypeByPlate(@RequestParam String plate){
+        List<ServiceType> dto = vehicleService.getServiceTypeByPlate(plate);
         return ResponseEntity.ok(dto);
     }
 

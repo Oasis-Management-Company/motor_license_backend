@@ -1,9 +1,6 @@
 package com.app.IVAS.serviceImpl;
 
-import com.app.IVAS.Enum.ApprovalStatus;
-import com.app.IVAS.Enum.PaymentStatus;
-import com.app.IVAS.Enum.PlateNumberStatus;
-import com.app.IVAS.Enum.RegType;
+import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -73,7 +70,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
         InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
-        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndType(category, types, RegType.REGISTRATION);
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegType(category, types, RegType.REGISTRATION);
         PortalUser portalUser = null;
 
         PortalUser user = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
@@ -321,18 +318,15 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public SalesDto AddVehicle(SalesDto sales) {
-        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
-        Sales sales1 = new Sales();
         UserDto dto = new UserDto();
-        Invoice invoice = new Invoice();
-        SalesDto salesDto = new SalesDto();
         PlateNumber number = new PlateNumber();
 
 
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         PlateNumberType type = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
+        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
 
         dto.setAddress(sales.getAddress());
         dto.setEmail(sales.getEmail());
@@ -349,6 +343,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         number.setType(type);
         number.setOwner(portalUser);
         number.setPlateNumberStatus(PlateNumberStatus.SOLD);
+        number.setPlateState(PlateState.OUT_OF_HOUSE);
         number.setAgent(jwtService.user);
 
         PlateNumber plateNumber = plateNumberRepository.save(number);
@@ -363,19 +358,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setPlateNumber(plateNumber);
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
+        vehicle.setYear(sales.getYear());
+        vehicle.setInsurance(insuranceCompany);
+        vehicle.setInsuranceNumber(sales.getInsuranceNumber());
+        vehicle.setLoad(sales.getLoad());
+        vehicle.setCapacity(sales.getCapacity());
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
-
-        invoice.setPayer(portalUser);
-        invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
-        invoice.setInvoiceNumber("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
-        Invoice savedInvoice = invoiceRepository.save(invoice);
-
-        sales1.setVehicle(savedVehicle);
-        sales1.setInvoice(savedInvoice);
-        sales1.setCreatedBy(jwtService.user);
-
-        Sales savedSales = salesRepository.save(sales1);
-
 
         return sales;
 
