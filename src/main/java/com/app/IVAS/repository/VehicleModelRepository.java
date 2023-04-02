@@ -13,4 +13,6 @@ public interface VehicleModelRepository extends JpaRepository<VehicleModel, Long
     List<VehicleModel> findAllByVehicleMake(VehicleMake make);
 
     Optional<VehicleModel> findByNameIgnoreCaseAndYearAndVehicleMake(String name, String year, VehicleMake vehicleMake);
+
+    Optional< List<VehicleModel>> findAllByVehicleMakeNameIgnoreCase(String name);
 }

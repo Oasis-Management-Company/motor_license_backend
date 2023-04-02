@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface VehicleMakeRepository extends JpaRepository<VehicleMake, Long> {
 
     Optional<VehicleMake> findByNameIgnoreCase(String name);
+
+
 }
