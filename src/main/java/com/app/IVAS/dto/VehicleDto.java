@@ -29,4 +29,6 @@ public class VehicleDto {
     private String phonenumber;
     private String email;
 
+    private Long categoryId;
+
 }

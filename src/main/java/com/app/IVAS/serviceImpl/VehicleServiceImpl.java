@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.sound.sampled.Port;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,6 +22,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     private final InvoiceRepository invoiceRepository;
     private final PortalUserRepository portalUserRepository;
+    private final VehicleCategoryRepository vehicleCategoryRepository;
 
 
     @Override
@@ -57,5 +59,22 @@ public class VehicleServiceImpl implements VehicleService {
         dto.setPhonenumber(user.getPhoneNumber());
         dto.setEmail(user.getEmail());
         return dto;
+    }
+
+    @Override
+    public Vehicle saveEditedVehicle(VehicleDto vehicleDto) {
+
+        Vehicle vehicle = vehicleRepository.findByChasisNumber(vehicleDto.getChasis());
+
+        vehicle.setYear(vehicleDto.getYear());
+        vehicle.setColor(vehicleDto.getColor());
+        vehicle.setChasisNumber(vehicleDto.getChasis());
+        vehicle.setEngineNumber(vehicleDto.getEngine());
+        vehicle.setVehicleCategory(vehicleCategoryRepository.findById(Long.valueOf(vehicleDto.getCategory())).get());
+        vehicle.setLastUpdatedAt(LocalDateTime.now());
+
+        vehicleRepository.save(vehicle);
+
+        return vehicle;
     }
 }

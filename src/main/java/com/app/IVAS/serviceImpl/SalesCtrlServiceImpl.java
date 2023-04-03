@@ -307,6 +307,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setCategory(sales.getVehicleCategory().getName());
             dto.setPlate(sales.getPlateNumber().getPlateNumber());
             dto.setDate(sales.getCreatedAt());
+            dto.setYear(sales.getYear());
             return dto;
 
         }).collect(Collectors.toList());
@@ -412,6 +413,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         dto.setModel(vehicle.get().getVehicleModel().getName());
         dto.setMake(vehicle.get().getVehicleModel().getVehicleMake().getName());
         dto.setCategory(vehicle.get().getVehicleCategory().getName());
+        dto.setCategoryId(vehicle.get().getVehicleCategory().getId());
         dto.setPlate(vehicle.get().getPlateNumber().getPlateNumber());
 
         return dto;

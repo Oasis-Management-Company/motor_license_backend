@@ -10,9 +10,11 @@ import com.app.IVAS.entity.QVehicleMake;
 import com.app.IVAS.entity.QVehicleModel;
 import com.app.IVAS.repository.VehicleCategoryRepository;
 import com.app.IVAS.repository.VehicleModelRepository;
+import com.app.IVAS.repository.VehicleRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.SalesCtrlService;
 import com.app.IVAS.service.VehicleMakeAndModelService;
+import com.app.IVAS.service.VehicleService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -37,6 +39,7 @@ public class VehicleMakeAndModelController {
     private final PredicateExtractor predicateExtractor;
     private final SalesCtrlService salesCtrlService;
     private final VehicleCategoryRepository vehicleCategoryRepository;
+    private final VehicleService vehicleService;
 
 
     @PostMapping("/create-edit")
@@ -85,17 +88,14 @@ public class VehicleMakeAndModelController {
     }
 
     @GetMapping("/vehicle/category")
-    public ResponseEntity<?> listVehicleCategories(){
+    public List<VehicleCategory> listVehicleCategories(){
 
-        List<VehicleCategory> vehicleCategoryList = vehicleCategoryRepository.findAll();
-
-        return ResponseEntity.ok(vehicleCategoryList);
+        return vehicleCategoryRepository.findAllByOrderByNameAsc();
     }
 
-    @PatchMapping("/vehicle/edit/save")
+    @PostMapping("/vehicle/edit/save")
     public ResponseEntity<?> saveVehicle(@RequestBody VehicleDto vehicleDto){
-
-        System.out.println("checked");
+        vehicleService.saveEditedVehicle(vehicleDto);
         return ResponseEntity.ok("");
     }
 
