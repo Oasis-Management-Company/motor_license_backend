@@ -46,8 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/user/login",
                         "/api/user/login/**",
                         "/api/validate-asin",
-                        "/api/verification/**",
-                "/api/vehicle-make_model/**"
+                        "/api/verification/**"
 
                 ).permitAll()
                 .anyRequest().authenticated()

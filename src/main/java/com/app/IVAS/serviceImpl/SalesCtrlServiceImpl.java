@@ -399,4 +399,22 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<InvoiceServiceType> invoiceServiceType = invoiceServiceTypeRepository.findByInvoice(invoice);
         return invoiceServiceType;
     }
+
+    @Override
+    public VehicleDto viewVehicle(String chassisNo) {
+        Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findByChasisNumberIgnoreCase(chassisNo));
+
+        VehicleDto dto = new VehicleDto();
+
+        dto.setChasis(vehicle.get().getChasisNumber());
+        dto.setEngine(vehicle.get().getEngineNumber());
+        dto.setColor(vehicle.get().getColor());
+        dto.setModel(vehicle.get().getVehicleModel().getName());
+        dto.setMake(vehicle.get().getVehicleModel().getVehicleMake().getName());
+        dto.setCategory(vehicle.get().getVehicleCategory().getName());
+        dto.setPlate(vehicle.get().getPlateNumber().getPlateNumber());
+
+        return dto;
+    }
+
 }
