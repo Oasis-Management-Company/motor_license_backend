@@ -14,6 +14,8 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     Vehicle findByChasisNumber(String chasis);
 
+    Vehicle findByChasisNumberIgnoreCase(String chassis);
+
     List<Vehicle> findByPortalUser(PortalUser user);
 
     Vehicle findFirstByPlateNumber(PlateNumber plateNumber);
