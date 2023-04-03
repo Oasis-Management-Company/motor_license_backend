@@ -72,8 +72,8 @@ public class RequestServiceImpl implements RequestService {
             pojo.setPrice(serviceType.getPrice());
             pojo.setDurationInMonth(serviceType.getDurationInMonth());
             pojo.setCategoryName(serviceType.getCategory() != null ? serviceType.getCategory().getName(): "");
-            pojo.setCreatedAt(serviceType.getCreatedAt().format(df));
-            pojo.setCreatedBy(serviceType.getCreatedBy().getDisplayName());
+            pojo.setCreatedAt(serviceType.getCreatedAt() != null ? serviceType.getCreatedAt().format(df) : "");
+            pojo.setCreatedBy(serviceType.getCreatedBy()!= null ?  serviceType.getCreatedBy().getDisplayName() : "");
             return pojo;
         }).collect(Collectors.toList());
     }
