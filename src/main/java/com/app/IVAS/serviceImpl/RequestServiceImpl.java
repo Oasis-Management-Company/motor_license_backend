@@ -15,12 +15,12 @@ import com.app.IVAS.service.RequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.css.style.derived.StringValue;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +39,8 @@ public class RequestServiceImpl implements RequestService {
     private final ServiceTypeRepository serviceTypeRepository;
     private final VehicleCategoryRepository vehicleCategoryRepository;
     private final WorkFlowLogRepository workFlowLogRepository;
+    private final PlateNumberRepository plateNumberRepository;
+
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
@@ -50,14 +52,20 @@ public class RequestServiceImpl implements RequestService {
             pojo.setTrackingId(request.getTrackingId());
             pojo.setCreatedAt(request.getCreatedAt().format(df));
             pojo.setCreatedBy(request.getCreatedBy().getDisplayName());
+            pojo.setMlaZone(request.getCreatedBy().getOffice().getName());
             pojo.setPlateNumberType(request.getPlateNumberType().getName());
             pojo.setTypeId(request.getPlateNumberType().getId());
             pojo.setPlateNumberSubType(request.getSubType() != null ? request.getSubType().getName() : null);
             pojo.setSubTypeId(request.getSubType() != null ? request.getSubType().getId() : null);
             pojo.setNumberOfPlates(request.getTotalNumberRequested().toString());
+            pojo.setAssignedPlates(plateNumberRepository.findByRequest(request).size());
             pojo.setStatus(request.getWorkFlowApprovalStatus());
             pojo.setAssignmentStatus(request.getAssignmentStatus());
             pojo.setCurrentApprovingOfficer(request.getWorkFlow().getStage().getApprovingOfficer().getDisplayName());
+
+            if (request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.APPROVED || request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.DENIED){
+                pojo.setFinalApprovingOfficer(workFlowLogRepository.findByRequest(request).stream().sorted(Comparator.comparing(WorkFLowLog::getCreatedAt).reversed()).collect(Collectors.toList()).get(0).getCreatedBy().getDisplayName());
+            }
 
             return pojo;
         }).collect(Collectors.toList());

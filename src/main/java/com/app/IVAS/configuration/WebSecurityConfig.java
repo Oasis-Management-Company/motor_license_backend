@@ -45,6 +45,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/verify/ucode/**",
                         "/api/user/login",
                         "/api/user/login/**",
+                        "/api/user/generate-otp",
+                        "/api/user/generate-otp/**",
+                        "/api/user/reset-password",
+                        "/api/user/reset-password/**",
                         "/api/validate-asin",
                         "/api/verification/**"
 

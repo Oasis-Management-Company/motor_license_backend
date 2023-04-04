@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -98,10 +99,28 @@ public class UserController {
         return HttpStatus.OK;
     }
 
+    @PostMapping("/change-password")
+    public HttpStatus changePassword(@RequestBody PasswordDto dto) throws Exception {
+        userManagementService.changePassword(dto);
+        return HttpStatus.OK;
+    }
+
     @PostMapping("/reset-password")
-    public HttpStatus resetPassword(@RequestBody PasswordDto dto) throws Exception {
+    public HttpStatus resetPassword(@RequestBody PasswordDto dto) {
         userManagementService.resetPassword(dto);
         return HttpStatus.OK;
+    }
+
+    @PostMapping("/generate-otp")
+    public String getOTP(@RequestParam String username) throws URISyntaxException {
+        PortalUser user =  portalUserRepository.findByUsernameIgnoreCaseAndStatus(username, GenericStatusConstant.ACTIVE).get();
+        if (user.getPhoneNumber().startsWith("234")){
+            return userManagementService.generateOTP("+" + user.getPhoneNumber());
+        } else if (user.getPhoneNumber().startsWith("0")){
+            String phoneNumber = user.getPhoneNumber().replaceFirst("0", "+234");
+            return userManagementService.generateOTP(phoneNumber);
+        }
+        return userManagementService.generateOTP(user.getPhoneNumber());
     }
 
     @GetMapping("/roles")

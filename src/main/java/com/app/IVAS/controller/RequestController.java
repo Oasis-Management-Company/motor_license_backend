@@ -24,7 +24,9 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -143,7 +145,7 @@ public class RequestController {
 
     @GetMapping("/prefix")
     public List<Prefix> getStartCodes(){
-        return prefixRepository.findAll();
+        return prefixRepository.findAll().stream().sorted(Comparator.comparing(Prefix::getCode)).collect(Collectors.toList());
     }
 
 }
