@@ -36,6 +36,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     private final PasswordService passwordService;
     private final ZonalOfficeRepository zonalOfficeRepository;
     private final SmsService smsService;
+    private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
 
     @Override
     @Transactional
@@ -134,7 +135,6 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     public PortalUserPojo get(PortalUser user) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         PortalUserPojo pojo = new PortalUserPojo();
         pojo.setName(user.getDisplayName());
         pojo.setEmail(user.getEmail());
@@ -148,7 +148,6 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     public List<PortalUserPojo> get(List<PortalUser> users) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return users.stream().map(user -> {
 
             PortalUserPojo pojo = new PortalUserPojo();
@@ -196,7 +195,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     @Override
     public String generateOTP(String phoneNumber) throws URISyntaxException {
         String otp = String.valueOf(new Random().nextInt(999999));
-        smsService.sendSms(phoneNumber, "this is your OTP to reset your password" + otp);
+        smsService.sendSms(phoneNumber, "Use this OTP to reset your password " + otp);
         return otp;
     }
 
@@ -286,7 +285,6 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     public List<PortalUserPojo> searchOtherUsers(List<PortalUser> users) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return users.stream().map(user -> {
 
             PortalUserPojo pojo = new PortalUserPojo();

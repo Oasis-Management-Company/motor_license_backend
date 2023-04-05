@@ -10,6 +10,7 @@ import com.app.IVAS.entity.QWorkFlowStage;
 import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.repository.PrefixRepository;
 import com.app.IVAS.repository.app.AppRepository;
+import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.RequestService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -38,6 +39,7 @@ public class RequestController {
     private final PredicateExtractor predicateExtractor;
     private final RequestService requestService;
     private final PrefixRepository prefixRepository;
+    private final JwtService jwtService;
 
     @GetMapping("/search/plate-number-request")
     @Transactional
@@ -48,6 +50,10 @@ public class RequestController {
                 .where(predicateExtractor.getPredicate(filter))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
+
+        if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
+            plateNumberRequestJPAQuery.where(QPlateNumberRequest.plateNumberRequest.createdBy.id.eq(jwtService.user.getId()));
+        }
 
         if (filter.getCreatedAfter() != null){
             plateNumberRequestJPAQuery.where(QPlateNumberRequest.plateNumberRequest.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));

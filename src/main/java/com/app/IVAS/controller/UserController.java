@@ -24,14 +24,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -112,15 +115,21 @@ public class UserController {
     }
 
     @PostMapping("/generate-otp")
-    public String getOTP(@RequestParam String username) throws URISyntaxException {
+    public char[] getOTP(@RequestParam String username) throws URISyntaxException {
         PortalUser user =  portalUserRepository.findByUsernameIgnoreCaseAndStatus(username, GenericStatusConstant.ACTIVE).get();
         if (user.getPhoneNumber().startsWith("234")){
-            return userManagementService.generateOTP("+" + user.getPhoneNumber());
+            return Hex.encode(userManagementService.generateOTP("+" + user.getPhoneNumber()).getBytes(StandardCharsets.UTF_8));
         } else if (user.getPhoneNumber().startsWith("0")){
             String phoneNumber = user.getPhoneNumber().replaceFirst("0", "+234");
-            return userManagementService.generateOTP(phoneNumber);
+            return Hex.encode(userManagementService.generateOTP(phoneNumber).getBytes(StandardCharsets.UTF_8));
         }
-        return userManagementService.generateOTP(user.getPhoneNumber());
+        return Hex.encode(userManagementService.generateOTP(user.getPhoneNumber()).getBytes(StandardCharsets.UTF_8));
+    }
+
+    @PostMapping("/check-otp")
+    public Boolean checkOtp(@RequestParam String otp, @RequestParam String hexOtp){
+        String hex = String.valueOf(Hex.encode(otp.getBytes(StandardCharsets.UTF_8)));
+        return hexOtp.equals(hex);
     }
 
     @GetMapping("/roles")

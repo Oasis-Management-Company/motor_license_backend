@@ -50,8 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/user/reset-password",
                         "/api/user/reset-password/**",
                         "/api/validate-asin",
-                        "/api/verification/**"
-
+                        "/api/user/check-otp"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()

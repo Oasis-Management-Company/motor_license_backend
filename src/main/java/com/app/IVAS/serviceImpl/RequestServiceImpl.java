@@ -126,6 +126,7 @@ public class RequestServiceImpl implements RequestService {
 
         if(request.getPlateNumberType().getName().toUpperCase().contains("CUSTOM")){
             request.setFancyPlate(dto.getFancyPlate());
+            request.setTotalNumberRequested(1L);
         }
 
         request.setWorkFlow(workFlowRepository.save(workFlow));
@@ -138,7 +139,7 @@ public class RequestServiceImpl implements RequestService {
         if (!dto.getPreferredPlates().isEmpty()){
             dto.getPreferredPlates().forEach(preferredPlateDto -> {
                 PreferredPlate preferredPlate = new PreferredPlate();
-                preferredPlate.setCode(preferredPlate.getCode());
+                preferredPlate.setCode(preferredPlateDto.getLgaCode());
                 preferredPlate.setNumberOfPlates(preferredPlateDto.getNumberOfPlates());
                 preferredPlate.setRequest(plateNumberRequest);
                 preferredPlateRepository.save(preferredPlate);
