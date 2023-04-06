@@ -117,12 +117,6 @@ public class UserController {
     @PostMapping("/generate-otp")
     public char[] getOTP(@RequestParam String username) throws URISyntaxException {
         PortalUser user =  portalUserRepository.findByUsernameIgnoreCaseAndStatus(username, GenericStatusConstant.ACTIVE).get();
-        if (user.getPhoneNumber().startsWith("234")){
-            return Hex.encode(userManagementService.generateOTP("+" + user.getPhoneNumber()).getBytes(StandardCharsets.UTF_8));
-        } else if (user.getPhoneNumber().startsWith("0")){
-            String phoneNumber = user.getPhoneNumber().replaceFirst("0", "+234");
-            return Hex.encode(userManagementService.generateOTP(phoneNumber).getBytes(StandardCharsets.UTF_8));
-        }
         return Hex.encode(userManagementService.generateOTP(user.getPhoneNumber()).getBytes(StandardCharsets.UTF_8));
     }
 

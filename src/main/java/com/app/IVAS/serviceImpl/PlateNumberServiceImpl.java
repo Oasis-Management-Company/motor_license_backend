@@ -13,6 +13,7 @@ import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.PlateNumberService;
+import com.app.IVAS.service.SmsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -126,6 +127,25 @@ public class PlateNumberServiceImpl implements PlateNumberService {
             plateNumber.setLastUpdatedBy(jwtService.user);
             plateNumberRepository.save(plateNumber);
         }
+        request.setAssignmentStatus(AssignmentStatusConstant.ASSIGNED);
+        plateNumberRequestRepository.save(request);
+    }
+
+    @Override
+    public void assignCustomPlateNumber(Long mlaId, Long requestId) {
+        PortalUser mla = portalUserRepository.findById(mlaId).get();
+        PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
+
+        PlateNumber plateNumber = new PlateNumber();
+        plateNumber.setPlateNumber(request.getFancyPlate());
+        plateNumber.setPlateNumberStatus(PlateNumberStatus.ASSIGNED);
+        plateNumber.setType(request.getPlateNumberType());
+        plateNumber.setAgent(mla);
+        plateNumber.setRequest(request);
+        plateNumber.setStatus(GenericStatusConstant.ACTIVE);
+        plateNumber.setCreatedBy(jwtService.user);
+        plateNumberRepository.save(plateNumber);
+
         request.setAssignmentStatus(AssignmentStatusConstant.ASSIGNED);
         plateNumberRequestRepository.save(request);
     }

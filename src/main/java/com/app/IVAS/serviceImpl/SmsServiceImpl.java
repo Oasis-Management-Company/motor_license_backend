@@ -9,11 +9,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Slf4j
@@ -33,7 +35,14 @@ public class SmsServiceImpl implements SmsService {
         HttpEntity requestEntity = new HttpEntity<>(headers);
 
         URIBuilder uriBuilder = new URIBuilder(appConfigurationProperties.getVansoUrl());
-        uriBuilder.addParameter("dest", recipient);
+        if (recipient.startsWith("234")){
+            uriBuilder.addParameter("dest", "+" + recipient);
+        } else if (recipient.startsWith("0")){
+            String phoneNumber = recipient.replaceFirst("0", "+234");
+            uriBuilder.addParameter("dest", phoneNumber);
+        } else {
+            uriBuilder.addParameter("dest", recipient);
+        }
         uriBuilder.addParameter("src", appConfigurationProperties.getVansoSender());
         uriBuilder.addParameter("text", message);
 

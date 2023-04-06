@@ -22,4 +22,5 @@ public class PlateNumberRequestPojo {
     private AssignmentStatusConstant assignmentStatus;
     private String currentApprovingOfficer;
     private String finalApprovingOfficer;
+    private String fancyPlate;
 }
