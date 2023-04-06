@@ -8,15 +8,18 @@ import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.security.PasswordService;
+import com.app.IVAS.service.SmsService;
 import com.app.IVAS.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +35,8 @@ public class UserManagementServiceImpl implements UserManagementService {
     private final AreaRepository areaRepository;
     private final PasswordService passwordService;
     private final ZonalOfficeRepository zonalOfficeRepository;
+    private final SmsService smsService;
+    private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
 
     @Override
     @Transactional
@@ -130,7 +135,6 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     public PortalUserPojo get(PortalUser user) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         PortalUserPojo pojo = new PortalUserPojo();
         pojo.setName(user.getDisplayName());
         pojo.setEmail(user.getEmail());
@@ -144,7 +148,6 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     public List<PortalUserPojo> get(List<PortalUser> users) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return users.stream().map(user -> {
 
             PortalUserPojo pojo = new PortalUserPojo();
@@ -178,7 +181,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
     @Override
-    public void resetPassword(PasswordDto dto) throws Exception {
+    public void changePassword(PasswordDto dto) throws Exception {
         PortalUser user = portalUserRepository.findByUsernameIgnoreCaseAndStatus(dto.getUsername(), GenericStatusConstant.ACTIVE)
                 .orElseThrow(() -> new Exception("Invalid Username - " + dto.getUsername()));
 
@@ -187,6 +190,20 @@ public class UserManagementServiceImpl implements UserManagementService {
            user.setLastUpdatedAt(LocalDateTime.now());
            portalUserRepository.save(user);
         } else throw new Exception("Invalid Password");
+    }
+
+    @Override
+    public String generateOTP(String phoneNumber) throws URISyntaxException {
+        String otp = String.valueOf(new Random().nextInt(999999));
+        smsService.sendSms(phoneNumber, "Use this OTP to reset your password " + otp);
+        return otp;
+    }
+
+    @Override
+    public void resetPassword(PasswordDto dto) {
+        PortalUser user = portalUserRepository.findByUsernameIgnoreCaseAndStatus(dto.getUsername(), GenericStatusConstant.ACTIVE).orElseThrow(RuntimeException::new);
+        user.setGeneratedPassword(passwordService.hashPassword(dto.getNewPassword()));
+        portalUserRepository.save(user);
     }
 
     @Override
@@ -253,6 +270,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
         return permissionTypeConstantList;
     }
+
     @Override
     public void resetPasswordMobile(PasswordDto dto) throws Exception {
         PortalUser user = portalUserRepository.findByUsernameIgnoreCaseAndStatus(dto.getUsername(), GenericStatusConstant.ACTIVE)
@@ -267,7 +285,6 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     @Override
     public List<PortalUserPojo> searchOtherUsers(List<PortalUser> users) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return users.stream().map(user -> {
 
             PortalUserPojo pojo = new PortalUserPojo();
@@ -282,5 +299,13 @@ public class UserManagementServiceImpl implements UserManagementService {
             return pojo;
         }).collect(Collectors.toList());
     }
+
+//    public static void main(String[] args) {
+//        int otp = new Random().nextInt(999999);
+//        System.out.println(otp);
+//        System.out.println(String.valueOf(otp));
+//        String phoneNumber = "09031849838";
+//        System.out.println(phoneNumber.replaceFirst("0", "+234"));
+//    }
 
 }

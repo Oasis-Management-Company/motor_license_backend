@@ -30,8 +30,10 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -107,13 +109,13 @@ public class PlateNumberController {
 
     @GetMapping("/get-plate-number-type")
     public List<PlateNumberType> getPlateNumberTypes(){
-        return plateNumberTypeRepository.findAll();
+        return plateNumberTypeRepository.findAll().stream().sorted(Comparator.comparing(PlateNumberType::getName)).collect(Collectors.toList());
     }
 
     @GetMapping("/get-plate-number-sub")
     public List<PlateNumberSubType> getPlateNumberSub(@RequestParam Long id){
         PlateNumberType type = plateNumberTypeRepository.findById(id).get();
-        return plateNumberSubTypeRepository.findByType(type);
+        return plateNumberSubTypeRepository.findByType(type).stream().sorted(Comparator.comparing(PlateNumberSubType::getName)).collect(Collectors.toList());
     }
 
     @GetMapping("/assign/get-plate-number")

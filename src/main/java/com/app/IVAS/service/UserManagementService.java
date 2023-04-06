@@ -8,6 +8,7 @@ import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -40,7 +41,11 @@ public interface UserManagementService {
 
     List<Area> getAreas(Long id);
 
-    void resetPassword(PasswordDto dto) throws Exception;
+    void changePassword(PasswordDto dto) throws Exception;
+
+    String generateOTP(String phoneNumber) throws URISyntaxException;
+
+    void resetPassword(PasswordDto dto);
 
     PortalUserPojo UpdateUser(Long id,UserDto user, PortalUser updatedBy);
 
