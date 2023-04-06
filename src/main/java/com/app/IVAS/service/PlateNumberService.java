@@ -19,4 +19,6 @@ public interface PlateNumberService {
     List<StockPojo> getStock(List<Stock> stocks);
 
     void assignPlateNumbers(List<Long> plateNumbers, Long mlaId, Long requestId);
+
+    void assignCustomPlateNumber(Long mlaId, Long requestId);
 }

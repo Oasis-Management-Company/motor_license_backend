@@ -133,4 +133,13 @@ public class PlateNumberController {
         plateNumberService.assignPlateNumbers(plateNumbers, mlaId, requestId);
         return ResponseEntity.ok("");
     }
+
+    @PostMapping("/assign-custom-plate-number")
+    @Transactional
+    public ResponseEntity<?> assignCustomPlateNumber(@RequestParam Long mlaId,
+                                               @RequestParam Long requestId){
+
+        plateNumberService.assignCustomPlateNumber(mlaId, requestId);
+        return ResponseEntity.ok("");
+    }
 }

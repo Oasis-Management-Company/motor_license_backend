@@ -12,12 +12,14 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.RequestService;
+import com.app.IVAS.service.SmsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.css.style.derived.StringValue;
 
 import javax.transaction.Transactional;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -40,6 +42,7 @@ public class RequestServiceImpl implements RequestService {
     private final VehicleCategoryRepository vehicleCategoryRepository;
     private final WorkFlowLogRepository workFlowLogRepository;
     private final PlateNumberRepository plateNumberRepository;
+    private final SmsService smsService;
 
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
@@ -62,6 +65,7 @@ public class RequestServiceImpl implements RequestService {
             pojo.setStatus(request.getWorkFlowApprovalStatus());
             pojo.setAssignmentStatus(request.getAssignmentStatus());
             pojo.setCurrentApprovingOfficer(request.getWorkFlow().getStage().getApprovingOfficer().getDisplayName());
+            pojo.setFancyPlate(request.getFancyPlate() != null ? request.getFancyPlate() : "");
 
             if (request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.APPROVED || request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.DENIED){
                 pojo.setFinalApprovingOfficer(workFlowLogRepository.findByRequest(request).stream().sorted(Comparator.comparing(WorkFLowLog::getCreatedAt).reversed()).collect(Collectors.toList()).get(0).getCreatedBy().getDisplayName());
@@ -211,7 +215,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void UpdatePlateNumberRequest(Long requestId, String action) {
+    public void UpdatePlateNumberRequest(Long requestId, String action) throws URISyntaxException {
         PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
 
         WorkFLowLog log = new WorkFLowLog();
@@ -230,6 +234,8 @@ public class RequestServiceImpl implements RequestService {
             request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
             plateNumberRequestRepository.save(request);
 
+            smsService.sendSms(request.getCreatedBy().getPhoneNumber(), "Your plate number request with tracking id: " + request.getTrackingId() + " has been disapproved");
+
         } else if ((workFlow.getStage().getIsFinalStage() || canApproveRequest()) && action.equalsIgnoreCase("APPROVED")){
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             workFlow.setFinalApprover(jwtService.user);
@@ -237,6 +243,7 @@ public class RequestServiceImpl implements RequestService {
             request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             plateNumberRequestRepository.save(request);
 
+            smsService.sendSms(request.getCreatedBy().getPhoneNumber(), "Your plate number request with tracking id: " + request.getTrackingId() + " has been approved");
         }
 
         workFlow.setLastUpdatedBy(jwtService.user);
@@ -255,7 +262,4 @@ public class RequestServiceImpl implements RequestService {
         });
     }
 
-//    private PlateNumber createCustomPlate(){
-//
-//    }
 }
