@@ -11,4 +11,6 @@ public class ServiceTypeDto {
     private Long category;
     private RegType type;
     private Long plateNumberType;
+    private Double amount;
+    private String revenueCode;
 }

@@ -2,6 +2,8 @@ package com.app.IVAS.controller;
 
 import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.entity.Invoice;
+import com.app.IVAS.entity.InvoiceServiceType;
 import com.app.IVAS.entity.ServiceType;
 import com.app.IVAS.entity.VehicleMake;
 import com.app.IVAS.service.VehicleService;
@@ -17,6 +19,11 @@ import java.util.List;
 @RestController
 @RequestMapping(name = "/api")
 public class vehicleCtrl {
+
+    @GetMapping("/home")
+    public String all(){
+        return "hellooo";
+    }
 
     @Autowired
     private VehicleService vehicleService;
@@ -42,6 +49,22 @@ public class vehicleCtrl {
     public ResponseEntity<List<ServiceType>> getServiceTypeByPlate(@RequestParam String plate){
         List<ServiceType> dto = vehicleService.getServiceTypeByPlate(plate);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/save/all/service-type/plate-number")
+    public ResponseEntity<?> saveServiceTypeByPlate(@RequestParam String myplate, @RequestParam List<Long> ids){
+        Invoice dto = vehicleService.saveServiceTypeByPlate(myplate, ids);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/get/type/invoice/edit")
+    public ResponseEntity<InvoiceDto> getTypeByInvoiceIdEdit(@RequestParam Long invoiceId){
+        return ResponseEntity.ok(vehicleService.getTypeByInvoiceIdEdit(invoiceId));
+    }
+
+    @PostMapping("/get/type/invoice/taxpayer")
+    public ResponseEntity<?> getTypeByInvoiceTaxpayer(){
+        return ResponseEntity.ok(vehicleService.getTypeByInvoiceTaxpayer());
     }
 
 }

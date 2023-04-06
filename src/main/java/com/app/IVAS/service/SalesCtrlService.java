@@ -42,9 +42,7 @@ public interface SalesCtrlService {
 
     List<InvoiceServiceType> getServiceTypeByInvoiceId(Long invoiceId);
 
-<<<<<<< HEAD
     List<InsuranceCompany> getInsurance();
-=======
+
     VehicleDto viewVehicle(String chassisNo);
->>>>>>> 5a3792e6b037496778790fb57ae500bc084faa49
 }

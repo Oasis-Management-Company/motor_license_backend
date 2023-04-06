@@ -24,4 +24,7 @@ public interface ServiceTypeRepository extends JpaRepository<ServiceType, Long> 
     List<ServiceType> findAllByCategoryAndRegTypeAndPlateNumberTypeOrCategoryIsNotNullAndPlateNumberTypeIsNull(VehicleCategory vehicleCategory, RegType renewal, PlateNumberType type);
 
     List<ServiceType> findAllByCategoryAndRegTypeAndPlateNumberTypeOrCategoryAndPlateNumberTypeIsNull(VehicleCategory vehicleCategory, RegType renewal, PlateNumberType type, VehicleCategory vehicleCategory1);
+
+    List<ServiceType> findAllByCategoryIsNullAndPlateNumberTypeIsNull();
+
 }
