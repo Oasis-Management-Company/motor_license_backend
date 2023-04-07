@@ -4,10 +4,12 @@ import com.app.IVAS.dto.InvoiceServiceTypeDto;
 import com.app.IVAS.dto.VerificationDto;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.InvoiceServiceType;
+import com.app.IVAS.entity.Vehicle;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.InvoiceRepository;
 import com.app.IVAS.repository.InvoiceServiceTypeRepository;
 import com.app.IVAS.repository.PortalUserRepository;
+import com.app.IVAS.repository.VehicleRepository;
 import com.app.IVAS.service.VerificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final InvoiceRepository invoiceRepository;
     private final PortalUserRepository portalUserRepository;
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
+    private final VehicleRepository vehicleRepository;
 
     @Override
     public VerificationDto getScannedInvoice(String invoiceNumber) {
@@ -33,10 +36,15 @@ public class VerificationServiceImpl implements VerificationService {
         Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberIgnoreCase(invoiceNumber);
         if (invoice.isPresent()) {
 
+            Optional<Vehicle> vehicle = vehicleRepository.findById(invoice.get().getVehicle().getId());
+
             verificationDto.setInvoiceNumber(invoice.get().getInvoiceNumber());
             verificationDto.setPaymentDate(invoice.get().getPaymentDate());
             verificationDto.setAmount(invoice.get().getAmount());
             verificationDto.setPaymentStatus(invoice.get().getPaymentStatus().name());
+            if(invoice.get().getPaymentDate() != null) {
+                verificationDto.setExpiryDate(invoice.get().getPaymentDate().plusYears(1));
+            }
 
 
             PortalUser portalUser = portalUserRepository.findById(invoice.get().getPayer().getId()).get();
@@ -60,6 +68,43 @@ public class VerificationServiceImpl implements VerificationService {
             if (portalUser.getAsin() != null) {
                 verificationDto.setAsin(portalUser.getAsin());
             }
+
+            if(vehicle.isPresent()){
+                if(vehicle.get().getChasisNumber() != null){
+                    verificationDto.setChasis(vehicle.get().getChasisNumber());
+                }
+                if(vehicle.get().getEngineNumber()!= null){
+                    verificationDto.setEngine(vehicle.get().getEngineNumber());
+                }
+                if(vehicle.get().getVehicleCategory() != null){
+                    verificationDto.setCategory(vehicle.get().getVehicleCategory().getName());
+                }
+                if(vehicle.get().getVehicleCategory().getWeight() != null){
+                    verificationDto.setWeight(vehicle.get().getVehicleCategory().getWeight());
+                }
+                if(vehicle.get().getVehicleModel() != null){
+                    verificationDto.setModel(vehicle.get().getVehicleModel().getName());
+                }
+
+                if(vehicle.get().getVehicleModel().getVehicleMake().getName() != null){
+                    verificationDto.setMake(vehicle.get().getVehicleModel().getVehicleMake().getName());
+                }
+
+                if(vehicle.get().getVehicleModel().getYear()!= null){
+                    verificationDto.setYear(vehicle.get().getVehicleModel().getYear());
+                }
+
+                if(vehicle.get().getColor()!= null){
+                    verificationDto.setColor(vehicle.get().getColor());
+                }
+
+                if(vehicle.get().getPlateNumber().getPlateNumber()!= null){
+                    verificationDto.setPlate(vehicle.get().getPlateNumber().getPlateNumber().toUpperCase());
+                }
+
+
+            }
+
 
             Optional<List<InvoiceServiceType>> invoiceServiceTypes = invoiceServiceTypeRepository.findAllByInvoice(invoice.get());
 

@@ -31,6 +31,9 @@ public class Vehicle extends StatusEntity {
     private PortalUser portalUser;
 
     @ManyToOne
+    private InsuranceCompany insurance;
+
+    @ManyToOne
     private VehicleModel vehicleModel;
 
     @ManyToOne
@@ -40,4 +43,8 @@ public class Vehicle extends StatusEntity {
     private Long passengers;
     private String color;
     private String year;
+    private String load;
+    private String capacity;
+    private String insuranceNumber;
+    private String permit;
 }

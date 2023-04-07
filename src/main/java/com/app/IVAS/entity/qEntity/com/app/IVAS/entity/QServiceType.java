@@ -55,6 +55,8 @@ public class QServiceType extends EntityPathBase<ServiceType> {
 
     public final NumberPath<Double> price = createNumber("price", Double.class);
 
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
+
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 

@@ -5,10 +5,7 @@ import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -27,7 +24,9 @@ public class Sales extends StatusEntity {
     @JoinColumn(name = "INVOICE_ID", referencedColumnName = "id")
     private Invoice invoice;
 
-    private ApprovalStatus approvalStatus = ApprovalStatus.PENDING;
+    @Enumerated(EnumType.STRING)
+    private ApprovalStatus approvalStatus = ApprovalStatus.APPROVED;
+
     private LocalDateTime approvedDate;
 
     @ManyToOne

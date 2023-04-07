@@ -44,5 +44,7 @@ public class SalesDto {
     private PaymentStatus status;
     private ApprovalStatus approvalStatus;
     private Long id;
+    private Long insurance;
+    private String insuranceNumber;
 
 }

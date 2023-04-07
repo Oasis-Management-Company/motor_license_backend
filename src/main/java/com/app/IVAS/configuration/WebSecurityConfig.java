@@ -50,6 +50,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/user/reset-password",
                         "/api/user/reset-password/**",
                         "/api/validate-asin",
+                        "/api/verification/**",
+                        "/api/home",
+                        "/api/payment/send",
                         "/api/user/check-otp"
                 ).permitAll()
                 .anyRequest().authenticated()
@@ -78,7 +81,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-ui.html",
                 "/webjars/**",
                 "/templates/**",
-                "/api/document-manager/getImage/**");
+                "/api/document-manager/getImage/**"
+        );
     }
 
 }

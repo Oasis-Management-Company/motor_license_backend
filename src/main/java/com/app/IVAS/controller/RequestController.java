@@ -7,7 +7,6 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.QWorkFlowStage;
-import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.repository.PrefixRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;

@@ -182,7 +182,7 @@ public class RequestServiceImpl implements RequestService {
 
             if (dto.getCategory() != null){
                 type.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
-                type.setType(dto.getType());
+                type.setRegType(dto.getType());
                 type.setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
             }
 
@@ -205,7 +205,7 @@ public class RequestServiceImpl implements RequestService {
             }
 
             if(dto.getType() != null){
-                serviceType.setType(dto.getType());
+                serviceType.setRegType(dto.getType());
             }
 
             if(dto.getPlateNumberType() != null){

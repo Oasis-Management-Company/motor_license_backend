@@ -4,6 +4,7 @@ import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Vehicle;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,4 +18,13 @@ public class InvoiceDto {
     private String asin;
     private String photo;
     List<Vehicle> vehicleDtos;
+    private String platenumber;
+    private String chasis;
+    private String engine;
+    private String make;
+    private String model;
+    private String category;
+    private String invoiceNumber;
+    private String reference;
+    private LocalDateTime date;
 }
