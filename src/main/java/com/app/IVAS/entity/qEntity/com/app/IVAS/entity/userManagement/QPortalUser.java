@@ -28,6 +28,8 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final QArea area;
 
+    public final StringPath asin = createString("asin");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
 

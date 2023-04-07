@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -25,6 +25,12 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QInvoice invoice;
+
+    public final DateTimePath<java.time.LocalDateTime> PaymentDate = createDateTime("PaymentDate", java.time.LocalDateTime.class);
+
+    public final StringPath reference = createString("reference");
+
+    public final StringPath revenuecode = createString("revenuecode");
 
     public final QServiceType serviceType;
 
