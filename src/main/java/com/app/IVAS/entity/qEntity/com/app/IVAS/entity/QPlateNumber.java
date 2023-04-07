@@ -53,6 +53,8 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
 
     public final EnumPath<com.app.IVAS.Enum.PlateNumberStatus> plateNumberStatus = createEnum("plateNumberStatus", com.app.IVAS.Enum.PlateNumberStatus.class);
 
+    public final EnumPath<com.app.IVAS.Enum.PlateState> plateState = createEnum("plateState", com.app.IVAS.Enum.PlateState.class);
+
     public final QPlateNumberRequest request;
 
     //inherited

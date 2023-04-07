@@ -24,6 +24,8 @@ public class QVehicle extends EntityPathBase<Vehicle> {
 
     public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
 
+    public final StringPath capacity = createString("capacity");
+
     public final StringPath chasisNumber = createString("chasisNumber");
 
     public final StringPath color = createString("color");
@@ -45,13 +47,21 @@ public class QVehicle extends EntityPathBase<Vehicle> {
     //inherited
     public final NumberPath<Long> id;
 
+    public final QInsuranceCompany insurance;
+
+    public final StringPath insuranceNumber = createString("insuranceNumber");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> lastUpdatedAt;
 
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser lastUpdatedBy;
 
+    public final StringPath load = createString("load");
+
     public final NumberPath<Long> passengers = createNumber("passengers", Long.class);
+
+    public final StringPath permit = createString("permit");
 
     public final QPlateNumber plateNumber;
 
@@ -92,6 +102,7 @@ public class QVehicle extends EntityPathBase<Vehicle> {
         this.dateDeactivated = _super.dateDeactivated;
         this.deactivatedBy = _super.deactivatedBy;
         this.id = _super.id;
+        this.insurance = inits.isInitialized("insurance") ? new QInsuranceCompany(forProperty("insurance")) : null;
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
         this.plateNumber = inits.isInitialized("plateNumber") ? new QPlateNumber(forProperty("plateNumber"), inits.get("plateNumber")) : null;

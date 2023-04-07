@@ -26,6 +26,8 @@ public class QServiceType extends EntityPathBase<ServiceType> {
 
     public final QVehicleCategory category;
 
+    public final StringPath code = createString("code");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
 
@@ -59,8 +61,6 @@ public class QServiceType extends EntityPathBase<ServiceType> {
 
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
-
-    public final EnumPath<com.app.IVAS.Enum.RegType> type = createEnum("type", com.app.IVAS.Enum.RegType.class);
 
     public QServiceType(String variable) {
         this(ServiceType.class, forVariable(variable), INITS);
