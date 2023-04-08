@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -23,6 +23,8 @@ public class QVehicleModel extends EntityPathBase<VehicleModel> {
     public static final QVehicleModel vehicleModel = new QVehicleModel("vehicleModel");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final StringPath name = createString("name");
 
     public final QVehicleMake vehicleMake;
 

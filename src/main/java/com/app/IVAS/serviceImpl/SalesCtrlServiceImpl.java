@@ -1,9 +1,6 @@
 package com.app.IVAS.serviceImpl;
 
-import com.app.IVAS.Enum.ApprovalStatus;
-import com.app.IVAS.Enum.PaymentStatus;
-import com.app.IVAS.Enum.PlateNumberStatus;
-import com.app.IVAS.Enum.RegType;
+import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -52,12 +49,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
     private final PortalUserRepository portalUserRepository;
     private final CardService cardService;
+    private final InsuranceRepository insuranceRepository;
+
 
 
     @Override
     public SalesDto SaveSales(SalesDto sales) {
-        System.out.println("Salessss");
-        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
@@ -72,7 +69,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
-        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndType(category, types, RegType.REGISTRATION);
+        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegType(category, types, RegType.REGISTRATION);
         PortalUser portalUser = null;
 
         PortalUser user = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
@@ -88,6 +86,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setPhoneNumber(sales.getPhone_number());
             dto.setPassword("password");
             dto.setRole("GENERAL_USER");
+            dto.setAsin(sales.getAsin());
 
             Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
             portalUser = userManagementService.createUser(dto, jwtService.user, role);
@@ -106,6 +105,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
         vehicle.setYear(sales.getYear());
+        vehicle.setInsurance(insuranceCompany);
+        vehicle.setInsuranceNumber(sales.getInsuranceNumber());
+        vehicle.setLoad(sales.getLoad());
+        vehicle.setCapacity(sales.getCapacity());
+
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
 
@@ -178,41 +182,41 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     }
 
-//    @Override
-//    public AsinDto ValidateAsin(String asin) {
-//
-//        AsinDto asinDto = new AsinDto();
-//        RestTemplate restTemplate = new RestTemplate();
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-//        HttpEntity<String> entity = new HttpEntity<String>(headers);
-//
-//        ResponseEntity<UserDemographicIndividual> responseRC = null;
-//        UserDemographicIndividual userinfo1 = null;
-//
-//        String url = asinVerification + asin;
-//        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
-//
-//        try {
-//            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographicIndividual.class);
-//
-//            userinfo1 = responseRC.getBody();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        assert userinfo1 != null;
-//        asinDto.setAsin(userinfo1.getAsin());
-//        asinDto.setAddress(userinfo1.getAddress());
-//        asinDto.setEmail(userinfo1.getEmail());
-//        asinDto.setPhoneNumber(userinfo1.getPhoneNumber());
-//        asinDto.setName(userinfo1.getName());
-//        asinDto.setPhoto(userinfo1.getPhoto());
-//        asinDto.setFirstname(userinfo1.getFirstname());
-//        asinDto.setLastname(userinfo1.getLastname());
-//        return asinDto;
-//    }
+    @Override
+    public AsinDto ValidateAsin(String asin) {
+
+        AsinDto asinDto = new AsinDto();
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        ResponseEntity<UserDemographyDto> responseRC = null;
+        UserDemographyDto userinfo1 = null;
+
+        String url = asinVerification + asin;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+
+        try {
+            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographyDto.class);
+
+            userinfo1 = responseRC.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        assert userinfo1 != null;
+        asinDto.setAsin(userinfo1.getAsin());
+        asinDto.setAddress(userinfo1.getAddress());
+        asinDto.setEmail(userinfo1.getEmail());
+        asinDto.setPhoneNumber(userinfo1.getPhoneNumber());
+        asinDto.setName(userinfo1.getName());
+        asinDto.setPhoto(userinfo1.getPhoto());
+        asinDto.setFirstname(userinfo1.getFirstname());
+        asinDto.setLastname(userinfo1.getLastname());
+        return asinDto;
+    }
 
     @Override
     public List<VehicleMake> getVehicleMake() {
@@ -315,18 +319,15 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public SalesDto AddVehicle(SalesDto sales) {
-        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
-        Sales sales1 = new Sales();
         UserDto dto = new UserDto();
-        Invoice invoice = new Invoice();
-        SalesDto salesDto = new SalesDto();
         PlateNumber number = new PlateNumber();
 
 
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         PlateNumberType type = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
+        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
 
         dto.setAddress(sales.getAddress());
         dto.setEmail(sales.getEmail());
@@ -343,6 +344,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         number.setType(type);
         number.setOwner(portalUser);
         number.setPlateNumberStatus(PlateNumberStatus.SOLD);
+        number.setPlateState(PlateState.OUT_OF_HOUSE);
         number.setAgent(jwtService.user);
 
         PlateNumber plateNumber = plateNumberRepository.save(number);
@@ -357,19 +359,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setPlateNumber(plateNumber);
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
+        vehicle.setYear(sales.getYear());
+        vehicle.setInsurance(insuranceCompany);
+        vehicle.setInsuranceNumber(sales.getInsuranceNumber());
+        vehicle.setLoad(sales.getLoad());
+        vehicle.setCapacity(sales.getCapacity());
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
-
-        invoice.setPayer(portalUser);
-        invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
-        invoice.setInvoiceNumber("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
-        Invoice savedInvoice = invoiceRepository.save(invoice);
-
-        sales1.setVehicle(savedVehicle);
-        sales1.setInvoice(savedInvoice);
-        sales1.setCreatedBy(jwtService.user);
-
-        Sales savedSales = salesRepository.save(sales1);
-
 
         return sales;
 
@@ -402,6 +397,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
     @Override
+    public List<InsuranceCompany> getInsurance() {
+        return insuranceRepository.findAll();
+    }
+
     public VehicleDto viewVehicle(String chassisNo) {
         Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findByChasisNumberIgnoreCase(chassisNo));
 
@@ -418,5 +417,4 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         return dto;
     }
-
 }

@@ -6,6 +6,7 @@ import com.app.IVAS.entity.ServiceType;
 import com.app.IVAS.entity.WorkFlowStage;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 public interface RequestService {
@@ -22,7 +23,7 @@ public interface RequestService {
 
     void CreateServiceType(ServiceTypeDto dto);
 
-    void UpdatePlateNumberRequest(Long requestId, String action);
+    void UpdatePlateNumberRequest(Long requestId, String action) throws URISyntaxException;
 
     Boolean canApproveRequest();
 }

@@ -24,13 +24,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -98,10 +102,28 @@ public class UserController {
         return HttpStatus.OK;
     }
 
+    @PostMapping("/change-password")
+    public HttpStatus changePassword(@RequestBody PasswordDto dto) throws Exception {
+        userManagementService.changePassword(dto);
+        return HttpStatus.OK;
+    }
+
     @PostMapping("/reset-password")
-    public HttpStatus resetPassword(@RequestBody PasswordDto dto) throws Exception {
+    public HttpStatus resetPassword(@RequestBody PasswordDto dto) {
         userManagementService.resetPassword(dto);
         return HttpStatus.OK;
+    }
+
+    @PostMapping("/generate-otp")
+    public char[] getOTP(@RequestParam String username) throws URISyntaxException {
+        PortalUser user =  portalUserRepository.findByUsernameIgnoreCaseAndStatus(username, GenericStatusConstant.ACTIVE).get();
+        return Hex.encode(userManagementService.generateOTP(user.getPhoneNumber()).getBytes(StandardCharsets.UTF_8));
+    }
+
+    @PostMapping("/check-otp")
+    public Boolean checkOtp(@RequestParam String otp, @RequestParam String hexOtp){
+        String hex = String.valueOf(Hex.encode(otp.getBytes(StandardCharsets.UTF_8)));
+        return hexOtp.equals(hex);
     }
 
     @GetMapping("/roles")

@@ -221,8 +221,8 @@ public class CardServiceImpl implements CardService {
             if (card.getCardStatus() != CardStatusConstant.NOT_PAID){
                 dto.setDateActivated(card.getLastUpdatedAt().format(df));
             }
-//            dto.setZonalOffice(card.getCreatedBy().getOffice().getName());
-//            dto.setExpiryDate(card.getExpiryDate().format(df));
+            dto.setZonalOffice(card.getCreatedBy().getOffice().getName());
+            dto.setExpiryDate(card.getExpiryDate().format(df));
             dto.setCreatedBy(card.getCreatedBy().getDisplayName());
             dto.setPlateNumber(card.getVehicle().getPlateNumber().getPlateNumber());
 
@@ -235,8 +235,6 @@ public class CardServiceImpl implements CardService {
         List<PdfDto> pdfDtos = dtos.stream().map(printDto -> {
             Card card = cardRepository.findById(printDto.getId()).orElseThrow(RuntimeException::new);
 
-            System.out.println(card);
-
             Map<String, Object> extraParameter = new TreeMap<>();
             String templateName = getTemplate(printDto.getType());
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
@@ -244,7 +242,31 @@ public class CardServiceImpl implements CardService {
             String dataValue = asin_verify+"="+card.getInvoice().getInvoiceNumber();
             String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
 
-
+            extraParameter.put("photo", card.getVehicle().getPortalUser().getImage());
+            extraParameter.put("asin", card.getVehicle().getPortalUser().getAsin());
+            extraParameter.put("name", card.getVehicle().getPortalUser().getDisplayName());
+            extraParameter.put("address", card.getVehicle().getPortalUser().getAddress());
+            extraParameter.put("phoneNumber", card.getVehicle().getPortalUser().getPhoneNumber());
+            extraParameter.put("zone", card.getVehicle().getCreatedBy().getOffice().getName());
+            extraParameter.put("dateCreated", card.getCreatedAt().format(df));
+            extraParameter.put("chasis", card.getVehicle().getChasisNumber());
+            extraParameter.put("engine", card.getVehicle().getEngineNumber());
+            extraParameter.put("plate", card.getVehicle().getPlateNumber().getPlateNumber());
+            extraParameter.put("make", card.getVehicle().getVehicleModel().getVehicleMake().getName());
+            extraParameter.put("model", card.getVehicle().getVehicleModel().getName());
+            extraParameter.put("year", card.getVehicle().getYear());
+            extraParameter.put("category", card.getVehicle().getVehicleCategory().getName());
+            extraParameter.put("type", card.getVehicle().getPlateNumber().getType().getName());
+            extraParameter.put("color", card.getVehicle().getColor());
+            extraParameter.put("created", card.getCreatedAt().format(df));
+            extraParameter.put("barcode", qrCode);
+            extraParameter.put("capacity", card.getVehicle().getPassengers());
+            extraParameter.put("weight", card.getVehicle().getLoad());
+            extraParameter.put("policy", card.getVehicle().getInsurance().getName());
+            extraParameter.put("insurance", card.getVehicle().getInsuranceNumber());
+            extraParameter.put("permit", card.getVehicle().getPermit());
+            extraParameter.put("invoice", card.getInvoice().getInvoiceNumber());
+            extraParameter.put("expiry", card.getExpiryDate());
 
 
             PdfDto pojo = new PdfDto();

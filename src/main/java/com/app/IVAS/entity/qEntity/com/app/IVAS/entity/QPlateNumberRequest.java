@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -24,6 +24,8 @@ public class QPlateNumberRequest extends EntityPathBase<PlateNumberRequest> {
 
     public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
 
+    public final EnumPath<com.app.IVAS.Enum.AssignmentStatusConstant> assignmentStatus = createEnum("assignmentStatus", com.app.IVAS.Enum.AssignmentStatusConstant.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
 
@@ -35,6 +37,8 @@ public class QPlateNumberRequest extends EntityPathBase<PlateNumberRequest> {
 
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser deactivatedBy;
+
+    public final StringPath fancyPlate = createString("fancyPlate");
 
     //inherited
     public final NumberPath<Long> id;

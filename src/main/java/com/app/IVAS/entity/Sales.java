@@ -25,7 +25,7 @@ public class Sales extends StatusEntity {
     private Invoice invoice;
 
     @Enumerated(EnumType.STRING)
-    private ApprovalStatus approvalStatus = ApprovalStatus.PENDING;
+    private ApprovalStatus approvalStatus = ApprovalStatus.APPROVED;
 
     private LocalDateTime approvedDate;
 

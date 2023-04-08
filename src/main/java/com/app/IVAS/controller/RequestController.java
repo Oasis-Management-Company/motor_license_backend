@@ -7,9 +7,9 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.QWorkFlowStage;
-import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.repository.PrefixRepository;
 import com.app.IVAS.repository.app.AppRepository;
+import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.RequestService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -21,10 +21,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -36,6 +39,7 @@ public class RequestController {
     private final PredicateExtractor predicateExtractor;
     private final RequestService requestService;
     private final PrefixRepository prefixRepository;
+    private final JwtService jwtService;
 
     @GetMapping("/search/plate-number-request")
     @Transactional
@@ -46,6 +50,10 @@ public class RequestController {
                 .where(predicateExtractor.getPredicate(filter))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
+
+        if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
+            plateNumberRequestJPAQuery.where(QPlateNumberRequest.plateNumberRequest.createdBy.id.eq(jwtService.user.getId()));
+        }
 
         if (filter.getCreatedAfter() != null){
             plateNumberRequestJPAQuery.where(QPlateNumberRequest.plateNumberRequest.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
@@ -84,7 +92,7 @@ public class RequestController {
     @PostMapping("/update/plate-number-request")
     @Transactional
     public ResponseEntity<?> UpdatePlateNumberRequest(@RequestParam Long requestId,
-                                                      @RequestParam String action){
+                                                      @RequestParam String action) throws URISyntaxException {
         requestService.UpdatePlateNumberRequest(requestId, action);
         return ResponseEntity.ok("");
     }
@@ -143,7 +151,7 @@ public class RequestController {
 
     @GetMapping("/prefix")
     public List<Prefix> getStartCodes(){
-        return prefixRepository.findAll();
+        return prefixRepository.findAll().stream().sorted(Comparator.comparing(Prefix::getCode)).collect(Collectors.toList());
     }
 
 }

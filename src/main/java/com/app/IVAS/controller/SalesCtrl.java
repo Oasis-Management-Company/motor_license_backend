@@ -130,7 +130,6 @@ public class SalesCtrl {
 
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QSales.sales.approvalStatus.eq(ApprovalStatus.PENDING))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
@@ -196,5 +195,9 @@ public class SalesCtrl {
     @PostMapping("/create")
     public ResponseEntity<PortalUser> createNewUser(@RequestBody @Valid UserDto dto) {
         return ResponseEntity.ok(service.createUser(dto));
+    }
+    @GetMapping("/insurance")
+    public ResponseEntity<List<InsuranceCompany>> getInsurance() {
+        return ResponseEntity.ok(service.getInsurance());
     }
 }

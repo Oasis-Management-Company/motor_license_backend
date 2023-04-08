@@ -12,15 +12,17 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.RequestService;
+import com.app.IVAS.service.SmsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.css.style.derived.StringValue;
 
 import javax.transaction.Transactional;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +41,9 @@ public class RequestServiceImpl implements RequestService {
     private final ServiceTypeRepository serviceTypeRepository;
     private final VehicleCategoryRepository vehicleCategoryRepository;
     private final WorkFlowLogRepository workFlowLogRepository;
+    private final PlateNumberRepository plateNumberRepository;
+    private final SmsService smsService;
+
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
@@ -50,14 +55,21 @@ public class RequestServiceImpl implements RequestService {
             pojo.setTrackingId(request.getTrackingId());
             pojo.setCreatedAt(request.getCreatedAt().format(df));
             pojo.setCreatedBy(request.getCreatedBy().getDisplayName());
+            pojo.setMlaZone(request.getCreatedBy().getOffice().getName());
             pojo.setPlateNumberType(request.getPlateNumberType().getName());
             pojo.setTypeId(request.getPlateNumberType().getId());
             pojo.setPlateNumberSubType(request.getSubType() != null ? request.getSubType().getName() : null);
             pojo.setSubTypeId(request.getSubType() != null ? request.getSubType().getId() : null);
             pojo.setNumberOfPlates(request.getTotalNumberRequested().toString());
+            pojo.setAssignedPlates(plateNumberRepository.findByRequest(request).size());
             pojo.setStatus(request.getWorkFlowApprovalStatus());
             pojo.setAssignmentStatus(request.getAssignmentStatus());
             pojo.setCurrentApprovingOfficer(request.getWorkFlow().getStage().getApprovingOfficer().getDisplayName());
+            pojo.setFancyPlate(request.getFancyPlate() != null ? request.getFancyPlate() : "");
+
+            if (request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.APPROVED || request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.DENIED){
+                pojo.setFinalApprovingOfficer(workFlowLogRepository.findByRequest(request).stream().sorted(Comparator.comparing(WorkFLowLog::getCreatedAt).reversed()).collect(Collectors.toList()).get(0).getCreatedBy().getDisplayName());
+            }
 
             return pojo;
         }).collect(Collectors.toList());
@@ -72,8 +84,8 @@ public class RequestServiceImpl implements RequestService {
             pojo.setPrice(serviceType.getPrice());
             pojo.setDurationInMonth(serviceType.getDurationInMonth());
             pojo.setCategoryName(serviceType.getCategory() != null ? serviceType.getCategory().getName(): "");
-            pojo.setCreatedAt(serviceType.getCreatedAt().format(df));
-            pojo.setCreatedBy(serviceType.getCreatedBy().getDisplayName());
+            pojo.setCreatedAt(serviceType.getCreatedAt() != null ? serviceType.getCreatedAt().format(df) : "");
+            pojo.setCreatedBy(serviceType.getCreatedBy()!= null ?  serviceType.getCreatedBy().getDisplayName() : "");
             return pojo;
         }).collect(Collectors.toList());
     }
@@ -118,6 +130,7 @@ public class RequestServiceImpl implements RequestService {
 
         if(request.getPlateNumberType().getName().toUpperCase().contains("CUSTOM")){
             request.setFancyPlate(dto.getFancyPlate());
+            request.setTotalNumberRequested(1L);
         }
 
         request.setWorkFlow(workFlowRepository.save(workFlow));
@@ -130,7 +143,7 @@ public class RequestServiceImpl implements RequestService {
         if (!dto.getPreferredPlates().isEmpty()){
             dto.getPreferredPlates().forEach(preferredPlateDto -> {
                 PreferredPlate preferredPlate = new PreferredPlate();
-                preferredPlate.setCode(preferredPlate.getCode());
+                preferredPlate.setCode(preferredPlateDto.getLgaCode());
                 preferredPlate.setNumberOfPlates(preferredPlateDto.getNumberOfPlates());
                 preferredPlate.setRequest(plateNumberRequest);
                 preferredPlateRepository.save(preferredPlate);
@@ -169,7 +182,7 @@ public class RequestServiceImpl implements RequestService {
 
             if (dto.getCategory() != null){
                 type.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
-                type.setType(dto.getType());
+                type.setRegType(dto.getType());
                 type.setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
             }
 
@@ -192,7 +205,7 @@ public class RequestServiceImpl implements RequestService {
             }
 
             if(dto.getType() != null){
-                serviceType.setType(dto.getType());
+                serviceType.setRegType(dto.getType());
             }
 
             if(dto.getPlateNumberType() != null){
@@ -202,7 +215,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void UpdatePlateNumberRequest(Long requestId, String action) {
+    public void UpdatePlateNumberRequest(Long requestId, String action) throws URISyntaxException {
         PlateNumberRequest request = plateNumberRequestRepository.findById(requestId).get();
 
         WorkFLowLog log = new WorkFLowLog();
@@ -221,6 +234,8 @@ public class RequestServiceImpl implements RequestService {
             request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
             plateNumberRequestRepository.save(request);
 
+            smsService.sendSms(request.getCreatedBy().getPhoneNumber(), "Your plate number request with tracking id: " + request.getTrackingId() + " has been disapproved");
+
         } else if ((workFlow.getStage().getIsFinalStage() || canApproveRequest()) && action.equalsIgnoreCase("APPROVED")){
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             workFlow.setFinalApprover(jwtService.user);
@@ -228,6 +243,7 @@ public class RequestServiceImpl implements RequestService {
             request.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             plateNumberRequestRepository.save(request);
 
+            smsService.sendSms(request.getCreatedBy().getPhoneNumber(), "Your plate number request with tracking id: " + request.getTrackingId() + " has been approved");
         }
 
         workFlow.setLastUpdatedBy(jwtService.user);
@@ -246,7 +262,4 @@ public class RequestServiceImpl implements RequestService {
         });
     }
 
-//    private PlateNumber createCustomPlate(){
-//
-//    }
 }

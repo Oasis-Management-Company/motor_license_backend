@@ -12,7 +12,7 @@ public interface SalesCtrlService {
 
     List<SalesDto> GetSales(List<Sales> results);
 
-//    AsinDto ValidateAsin(String asin);
+    AsinDto ValidateAsin(String asin);
 
     List<VehicleMake> getVehicleMake();
 
@@ -41,6 +41,8 @@ public interface SalesCtrlService {
     PortalUser createUser(UserDto dto);
 
     List<InvoiceServiceType> getServiceTypeByInvoiceId(Long invoiceId);
+
+    List<InsuranceCompany> getInsurance();
 
     VehicleDto viewVehicle(String chassisNo);
 }

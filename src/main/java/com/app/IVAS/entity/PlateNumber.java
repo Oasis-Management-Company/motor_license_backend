@@ -2,6 +2,7 @@ package com.app.IVAS.entity;
 
 
 import com.app.IVAS.Enum.PlateNumberStatus;
+import com.app.IVAS.Enum.PlateState;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,9 @@ public class PlateNumber extends StatusEntity {
 
     @Enumerated(EnumType.STRING)
     private PlateNumberStatus plateNumberStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PlateState plateState = PlateState.IN_HOUSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore

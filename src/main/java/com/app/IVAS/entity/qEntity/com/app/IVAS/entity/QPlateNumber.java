@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -53,14 +53,18 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
 
     public final EnumPath<com.app.IVAS.Enum.PlateNumberStatus> plateNumberStatus = createEnum("plateNumberStatus", com.app.IVAS.Enum.PlateNumberStatus.class);
 
+    public final EnumPath<com.app.IVAS.Enum.PlateState> plateState = createEnum("plateState", com.app.IVAS.Enum.PlateState.class);
+
+    public final QPlateNumberRequest request;
+
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
-    public final com.app.IVAS.entity.QStock stock;
+    public final QStock stock;
 
-    public final com.app.IVAS.entity.QPlateNumberSubType subType;
+    public final QPlateNumberSubType subType;
 
-    public final com.app.IVAS.entity.QPlateNumberType type;
+    public final QPlateNumberType type;
 
     public QPlateNumber(String variable) {
         this(PlateNumber.class, forVariable(variable), INITS);
@@ -90,6 +94,7 @@ public class QPlateNumber extends EntityPathBase<PlateNumber> {
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
         this.owner = inits.isInitialized("owner") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("owner"), inits.get("owner")) : null;
+        this.request = inits.isInitialized("request") ? new QPlateNumberRequest(forProperty("request"), inits.get("request")) : null;
         this.status = _super.status;
         this.stock = inits.isInitialized("stock") ? new QStock(forProperty("stock"), inits.get("stock")) : null;
         this.subType = inits.isInitialized("subType") ? new QPlateNumberSubType(forProperty("subType"), inits.get("subType")) : null;

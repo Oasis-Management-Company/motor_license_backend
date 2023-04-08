@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -24,6 +24,10 @@ public class QServiceType extends EntityPathBase<ServiceType> {
 
     public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
 
+    public final QVehicleCategory category;
+
+    public final StringPath code = createString("code");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
 
@@ -36,6 +40,8 @@ public class QServiceType extends EntityPathBase<ServiceType> {
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser deactivatedBy;
 
+    public final NumberPath<Long> durationInMonth = createNumber("durationInMonth", Long.class);
+
     //inherited
     public final NumberPath<Long> id;
 
@@ -47,7 +53,11 @@ public class QServiceType extends EntityPathBase<ServiceType> {
 
     public final StringPath name = createString("name");
 
+    public final QPlateNumberType plateNumberType;
+
     public final NumberPath<Double> price = createNumber("price", Double.class);
+
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
 
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
@@ -71,6 +81,7 @@ public class QServiceType extends EntityPathBase<ServiceType> {
     public QServiceType(Class<? extends ServiceType> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new com.app.IVAS.entity.userManagement.QStatusEntity(type, metadata, inits);
+        this.category = inits.isInitialized("category") ? new QVehicleCategory(forProperty("category")) : null;
         this.createdAt = _super.createdAt;
         this.createdBy = _super.createdBy;
         this.dateDeactivated = _super.dateDeactivated;
@@ -78,6 +89,7 @@ public class QServiceType extends EntityPathBase<ServiceType> {
         this.id = _super.id;
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
+        this.plateNumberType = inits.isInitialized("plateNumberType") ? new QPlateNumberType(forProperty("plateNumberType")) : null;
         this.status = _super.status;
     }
 
