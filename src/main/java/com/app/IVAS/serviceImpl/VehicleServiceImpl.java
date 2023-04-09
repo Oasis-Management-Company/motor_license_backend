@@ -12,7 +12,8 @@ import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import javax.sound.sampled.Port;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     private final InvoiceRepository invoiceRepository;
     private final PortalUserRepository portalUserRepository;
+    private final VehicleCategoryRepository vehicleCategoryRepository;
     private final PlateNumberRepository plateNumberRepository;
     private final ServiceTypeRepository serviceTypeRepository;
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
@@ -67,6 +69,22 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    public Vehicle saveEditedVehicle(VehicleDto vehicleDto) {
+
+        Vehicle vehicle = vehicleRepository.findByChasisNumber(vehicleDto.getChasis());
+
+        vehicle.setYear(vehicleDto.getYear());
+        vehicle.setColor(vehicleDto.getColor());
+        vehicle.setChasisNumber(vehicleDto.getChasis());
+        vehicle.setEngineNumber(vehicleDto.getEngine());
+        vehicle.setVehicleCategory(vehicleCategoryRepository.findById(Long.valueOf(vehicleDto.getCategory())).get());
+        vehicle.setLastUpdatedAt(LocalDateTime.now());
+
+        vehicleRepository.save(vehicle);
+
+        return vehicle;
+    }
+
     public VehicleDto getVehicleDetailsByPlate(String plate) {
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
         Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
@@ -112,8 +130,6 @@ public class VehicleServiceImpl implements VehicleService {
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
-
-
 
         for (Long id : ids) {
             InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
