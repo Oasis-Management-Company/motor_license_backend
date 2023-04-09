@@ -36,4 +36,5 @@ public class Invoice extends StatusEntity {
     @JoinColumn(name = "VEHICLE_ID", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Vehicle vehicle;
+
 }

@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -25,6 +25,8 @@ public class QServiceType extends EntityPathBase<ServiceType> {
     public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
 
     public final QVehicleCategory category;
+
+    public final StringPath code = createString("code");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;

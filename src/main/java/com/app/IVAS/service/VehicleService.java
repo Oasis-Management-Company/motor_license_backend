@@ -1,5 +1,6 @@
 package com.app.IVAS.service;
 
+import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.entity.Invoice;
@@ -22,4 +23,8 @@ public interface VehicleService {
     InvoiceDto getTypeByInvoiceIdEdit(Long invoiceId);
 
     List<ServiceType> getTypeByInvoiceTaxpayer();
+
+    Invoice saveServiceTypeByPlateForTaxpayer(String phonenumber, List<Long> ids);
+
+    AsinDto getTaxpayerByDetails(String phonenumber);
 }

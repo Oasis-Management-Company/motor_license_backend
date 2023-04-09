@@ -45,4 +45,6 @@ public interface SalesCtrlService {
     List<InsuranceCompany> getInsurance();
 
     VehicleDto viewVehicle(String chassisNo);
+
+    InvoiceDto getVehicleOwnerDetails(Long invoiceId);
 }

@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -91,7 +92,7 @@ public class RequestController {
     @PostMapping("/update/plate-number-request")
     @Transactional
     public ResponseEntity<?> UpdatePlateNumberRequest(@RequestParam Long requestId,
-                                                      @RequestParam String action){
+                                                      @RequestParam String action) throws URISyntaxException {
         requestService.UpdatePlateNumberRequest(requestId, action);
         return ResponseEntity.ok("");
     }

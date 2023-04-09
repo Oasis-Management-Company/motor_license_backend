@@ -1,6 +1,6 @@
 package com.app.IVAS.controller;
 
-import com.app.IVAS.Enum.ApprovalStatus;
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
@@ -47,12 +47,39 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.SaveSales(sales));
     }
 
-    @PostMapping("/get/sales")
+    @GetMapping("/get/sales")
     public QueryResults<SalesDto> searchDirectTax(SalesSearchFilter filter) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
+                .where(QSales.sales.plateType.eq(RegType.REGISTRATION))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+
+        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
+            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
+            userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
+        }
+        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
+            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
+            userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
+        QueryResults<Sales> userQueryResults = userJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(service.GetSales(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
+    }
+
+    @PostMapping("/get/sales/renewal")
+    public QueryResults<SalesDto> searchSalesRenewal(SalesSearchFilter filter) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QSales.sales.plateType.eq(RegType.RENEWAL))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
@@ -74,9 +101,8 @@ public class SalesCtrl {
 
     @GetMapping("/validate-asin")
     public ResponseEntity<AsinDto> ValidateAsin(@RequestParam String asin){
-//        AsinDto dto = service.ValidateAsin(asin);
-//        return ResponseEntity.ok(dto);
-        return null;
+        AsinDto dto = service.ValidateAsin(asin);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/vehicle-make")
@@ -185,6 +211,11 @@ public class SalesCtrl {
     @PostMapping("/get/serviceType/invoice")
     public ResponseEntity<List<InvoiceServiceType>> getServiceTypeByInvoiceId(@RequestParam Long invoiceId){
         return ResponseEntity.ok(service.getServiceTypeByInvoiceId(invoiceId));
+    }
+
+    @PostMapping("/get/serviceType/owner/details")
+    public ResponseEntity<InvoiceDto> getVehicleOwnerDetails(@RequestParam Long invoiceId){
+        return ResponseEntity.ok(service.getVehicleOwnerDetails(invoiceId));
     }
 
     @GetMapping("/vehicle/invoice")

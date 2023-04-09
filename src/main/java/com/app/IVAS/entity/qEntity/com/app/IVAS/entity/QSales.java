@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -52,6 +52,8 @@ public class QSales extends EntityPathBase<Sales> {
 
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser lastUpdatedBy;
+
+    public final EnumPath<com.app.IVAS.Enum.RegType> plateType = createEnum("plateType", com.app.IVAS.Enum.RegType.class);
 
     public final StringPath reason = createString("reason");
 
