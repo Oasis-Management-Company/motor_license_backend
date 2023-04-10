@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SalesCtrlService {
-    SalesDto SaveSales(SalesDto sales);
+    Invoice SaveSales(SalesDto sales);
 
     List<SalesDto> GetSales(List<Sales> results);
 

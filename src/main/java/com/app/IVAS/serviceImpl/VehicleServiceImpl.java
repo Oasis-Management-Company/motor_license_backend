@@ -4,6 +4,7 @@ import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.InvoiceDto;
+import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -16,6 +17,7 @@ import javax.sound.sampled.Port;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -124,10 +126,11 @@ public class VehicleServiceImpl implements VehicleService {
         invoice.setVehicle(vehicle);
         invoice.setPayer(vehicle.getPortalUser());
         invoice.setPaymentRef("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
-        invoice.setInvoiceNumber("AIRS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setInvoiceNumber("" + LocalDate.now().getYear()+ (int)(Math.random()* 347805607));
         invoice.setPayer(vehicle.getPortalUser());
         invoice.setAmount(totalAmount);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
+        invoice.setCreatedBy(jwtService.user);
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
@@ -221,5 +224,91 @@ public class VehicleServiceImpl implements VehicleService {
         asinDto.setEmail(portalUser.getEmail());
 
         return asinDto;
+    }
+
+    @Override
+    public List<ServiceType> getTaxpayerByDetailsServices() {
+        return serviceTypeRepository.findAllByRegType(RegType.NON_VEHICLE);
+    }
+
+    @Override
+    public Invoice saveTaxPayerServiceType(Long id, List<Long> ids) {
+        PortalUser portalUser = portalUserRepository.findById(id).get();
+
+        Double totalAmount = 0.0;
+
+        for (Long nid : ids) {
+            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            totalAmount += serviceType.getPrice();
+        }
+
+        Invoice invoice = new Invoice();
+        invoice.setPayer(portalUser);
+        invoice.setPaymentRef("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setInvoiceNumber("AIRS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setAmount(totalAmount);
+        invoice.setCreatedBy(jwtService.user);
+
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+
+
+
+        for (Long nid : ids) {
+            InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
+            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            invoiceServiceType.setServiceType(serviceType);
+            invoiceServiceType.setInvoice(savedInvoice);
+            invoiceServiceType.setRevenuecode(serviceType.getCode());
+            invoiceServiceType.setReference("IVAS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+            invoiceServiceTypeRepository.save(invoiceServiceType);
+        }
+
+        Sales sales1 = new Sales();
+//        sales1.setVehicle(vehicle);
+        sales1.setInvoice(savedInvoice);
+        sales1.setCreatedBy(jwtService.user);
+        sales1.setPlateType(RegType.NON_VEHICLE);
+        salesRepository.save(sales1);
+
+        return savedInvoice;
+    }
+
+    @Override
+    public List<SalesDto> searchTaxpayerAssessments(List<Sales> results) {
+        return results.stream().map(sales -> {
+            SalesDto dto = new SalesDto();
+            dto.setFirstname(sales.getInvoice().getPayer().getDisplayName());
+            dto.setPhone_number(sales.getInvoice().getPayer().getPhoneNumber());
+            dto.setAddress(sales.getInvoice().getPayer().getAddress());
+            dto.setAsin(sales.getInvoice().getPayer().getAsin());
+            dto.setEmail(sales.getInvoice().getPayer().getEmail());
+            dto.setMla(sales.getCreatedBy().getDisplayName());
+            dto.setDate(sales.getCreatedAt());
+            dto.setAmount(sales.getInvoice().getAmount());
+            dto.setStatus(sales.getInvoice().getPaymentStatus());
+            dto.setApprovalStatus(sales.getApprovalStatus());
+            dto.setId(sales.getId());
+            return dto;
+
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InvoiceDto> searchAllInvoice(List<Invoice> invoices) {
+        return invoices.stream().map(invoice -> {
+            InvoiceDto dto = new InvoiceDto();
+            dto.setFirstname(invoice.getPayer().getDisplayName());
+            dto.setPhonenumber(invoice.getPayer().getPhoneNumber());
+            dto.setAsin(invoice.getPayer().getAsin());
+            dto.setEmail(invoice.getPayer().getEmail());
+            dto.setMla(invoice.getCreatedBy().getDisplayName());
+            dto.setDate(invoice.getCreatedAt());
+            dto.setAmount(invoice.getAmount());
+            dto.setStatus(invoice.getPaymentStatus());
+            dto.setInvoiceNumber(invoice.getInvoiceNumber());
+            dto.setReference(invoice.getPaymentRef());
+            dto.setId(invoice.getId());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

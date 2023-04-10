@@ -162,8 +162,6 @@ public class PublicNimcController {
     @PostMapping("/nimc/search-with-nin/{nin_number}")
     public NIN searchWithNIN(@PathVariable("nin_number") String ninNumber) {
 
-        System.out.println(ninNumber);
-
         ApiError apiError = null;
 
         if(ninNumber.isEmpty()) {

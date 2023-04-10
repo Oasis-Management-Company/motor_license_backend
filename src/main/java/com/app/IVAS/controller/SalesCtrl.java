@@ -43,7 +43,7 @@ public class SalesCtrl {
     private final PredicateExtractor predicateExtractor;
 
     @PostMapping("/save/sales")
-    public ResponseEntity<SalesDto> SaveSales(@RequestBody SalesDto sales){
+    public ResponseEntity<Invoice> SaveSales(@RequestBody SalesDto sales){
         return ResponseEntity.ok(service.SaveSales(sales));
     }
 

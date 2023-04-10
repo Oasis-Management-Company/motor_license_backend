@@ -1,5 +1,6 @@
 package com.app.IVAS.dto;
 
+import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Vehicle;
 import lombok.Data;
@@ -27,4 +28,8 @@ public class InvoiceDto {
     private String invoiceNumber;
     private String reference;
     private LocalDateTime date;
+    private String mla;
+    private Double amount;
+    private PaymentStatus status;
+    private Long id;
 }

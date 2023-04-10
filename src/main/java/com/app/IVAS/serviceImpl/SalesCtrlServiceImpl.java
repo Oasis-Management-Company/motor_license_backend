@@ -53,8 +53,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
 
     @Override
-    public SalesDto SaveSales(SalesDto sales) {
-        System.out.println(sales);
+    public Invoice SaveSales(SalesDto sales) {
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
@@ -121,6 +120,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         invoice.setInvoiceNumber("AIRS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
         invoice.setAmount(totalAmount);
         invoice.setVehicle(savedVehicle);
+        invoice.setCreatedBy(jwtService.user);
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
@@ -145,11 +145,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         number.setOwner(portalUser);
         number.setPlateNumberStatus(PlateNumberStatus.SOLD);
         plateNumberRepository.save(number);
-        salesRepository.save(sales1);
+        Sales saved = salesRepository.save(sales1);
         cardService.createCard(savedInvoice, savedVehicle);
 
 
-        return sales;
+        return savedInvoice;
     }
 
     @Override
@@ -435,16 +435,15 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         invoiceDto.setEmail(invoice.getPayer().getEmail());
         invoiceDto.setInvoiceNumber(invoice.getInvoiceNumber());
         invoiceDto.setReference(invoice.getPaymentRef());
-        invoiceDto.setCategory(invoice.getVehicle().getVehicleCategory().getName());
-        invoiceDto.setPlatenumber(invoice.getVehicle().getPlateNumber().getPlateNumber());
-        invoiceDto.setMake(invoice.getVehicle().getVehicleModel().getVehicleMake().getName());
-        invoiceDto.setModel(invoice.getVehicle().getVehicleModel().getName());
-        invoiceDto.setEngine(invoice.getVehicle().getEngineNumber());
-        invoiceDto.setChasis(invoice.getVehicle().getChasisNumber());
+        if(invoice.getVehicle() != null){
+            invoiceDto.setCategory(invoice.getVehicle().getVehicleCategory().getName());
+            invoiceDto.setPlatenumber(invoice.getVehicle().getPlateNumber().getPlateNumber());
+            invoiceDto.setMake(invoice.getVehicle().getVehicleModel().getVehicleMake().getName());
+            invoiceDto.setModel(invoice.getVehicle().getVehicleModel().getName());
+            invoiceDto.setEngine(invoice.getVehicle().getEngineNumber());
+            invoiceDto.setChasis(invoice.getVehicle().getChasisNumber());
+        }
         invoiceDto.setDate(invoice.getCreatedAt());
-
-
-
         return invoiceDto;
     }
 }
