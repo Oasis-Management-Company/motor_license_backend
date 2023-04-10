@@ -1,5 +1,6 @@
 package com.app.IVAS.controller;
 
+import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.entity.Invoice;
@@ -65,6 +66,18 @@ public class vehicleCtrl {
     @PostMapping("/get/type/invoice/taxpayer")
     public ResponseEntity<?> getTypeByInvoiceTaxpayer(){
         return ResponseEntity.ok(vehicleService.getTypeByInvoiceTaxpayer());
+    }
+
+    @PostMapping("/save/all/service-type/taxpayer")
+    public ResponseEntity<?> saveServiceTypeByPlateForTaxpayer(@RequestParam String phonenumber, @RequestParam List<Long> ids){
+        Invoice dto = vehicleService.saveServiceTypeByPlateForTaxpayer(phonenumber, ids);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/get/all/taxpayer/details")
+    public ResponseEntity<?> getTaxpayerByDetails(@RequestParam String phonenumber){
+        AsinDto dto = vehicleService.getTaxpayerByDetails(phonenumber);
+        return ResponseEntity.ok(dto);
     }
 
 }

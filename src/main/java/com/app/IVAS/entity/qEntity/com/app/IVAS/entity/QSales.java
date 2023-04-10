@@ -53,6 +53,8 @@ public class QSales extends EntityPathBase<Sales> {
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser lastUpdatedBy;
 
+    public final EnumPath<com.app.IVAS.Enum.RegType> plateType = createEnum("plateType", com.app.IVAS.Enum.RegType.class);
+
     public final StringPath reason = createString("reason");
 
     public final StringPath reference_no = createString("reference_no");

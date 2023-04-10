@@ -34,4 +34,6 @@ public class ServiceType extends StatusEntity {
     @JoinColumn(name = "plate_number_type_id", referencedColumnName = "ID")
     private PlateNumberType plateNumberType;
 
+    private String revenueCode;
+
 }

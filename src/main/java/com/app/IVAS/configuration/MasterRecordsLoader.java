@@ -64,14 +64,14 @@ public class MasterRecordsLoader {
 
     private void createSuperAdminUser(UserDto dto, Role role) {
         portalUserRepository.findByUsernameIgnoreCaseAndStatus(dto.getEmail(), GenericStatusConstant.ACTIVE)
-                .orElseGet(() -> {
-                    log.info("=========== CREATING SUPER_ADMIN {} ============", dto.getEmail());
-                    try {
-                       PortalUser portalUser = userManagementService.createUser(dto, null, role);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                });
+            .orElseGet(() -> {
+                log.info("=========== CREATING SUPER_ADMIN {} ============", dto.getEmail());
+                try {
+                   PortalUser portalUser = userManagementService.createUser(dto, null, role);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            });
     }
 }

@@ -1,6 +1,7 @@
 package com.app.IVAS.entity;
 
 import com.app.IVAS.Enum.ApprovalStatus;
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.Data;
@@ -34,4 +35,8 @@ public class Sales extends StatusEntity {
     private PortalUser approvedBy;
 
     private String reason;
+
+    @Enumerated(EnumType.STRING)
+    private RegType plateType;
+
 }

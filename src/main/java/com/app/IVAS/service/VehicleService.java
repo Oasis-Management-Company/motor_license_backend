@@ -1,10 +1,11 @@
 package com.app.IVAS.service;
 
+import com.app.IVAS.dto.AsinDto;
 import com.app.IVAS.dto.InvoiceDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.entity.Invoice;
-import com.app.IVAS.entity.InvoiceServiceType;
 import com.app.IVAS.entity.ServiceType;
+import com.app.IVAS.entity.Vehicle;
 
 import java.util.List;
 
@@ -12,6 +13,8 @@ public interface VehicleService {
     InvoiceDto getUserVehicleDetails(Long id);
 
     VehicleDto getVehicleDetails(String chasis);
+
+    Vehicle saveEditedVehicle(VehicleDto vehicleDto);
 
     VehicleDto getVehicleDetailsByPlate(String plate);
 
@@ -22,4 +25,8 @@ public interface VehicleService {
     InvoiceDto getTypeByInvoiceIdEdit(Long invoiceId);
 
     List<ServiceType> getTypeByInvoiceTaxpayer();
+
+    Invoice saveServiceTypeByPlateForTaxpayer(String phonenumber, List<Long> ids);
+
+    AsinDto getTaxpayerByDetails(String phonenumber);
 }
