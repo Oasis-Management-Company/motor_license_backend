@@ -59,6 +59,8 @@ public class QServiceType extends EntityPathBase<ServiceType> {
 
     public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
 
+    public final StringPath revenueCode = createString("revenueCode");
+
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
