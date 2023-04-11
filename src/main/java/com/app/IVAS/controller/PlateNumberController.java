@@ -76,18 +76,13 @@ public class PlateNumberController {
     @Transactional
     public QueryResults<PlateNumberPojo> searchPlateNumber(PlateNumberSearchFilter filter){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        OrderSpecifier<?> sortedColumn = null;
 
         JPAQuery<PlateNumber> plateNumberJPAQuery = appRepository.startJPAQuery(QPlateNumber.plateNumber1)
                 .where(predicateExtractor.getPredicate(filter))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
-        if (filter.getIsAgent() != null){
-            if (filter.getIsAgent().equalsIgnoreCase("true")){
-                plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.isNotNull());
-                plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.username.equalsIgnoreCase(jwtService.user.getUsername()));
-            }
-        }
 
         if (filter.getCreatedAfter() != null){
             plateNumberJPAQuery.where(QPlateNumber.plateNumber1.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
@@ -97,7 +92,19 @@ public class PlateNumberController {
             plateNumberJPAQuery.where(QPlateNumber.plateNumber1.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
         }
 
-        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
+        if (filter.getIsAgent() != null){
+            if (filter.getIsAgent().equalsIgnoreCase("true")){
+                plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.isNotNull());
+                plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.username.equalsIgnoreCase(jwtService.user.getUsername()));
+                sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
+            } else {
+                sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
+            }
+        } else {
+            sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
+        }
+
+
         QueryResults<PlateNumber> plateNumberQueryResults = plateNumberJPAQuery.select(QPlateNumber.plateNumber1).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(plateNumberService.getPlateNumbers(plateNumberQueryResults.getResults()), plateNumberQueryResults.getLimit(), plateNumberQueryResults.getOffset(), plateNumberQueryResults.getTotal());
     }

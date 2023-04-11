@@ -128,7 +128,7 @@ public class RequestServiceImpl implements RequestService {
             request.setSubType(plateNumberSubTypeRepository.findByName(dto.getPlateSubType()));
         }
 
-        if(request.getPlateNumberType().getName().toUpperCase().contains("CUSTOM")){
+        if(request.getPlateNumberType().getName().toUpperCase().contains("FANCY")){
             request.setFancyPlate(dto.getFancyPlate());
             request.setTotalNumberRequested(1L);
         }
@@ -173,8 +173,8 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void CreateServiceType(ServiceTypeDto dto) {
-        ServiceType serviceType = serviceTypeRepository.findByName(dto.getName()).orElseThrow(RuntimeException::new);
-        if (serviceType == null) {
+        Optional<ServiceType> serviceType = serviceTypeRepository.findByName(dto.getName());
+        if (!serviceType.isPresent()) {
             ServiceType type = new ServiceType();
             type.setName(dto.getName());
             type.setPrice(dto.getPrice());
@@ -191,26 +191,27 @@ public class RequestServiceImpl implements RequestService {
             serviceTypeRepository.save(type);
         } else {
             if(dto.getName() != null){
-                serviceType.setName(dto.getName());
+                serviceType.get().setName(dto.getName());
             }
             if(dto.getPrice() != null){
-                serviceType.setPrice(dto.getPrice());
+                serviceType.get().setPrice(dto.getPrice());
             }
             if(dto.getDurationInMonth() != null){
-                serviceType.setDurationInMonth(dto.getDurationInMonth());
+                serviceType.get().setDurationInMonth(dto.getDurationInMonth());
             }
 
             if (dto.getCategory() != null){
-                serviceType.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
+                serviceType.get().setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
             }
 
             if(dto.getType() != null){
-                serviceType.setRegType(dto.getType());
+                serviceType.get().setRegType(dto.getType());
             }
 
             if(dto.getPlateNumberType() != null){
-                serviceType.setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
+                serviceType.get().setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
             }
+            serviceTypeRepository.save(serviceType.get());
         }
     }
 

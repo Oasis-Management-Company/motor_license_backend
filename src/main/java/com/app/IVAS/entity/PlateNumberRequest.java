@@ -23,6 +23,7 @@ public class PlateNumberRequest extends StatusEntity {
     private String trackingId;
     private String fancyPlate;
     @ManyToOne
+    @JoinColumn(name = "PLATE_NUMBER_TYPE_ID", referencedColumnName = "id")
     private PlateNumberType plateNumberType;
 
     @ManyToOne
