@@ -14,6 +14,6 @@ public class VehicleModelSearchFilter extends BaseSearchDto implements QuerydslB
 
     @Override
     public void customize(QuerydslBindings bindings, QVehicleModel root) {
-
+        bindings.including(root.vehicleMake.name);
     }
 }
