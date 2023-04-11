@@ -1,5 +1,6 @@
 package com.app.IVAS.repository;
 
+import com.app.IVAS.Utils.OkHttp3Util;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Vehicle;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -17,4 +18,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByPayer(PortalUser user);
 
     List<Invoice> findByVehicle(Vehicle vehicle);
+
+    Optional<Invoice> findByPaymentRefIgnoreCase(String number);
 }

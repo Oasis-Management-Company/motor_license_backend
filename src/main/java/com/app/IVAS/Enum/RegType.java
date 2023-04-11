@@ -4,5 +4,6 @@ public enum RegType {
     RENEWAL,
     REGISTRATION,
     NON_VEHICLE,
-    OTHERS
+    OTHERS,
+    COMPULSARY
 }

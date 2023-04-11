@@ -23,4 +23,6 @@ public interface CardService {
     Resource printCard(List<PrintDto> dtos) throws Exception;
     
     List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount);
+
+    Resource printDocuments(List<PrintDto> dtos) throws Exception;
 }

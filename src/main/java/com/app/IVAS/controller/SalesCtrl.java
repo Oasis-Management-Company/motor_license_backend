@@ -231,4 +231,11 @@ public class SalesCtrl {
     public ResponseEntity<List<InsuranceCompany>> getInsurance() {
         return ResponseEntity.ok(service.getInsurance());
     }
+
+    @GetMapping("/all/service/category/plate")
+    public ResponseEntity<List<ServiceType>> getServiceByCatandPlate(@RequestParam Long cat, @RequestParam Long plate) {
+        return ResponseEntity.ok(service.getServiceByCatandPlate(cat, plate));
+    }
+
+
 }

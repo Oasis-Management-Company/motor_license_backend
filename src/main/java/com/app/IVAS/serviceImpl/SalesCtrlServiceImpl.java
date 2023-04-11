@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,10 +50,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final PortalUserRepository portalUserRepository;
     private final CardService cardService;
     private final InsuranceRepository insuranceRepository;
+    private final RrrGenerationService rrrGenerationService;
 
 
 
     @Override
+    @Transactional
     public Invoice SaveSales(SalesDto sales) {
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
@@ -69,7 +72,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
         InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
-        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegType(category, types, RegType.REGISTRATION);
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
         PortalUser portalUser = null;
 
         PortalUser user = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
@@ -117,7 +120,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         invoice.setPayer(portalUser);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
-        invoice.setInvoiceNumber("AIRS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
         invoice.setAmount(totalAmount);
         invoice.setVehicle(savedVehicle);
         invoice.setCreatedBy(jwtService.user);
@@ -129,9 +132,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             InvoiceServiceType serviceType = new InvoiceServiceType();
             serviceType.setServiceType(type);
             serviceType.setInvoice(savedInvoice);
-            serviceType.setReference("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
-            serviceType.setRevenuecode("2000787-7888900");
-
+            serviceType.setReference(rrrGenerationService.generateNewReferenceNumber());
+            if (type.getRevenueCode() != null){
+                serviceType.setRevenuecode(type.getRevenueCode());
+            }
             invoiceServiceTypeArrayList.add(serviceType);
         }
         invoiceServiceTypeRepository.saveAll(invoiceServiceTypeArrayList);
@@ -175,6 +179,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setApprovalStatus(sales.getApprovalStatus());
             dto.setCategoryId(sales.getVehicle().getVehicleCategory().getId());
             dto.setId(sales.getId());
+            dto.setInvoice(sales.getInvoice().getId());
+            dto.setPlatecat(sales.getVehicle().getPlateNumber().getType().getName());
             return dto;
 
         }).collect(Collectors.toList());
@@ -311,6 +317,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setPlate(sales.getPlateNumber().getPlateNumber());
             dto.setDate(sales.getCreatedAt());
             dto.setYear(sales.getYear());
+            dto.setPlateType(sales.getPlateNumber().getType().getName());
             return dto;
 
         }).collect(Collectors.toList());
@@ -442,8 +449,18 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             invoiceDto.setModel(invoice.getVehicle().getVehicleModel().getName());
             invoiceDto.setEngine(invoice.getVehicle().getEngineNumber());
             invoiceDto.setChasis(invoice.getVehicle().getChasisNumber());
+            invoiceDto.setPlateType(invoice.getVehicle().getPlateNumber().getType().getName());
         }
         invoiceDto.setDate(invoice.getCreatedAt());
         return invoiceDto;
+    }
+
+    @Override
+    public List<ServiceType> getServiceByCatandPlate(Long cat, Long plate) {
+
+        VehicleCategory category = vehicleCategoryRepository.findById(cat).get();
+        PlateNumberType plateNumber = plateNumberTypeRepository.findById(plate).get();
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, plateNumber, RegType.REGISTRATION, RegType.COMPULSARY);
+        return serviceTypes;
     }
 }
