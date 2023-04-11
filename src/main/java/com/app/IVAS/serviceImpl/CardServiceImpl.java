@@ -311,6 +311,14 @@ public class CardServiceImpl implements CardService {
                 return templateName = "sticker";
             case COMPUTERIZED:
                 return templateName = "npr";
+            case LEARNERS:
+                return templateName = "Referral_printout";
+            case GENERAL:
+                return templateName = "GMR";
+            case HEAVY:
+                return templateName = "heavy_duty";
+            case HACKNEY:
+                return templateName = "hackney_permit";
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }

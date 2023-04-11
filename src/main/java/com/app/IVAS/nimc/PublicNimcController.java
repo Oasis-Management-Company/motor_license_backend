@@ -374,34 +374,22 @@ public class PublicNimcController {
                 if (nins.getResponseData() != null){
                     NIN saved = ninRepository.save(nins.getResponseData());
                     dto.setPhoto(saved.getPhoto());
-                    dto.setEmail(saved.getEmail());
+                    dto.setEmail(saved.getNin()+"@gmail.com");
                     dto.setPhoneNumber(saved.getTelePhoneNumber());
-                    dto.setName(saved.getFirstName());
+                    dto.setName(saved.getFirstName() + " " + saved.getSurname());
                     dto.setAddress(saved.getResidenceAddressLine1());
                     dto.setNinId(saved.getId());
-                    return dto;
-                }else{
-                    UserDemographicIndividual individual =  publicService.getInformalSectioFromTax(number);
-                    System.out.println(individual);
-                    dto.setPhoto(individual.getPhoto());
-                    dto.setEmail(individual.getEmail());
-                    dto.setPhoneNumber(individual.getPhoneNumber());
-                    dto.setName(individual.getName());
-                    dto.setAddress(individual.getAddress());
-                    dto.setFirstname(individual.getFirstname());
-                    dto.setLastname(individual.getLastname());
-                    dto.setLga(individual.getLga());
-
+                    dto.setLastname(saved.getFirstName());
                     return dto;
                 }
-
             }
             dto.setPhoto(nin.getPhoto());
             dto.setEmail(nin.getEmail());
             dto.setPhoneNumber(nin.getTelePhoneNumber());
-            dto.setName(nin.getFirstName());
+            dto.setName(nin.getFirstName() + " " + nin.getSurname());
             dto.setAddress(nin.getResidenceAddressLine1());
             dto.setNinId(nin.getId());
+            dto.setLastname(nin.getFirstName());
             return  dto;
         }catch (Exception ex){
             System.out.println(ex);
