@@ -7,6 +7,8 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.QWorkFlowStage;
+import com.app.IVAS.entity.userManagement.PortalUser;
+import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.repository.PrefixRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
@@ -25,6 +27,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -152,6 +155,18 @@ public class RequestController {
     @GetMapping("/prefix")
     public List<Prefix> getStartCodes(){
         return prefixRepository.findAll().stream().sorted(Comparator.comparing(Prefix::getCode)).collect(Collectors.toList());
+    }
+
+    @GetMapping("/get-mla")
+    public List<String> getMla(){
+        List<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
+                .where(QPortalUser.portalUser.role.name.equalsIgnoreCase("MLA"))
+                .fetch();
+
+        List<String> mlas= new ArrayList<>();
+        for (PortalUser user : portalUserJPAQuery){ mlas.add(user.getDisplayName()); }
+
+        return mlas;
     }
 
 }

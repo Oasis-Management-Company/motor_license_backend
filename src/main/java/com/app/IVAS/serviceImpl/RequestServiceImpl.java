@@ -128,7 +128,7 @@ public class RequestServiceImpl implements RequestService {
             request.setSubType(plateNumberSubTypeRepository.findByName(dto.getPlateSubType()));
         }
 
-        if(request.getPlateNumberType().getName().toUpperCase().contains("CUSTOM")){
+        if(request.getPlateNumberType().getName().toUpperCase().contains("FANCY")){
             request.setFancyPlate(dto.getFancyPlate());
             request.setTotalNumberRequested(1L);
         }
