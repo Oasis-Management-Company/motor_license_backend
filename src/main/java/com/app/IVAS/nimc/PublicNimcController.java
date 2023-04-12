@@ -374,7 +374,11 @@ public class PublicNimcController {
                 if (nins.getResponseData() != null){
                     NIN saved = ninRepository.save(nins.getResponseData());
                     dto.setPhoto(saved.getPhoto());
-                    dto.setEmail(saved.getNin()+"@gmail.com");
+                    if(saved.getEmail() == null){
+                        dto.setEmail(saved.getNin()+"@gmail.com");
+                    }else {
+                        dto.setEmail(saved.getEmail());
+                    }
                     dto.setPhoneNumber(saved.getTelePhoneNumber());
                     dto.setName(saved.getFirstName() + " " + saved.getSurname());
                     dto.setAddress(saved.getResidenceAddressLine1());
@@ -384,7 +388,11 @@ public class PublicNimcController {
                 }
             }
             dto.setPhoto(nin.getPhoto());
-            dto.setEmail(nin.getEmail());
+            if (nin.getEmail() == null){
+                dto.setEmail(nin.getNin()+"@gmail.com");
+            }else{
+                dto.setEmail(nin.getEmail());
+            }
             dto.setPhoneNumber(nin.getTelePhoneNumber());
             dto.setName(nin.getFirstName() + " " + nin.getSurname());
             dto.setAddress(nin.getResidenceAddressLine1());

@@ -2,10 +2,12 @@ package com.app.IVAS.repository;
 
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.entity.userManagement.PortalUser;
+import com.app.IVAS.entity.userManagement.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,4 +24,6 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
     PortalUser findByPhoneNumber(String number);
 
     PortalUser findFirstByPhoneNumber(String number);
+
+    List<PortalUser> findAllByRole(Optional<Role> role);
 }

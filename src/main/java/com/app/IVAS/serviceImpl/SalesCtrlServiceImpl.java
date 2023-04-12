@@ -8,6 +8,7 @@ import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.CardService;
+import com.app.IVAS.service.PaymentService;
 import com.app.IVAS.service.SalesCtrlService;
 import com.app.IVAS.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final CardService cardService;
     private final InsuranceRepository insuranceRepository;
     private final RrrGenerationService rrrGenerationService;
+    private final PaymentServiceImpl paymentService;
 
 
 
@@ -151,6 +153,13 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         plateNumberRepository.save(number);
         Sales saved = salesRepository.save(sales1);
         cardService.createCard(savedInvoice, savedVehicle);
+
+        try{
+            System.out.println("reached here for uplad to tax");
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        }catch (Exception e){
+            System.out.println(e);
+        }
 
 
         return savedInvoice;
