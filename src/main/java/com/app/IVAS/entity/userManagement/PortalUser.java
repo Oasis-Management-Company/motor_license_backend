@@ -134,6 +134,7 @@ public class PortalUser extends StatusEntity {
     private String address;
 
     @ManyToOne
+    @JoinColumn(name = "OFFICE_ID", referencedColumnName = "id")
     private ZonalOffice office;
 
 }

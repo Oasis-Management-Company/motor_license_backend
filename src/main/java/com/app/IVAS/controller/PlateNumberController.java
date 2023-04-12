@@ -96,14 +96,13 @@ public class PlateNumberController {
             if (filter.getIsAgent().equalsIgnoreCase("true")){
                 plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.isNotNull());
                 plateNumberJPAQuery.where(QPlateNumber.plateNumber1.agent.username.equalsIgnoreCase(jwtService.user.getUsername()));
-                sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
-            } else {
                 sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
+            } else {
+                sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
             }
         } else {
-            sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
+            sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("createdAt"), QPlateNumber.plateNumber1);
         }
-
 
 
         QueryResults<PlateNumber> plateNumberQueryResults = plateNumberJPAQuery.select(QPlateNumber.plateNumber1).distinct().orderBy(sortedColumn).fetchResults();

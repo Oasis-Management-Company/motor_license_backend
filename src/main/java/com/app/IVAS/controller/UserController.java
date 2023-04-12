@@ -34,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -193,6 +192,11 @@ public class UserController {
     public List<ZonalOffice> getZonalOffice(@RequestParam Long id) {
         Zone zone = zoneRepository.findById(id).get();
         return  zonalOfficeRepository.findByZone(zone);
+    }
+
+    @GetMapping("/get-office")
+    public List<ZonalOffice> getOffice() {
+        return  zonalOfficeRepository.findAll();
     }
 
     @GetMapping("/search/others")
