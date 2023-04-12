@@ -1,4 +1,5 @@
 package com.app.IVAS.serviceImpl;
+
 import com.app.IVAS.Enum.AssignmentStatusConstant;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.PlateNumberRequest;
@@ -67,7 +68,7 @@ public class RequestServiceImpl implements RequestService {
             pojo.setCurrentApprovingOfficer(request.getWorkFlow().getStage().getApprovingOfficer().getDisplayName());
             pojo.setFancyPlate(request.getFancyPlate() != null ? request.getFancyPlate() : "");
 
-            if (request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.APPROVED || request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.DENIED){
+            if (request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.APPROVED || request.getWorkFlowApprovalStatus() == WorkFlowApprovalStatus.DENIED) {
                 pojo.setFinalApprovingOfficer(workFlowLogRepository.findByRequest(request).stream().sorted(Comparator.comparing(WorkFLowLog::getCreatedAt).reversed()).collect(Collectors.toList()).get(0).getCreatedBy().getDisplayName());
             }
 
@@ -80,12 +81,13 @@ public class RequestServiceImpl implements RequestService {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return serviceTypes.stream().map(serviceType -> {
             ServiceTypePojo pojo = new ServiceTypePojo();
+            pojo.setId(serviceType.getId());
             pojo.setName(serviceType.getName());
             pojo.setPrice(serviceType.getPrice());
             pojo.setDurationInMonth(serviceType.getDurationInMonth());
-            pojo.setCategoryName(serviceType.getCategory() != null ? serviceType.getCategory().getName(): "");
+            pojo.setCategoryName(serviceType.getCategory() != null ? serviceType.getCategory().getName() : "");
             pojo.setCreatedAt(serviceType.getCreatedAt() != null ? serviceType.getCreatedAt().format(df) : "");
-            pojo.setCreatedBy(serviceType.getCreatedBy()!= null ?  serviceType.getCreatedBy().getDisplayName() : "");
+            pojo.setCreatedBy(serviceType.getCreatedBy() != null ? serviceType.getCreatedBy().getDisplayName() : "");
             return pojo;
         }).collect(Collectors.toList());
     }
@@ -93,7 +95,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<WorkFLowStagePojo> getWorkFlowStage(List<WorkFlowStage> workFlowStages) {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
-        return  workFlowStages.stream().map(workFlowStage -> {
+        return workFlowStages.stream().map(workFlowStage -> {
             WorkFLowStagePojo pojo = new WorkFLowStagePojo();
             pojo.setStep(workFlowStage.getStep());
             pojo.setApprovingOfficer(workFlowStage.getApprovingOfficer().getDisplayName());
@@ -124,11 +126,11 @@ public class RequestServiceImpl implements RequestService {
         request.setTotalNumberRequested(dto.getNumberOfPlates());
         request.setPlateNumberType(plateNumberTypeRepository.findByName(dto.getPlateType()));
 
-        if (dto.getPlateSubType() != null){
+        if (dto.getPlateSubType() != null) {
             request.setSubType(plateNumberSubTypeRepository.findByName(dto.getPlateSubType()));
         }
 
-        if(request.getPlateNumberType().getName().toUpperCase().contains("FANCY")){
+        if (request.getPlateNumberType().getName().toUpperCase().contains("FANCY")) {
             request.setFancyPlate(dto.getFancyPlate());
             request.setTotalNumberRequested(1L);
         }
@@ -140,7 +142,7 @@ public class RequestServiceImpl implements RequestService {
         request.setCreatedBy(jwtService.user);
         PlateNumberRequest plateNumberRequest = plateNumberRequestRepository.save(request);
 
-        if (!dto.getPreferredPlates().isEmpty()){
+        if (!dto.getPreferredPlates().isEmpty()) {
             dto.getPreferredPlates().forEach(preferredPlateDto -> {
                 PreferredPlate preferredPlate = new PreferredPlate();
                 preferredPlate.setCode(preferredPlateDto.getLgaCode());
@@ -157,7 +159,7 @@ public class RequestServiceImpl implements RequestService {
         List<WorkFlowStage> stages = workFlowStageRepository.findByType(dto.getType());
 
         WorkFlowStage newStage = new WorkFlowStage();
-        if (stages.isEmpty()){
+        if (stages.isEmpty()) {
             newStage.setStep(1L);
         } else {
             newStage.setStep(stages.size() + 1L);
@@ -173,14 +175,14 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void CreateServiceType(ServiceTypeDto dto) {
-        Optional<ServiceType> serviceType = serviceTypeRepository.findByName(dto.getName());
+        Optional<ServiceType> serviceType = serviceTypeRepository.findByNameIgnoreCase(dto.getName());
         if (!serviceType.isPresent()) {
             ServiceType type = new ServiceType();
             type.setName(dto.getName());
             type.setPrice(dto.getPrice());
             type.setDurationInMonth(dto.getDurationInMonth());
 
-            if (dto.getCategory() != null){
+            if (dto.getCategory() != null) {
                 type.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
                 type.setRegType(dto.getType());
                 type.setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
@@ -190,30 +192,108 @@ public class RequestServiceImpl implements RequestService {
             type.setCreatedBy(jwtService.user);
             serviceTypeRepository.save(type);
         } else {
-            if(dto.getName() != null){
+            if (dto.getName() != null) {
                 serviceType.get().setName(dto.getName());
             }
-            if(dto.getPrice() != null){
+            if (dto.getPrice() != null) {
                 serviceType.get().setPrice(dto.getPrice());
             }
-            if(dto.getDurationInMonth() != null){
+            if (dto.getDurationInMonth() != null) {
                 serviceType.get().setDurationInMonth(dto.getDurationInMonth());
             }
 
-            if (dto.getCategory() != null){
+            if (dto.getCategory() != null) {
                 serviceType.get().setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
             }
 
-            if(dto.getType() != null){
+            if (dto.getType() != null) {
                 serviceType.get().setRegType(dto.getType());
             }
 
-            if(dto.getPlateNumberType() != null){
+            if (dto.getPlateNumberType() != null) {
                 serviceType.get().setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
             }
             serviceTypeRepository.save(serviceType.get());
         }
     }
+
+    @Override
+    public ServiceTypeDto viewServiceType(Long id) {
+        ServiceType serviceType = serviceTypeRepository.findById(id).get();
+
+        ServiceTypeDto serviceTypeDto = new ServiceTypeDto();
+
+        serviceTypeDto.setName(serviceType.getName());
+        serviceTypeDto.setType(serviceType.getRegType());
+
+        if (serviceType.getPrice() != null) {
+            serviceTypeDto.setPrice(serviceType.getPrice());
+        }
+
+        if (serviceType.getDurationInMonth() != null) {
+            serviceTypeDto.setDurationInMonth(serviceType.getDurationInMonth());
+        }
+
+        if (serviceType.getCategory() != null) {
+            serviceTypeDto.setCategory(serviceType.getCategory().getId());
+            serviceTypeDto.setCategoryName(serviceType.getCategory().getName());
+        }
+
+        if (serviceType.getPlateNumberType() != null) {
+            serviceTypeDto.setPlateNumberType(serviceType.getPlateNumberType().getId());
+            serviceTypeDto.setPlateNumberTypeName(serviceType.getPlateNumberType().getName());
+        }
+
+
+        return serviceTypeDto;
+
+    }
+
+    @Override
+    public void editServiceType(ServiceTypeDto dto) {
+        Optional<ServiceType> serviceType = serviceTypeRepository.findByNameIgnoreCase(dto.getName());
+        if (!serviceType.isPresent()) {
+            ServiceType type = new ServiceType();
+            type.setName(dto.getName());
+            type.setPrice(dto.getPrice());
+            type.setDurationInMonth(dto.getDurationInMonth());
+
+            if (dto.getCategory() != null) {
+                type.setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
+                type.setRegType(dto.getType());
+                type.setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
+            }
+
+            type.setStatus(GenericStatusConstant.ACTIVE);
+            type.setCreatedBy(jwtService.user);
+            serviceTypeRepository.save(type);
+        } else {
+            if (dto.getName() != null) {
+                serviceType.get().setName(dto.getName());
+            }
+            if (dto.getPrice() != null) {
+                serviceType.get().setPrice(dto.getPrice());
+            }
+            if (dto.getDurationInMonth() != null) {
+                serviceType.get().setDurationInMonth(dto.getDurationInMonth());
+            }
+
+            if (dto.getCategory() != null) {
+                serviceType.get().setCategory(vehicleCategoryRepository.findById(dto.getCategory()).get());
+            }
+
+            if (dto.getType() != null) {
+                serviceType.get().setRegType(dto.getType());
+            }
+
+            if (dto.getPlateNumberType() != null) {
+                serviceType.get().setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
+            }
+            serviceTypeRepository.save(serviceType.get());
+        }
+    }
+
+
 
     @Override
     public void UpdatePlateNumberRequest(Long requestId, String action) throws URISyntaxException {
@@ -226,7 +306,7 @@ public class RequestServiceImpl implements RequestService {
         workFlowLogRepository.save(log);
 
         WorkFlow workFlow = request.getWorkFlow();
-        if ((!workFlow.getStage().getIsFinalStage() && !workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")){
+        if ((!workFlow.getStage().getIsFinalStage() && !workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")) {
             workFlow.setStage(workFlowStageRepository.findByTypeAndStep(workFlow.getType(), workFlow.getStage().getStep() + 1).get());
         } else if (action.equalsIgnoreCase("DISAPPROVED")) {
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
@@ -237,7 +317,7 @@ public class RequestServiceImpl implements RequestService {
 
             smsService.sendSms(request.getCreatedBy().getPhoneNumber(), "Your plate number request with tracking id: " + request.getTrackingId() + " has been disapproved");
 
-        } else if ((workFlow.getStage().getIsFinalStage() || canApproveRequest()) && action.equalsIgnoreCase("APPROVED")){
+        } else if ((workFlow.getStage().getIsFinalStage() || canApproveRequest()) && action.equalsIgnoreCase("APPROVED")) {
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             workFlow.setFinalApprover(jwtService.user);
 
@@ -256,8 +336,8 @@ public class RequestServiceImpl implements RequestService {
         List<WorkFlowStage> stages = workFlowStageRepository.findByType(WorkFlowType.PLATE_NUMBER_REQUEST);
 
         return stages.stream().anyMatch(stage -> {
-            if (stage.getIsSuperApprover()){
-               return stage.getApprovingOfficer().getDisplayName().equalsIgnoreCase(jwtService.user.getDisplayName());
+            if (stage.getIsSuperApprover()) {
+                return stage.getApprovingOfficer().getDisplayName().equalsIgnoreCase(jwtService.user.getDisplayName());
             }
             return false;
         });
