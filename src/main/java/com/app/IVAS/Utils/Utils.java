@@ -104,6 +104,13 @@ public class Utils {
         return (int) (Math.random() * (max - min + 1) + min);
     }
 
+    public static long numbGen() {
+        while (true) {
+            long numb = (long)(Math.random() * 100000000 * 1000000);
+            if (String.valueOf(numb).length() == 13)
+                return numb;
+        }
+    }
 
     public static String removeDoubleQuoteAndIsNullCheck(String input) {
         // Remove double quote

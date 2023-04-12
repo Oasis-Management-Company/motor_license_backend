@@ -47,4 +47,6 @@ public interface SalesCtrlService {
     VehicleDto viewVehicle(String chassisNo);
 
     InvoiceDto getVehicleOwnerDetails(Long invoiceId);
+
+    List<ServiceType> getServiceByCatandPlate(Long cat, Long plate);
 }

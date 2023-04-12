@@ -29,6 +29,7 @@ public class InvoiceDto {
     private String reference;
     private LocalDateTime date;
     private String mla;
+    private String plateType;
     private Double amount;
     private PaymentStatus status;
     private Long id;

@@ -17,11 +17,11 @@ public interface ServiceTypeRepository extends JpaRepository<ServiceType, Long> 
     
      Optional<ServiceType> findByName(String name);
 
-    List<ServiceType> findAllByCategoryAndPlateNumberTypeAndRegType(VehicleCategory category, PlateNumberType types, RegType registration);
-
     List<ServiceType> findAllByCategoryAndRegTypeAndPlateNumberTypeOrCategoryAndPlateNumberTypeIsNull(VehicleCategory vehicleCategory, RegType renewal, PlateNumberType type, VehicleCategory vehicleCategory1);
 
     List<ServiceType> findAllByCategoryIsNullAndPlateNumberTypeIsNull();
 
-    List<ServiceType> findAllByRegType(RegType nonVehicle);
+    List<ServiceType> findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(VehicleCategory category, PlateNumberType types, RegType registration, RegType compulsary);
+
+    List<ServiceType> findAllByRegTypeOrRegType(RegType nonVehicle, RegType compulsary);
 }

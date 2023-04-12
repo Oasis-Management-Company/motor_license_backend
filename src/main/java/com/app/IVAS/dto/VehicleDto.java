@@ -24,6 +24,7 @@ public class VehicleDto {
     private Vehicle vehicle;
     private String insurance;
     private String company;
+    private String plateType;
 
 
     private String firstname;

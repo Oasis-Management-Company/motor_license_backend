@@ -33,6 +33,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
     private final JwtService jwtService;
     private final SalesRepository salesRepository;
+    private final RrrGenerationService rrrGenerationService;
 
     @Override
     public InvoiceDto getUserVehicleDetails(Long id) {
@@ -97,6 +98,7 @@ public class VehicleServiceImpl implements VehicleService {
         vehicleDto.setEmail(vehicle.getPortalUser().getEmail());
         vehicleDto.setAddress(vehicle.getPortalUser().getAddress());
         vehicleDto.setPhonenumber(vehicle.getPortalUser().getPhoneNumber());
+        vehicleDto.setPlateType(vehicle.getPlateNumber().getType().getName());
 
         return vehicleDto;
     }
@@ -106,7 +108,7 @@ public class VehicleServiceImpl implements VehicleService {
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
         Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
 
-        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndRegTypeAndPlateNumberTypeOrCategoryAndPlateNumberTypeIsNull(vehicle.getVehicleCategory(), RegType.RENEWAL, plateNumber.getType(), vehicle.getVehicleCategory());
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(vehicle.getVehicleCategory(),plateNumber.getType(), RegType.RENEWAL, RegType.COMPULSARY);
         return serviceTypes;
     }
 
@@ -125,8 +127,7 @@ public class VehicleServiceImpl implements VehicleService {
         Invoice invoice = new Invoice();
         invoice.setVehicle(vehicle);
         invoice.setPayer(vehicle.getPortalUser());
-        invoice.setPaymentRef("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
-        invoice.setInvoiceNumber("" + LocalDate.now().getYear()+ (int)(Math.random()* 347805607));
+        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
         invoice.setPayer(vehicle.getPortalUser());
         invoice.setAmount(totalAmount);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
@@ -140,7 +141,7 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference("IVAS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+            invoiceServiceType.setReference(rrrGenerationService.generateNewReferenceNumber());
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
@@ -192,8 +193,7 @@ public class VehicleServiceImpl implements VehicleService {
 
         Invoice invoice = new Invoice();
         invoice.setPayer(portalUser);
-        invoice.setPaymentRef("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
-        invoice.setInvoiceNumber("AIRS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
         invoice.setAmount(totalAmount);
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
@@ -206,7 +206,7 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference("IVAS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+            invoiceServiceType.setReference(rrrGenerationService.generateNewReferenceNumber());
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
         return savedInvoice;
@@ -228,7 +228,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<ServiceType> getTaxpayerByDetailsServices() {
-        return serviceTypeRepository.findAllByRegType(RegType.NON_VEHICLE);
+        return serviceTypeRepository.findAllByRegTypeOrRegType(RegType.NON_VEHICLE, RegType.COMPULSARY);
     }
 
     @Override
@@ -244,9 +244,8 @@ public class VehicleServiceImpl implements VehicleService {
 
         Invoice invoice = new Invoice();
         invoice.setPayer(portalUser);
-        invoice.setPaymentRef("IVS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
-        invoice.setInvoiceNumber("AIRS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
         invoice.setAmount(totalAmount);
+        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
         invoice.setCreatedBy(jwtService.user);
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
@@ -255,11 +254,11 @@ public class VehicleServiceImpl implements VehicleService {
 
         for (Long nid : ids) {
             InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
-            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            ServiceType serviceType = serviceTypeRepository.findById(nid).get();
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference("IVAS-" + LocalDate.now().getYear()+ (int)(Math.random()* 12345607));
+            invoiceServiceType.setReference(rrrGenerationService.generateNewReferenceNumber());
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
