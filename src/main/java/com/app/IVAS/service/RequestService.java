@@ -23,6 +23,10 @@ public interface RequestService {
 
     void CreateServiceType(ServiceTypeDto dto);
 
+    ServiceTypeDto viewServiceType(Long id);
+
+    void editServiceType(ServiceTypeDto dto);
+
     void UpdatePlateNumberRequest(Long requestId, String action) throws URISyntaxException;
 
     Boolean canApproveRequest();

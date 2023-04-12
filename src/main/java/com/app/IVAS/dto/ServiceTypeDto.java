@@ -9,8 +9,10 @@ public class ServiceTypeDto {
     private Double price;
     private Long durationInMonth;
     private Long category;
+    private String categoryName;
     private RegType type;
     private Long plateNumberType;
+    private String plateNumberTypeName;
     private Double amount;
     private String revenueCode;
 }

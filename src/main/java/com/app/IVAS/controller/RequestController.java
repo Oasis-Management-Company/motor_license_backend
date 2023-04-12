@@ -92,6 +92,13 @@ public class RequestController {
        return ResponseEntity.ok("");
     }
 
+    @PostMapping("/edit-service")
+    @Transactional
+    public ResponseEntity<?> editServiceType(@RequestBody ServiceTypeDto dto){
+        requestService.editServiceType(dto);
+        return ResponseEntity.ok("");
+    }
+
     @PostMapping("/update/plate-number-request")
     @Transactional
     public ResponseEntity<?> UpdatePlateNumberRequest(@RequestParam Long requestId,
@@ -167,6 +174,12 @@ public class RequestController {
         for (PortalUser user : portalUserJPAQuery){ mlas.add(user.getDisplayName()); }
 
         return mlas;
+    }
+
+    @GetMapping("/serviceType/view")
+    public ResponseEntity<?> viewServiceType(@RequestParam Long rowId){
+
+        return ResponseEntity.ok(requestService.viewServiceType(rowId));
     }
 
 }

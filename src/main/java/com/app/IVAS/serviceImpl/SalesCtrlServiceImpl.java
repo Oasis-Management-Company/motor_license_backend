@@ -413,6 +413,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         return insuranceRepository.findAll();
     }
 
+    @Override
     public VehicleDto viewVehicle(String chassisNo) {
         Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findByChasisNumberIgnoreCase(chassisNo));
 
