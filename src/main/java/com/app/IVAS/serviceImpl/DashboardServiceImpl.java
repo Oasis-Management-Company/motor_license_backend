@@ -6,7 +6,6 @@ import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.DashboardDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QInvoice;
-import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QSales;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 @Slf4j
