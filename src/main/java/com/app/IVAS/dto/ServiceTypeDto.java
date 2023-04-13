@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class ServiceTypeDto {
+    private Long id;
     private String name;
     private Double price;
     private Long durationInMonth;
