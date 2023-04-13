@@ -51,12 +51,12 @@ public class UserController {
     private final ZoneRepository zoneRepository;
     private final ZonalOfficeRepository zonalOfficeRepository;
     private final PermissionRepository permissionRepository;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
     @GetMapping("/search")
     @Transactional
     public QueryResults<PortalUserPojo> searchUsers(PortalUserSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         JPAQuery<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
                 .where(predicateExtractor.getPredicate(filter))
@@ -202,7 +202,6 @@ public class UserController {
     @GetMapping("/search/others")
     @Transactional
     public QueryResults<PortalUserPojo> searchOtherUsers(PortalUserSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         JPAQuery<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
                 .where(predicateExtractor.getPredicate(filter))

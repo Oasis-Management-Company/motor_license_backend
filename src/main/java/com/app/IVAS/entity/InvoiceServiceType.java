@@ -32,4 +32,5 @@ public class InvoiceServiceType {
 
     private String reference;
     private String revenuecode;
+    private Double amount;
 }

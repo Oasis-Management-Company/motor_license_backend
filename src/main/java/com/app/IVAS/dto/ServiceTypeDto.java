@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ServiceTypeDto {
+    private Long id;
     private String name;
     private Double price;
     private Long durationInMonth;

@@ -39,6 +39,7 @@ public class CardController {
     private final CardService cardService;
     private final AppRepository appRepository;
     private final PredicateExtractor predicateExtractor;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
     @GetMapping("/get_full_details/{invoiceNumber}")
@@ -56,7 +57,6 @@ public class CardController {
     @GetMapping("/search")
     @Transactional
     public QueryResults<CardDto> searchCards(CardSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         JPAQuery<Card> cardJPAQuery = appRepository.startJPAQuery(QCard.card)
                 .where(predicateExtractor.getPredicate(filter))

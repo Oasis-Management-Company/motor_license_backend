@@ -222,7 +222,7 @@ public class RequestServiceImpl implements RequestService {
         ServiceType serviceType = serviceTypeRepository.findById(id).get();
 
         ServiceTypeDto serviceTypeDto = new ServiceTypeDto();
-
+        serviceTypeDto.setId(serviceType.getId());
         serviceTypeDto.setName(serviceType.getName());
         serviceTypeDto.setType(serviceType.getRegType());
 
@@ -251,7 +251,8 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public void editServiceType(ServiceTypeDto dto) {
-        Optional<ServiceType> serviceType = serviceTypeRepository.findByNameIgnoreCase(dto.getName());
+        Optional<ServiceType> serviceType = serviceTypeRepository.findById(dto.getId());
+
         if (!serviceType.isPresent()) {
             ServiceType type = new ServiceType();
             type.setName(dto.getName());

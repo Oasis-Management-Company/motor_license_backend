@@ -22,6 +22,8 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public static final QInvoiceServiceType invoiceServiceType = new QInvoiceServiceType("invoiceServiceType");
 
+    public final NumberPath<Double> amount = createNumber("amount", Double.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QInvoice invoice;

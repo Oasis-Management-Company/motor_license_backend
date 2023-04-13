@@ -43,11 +43,11 @@ public class RequestController {
     private final RequestService requestService;
     private final PrefixRepository prefixRepository;
     private final JwtService jwtService;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping("/search/plate-number-request")
     @Transactional
     public QueryResults<PlateNumberRequestPojo> searchPlateNumberRequest(PlateNumberRequestSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         JPAQuery<PlateNumberRequest> plateNumberRequestJPAQuery = appRepository.startJPAQuery(QPlateNumberRequest.plateNumberRequest)
                 .where(predicateExtractor.getPredicate(filter))
@@ -110,7 +110,6 @@ public class RequestController {
     @GetMapping("/search/service-type")
     @Transactional
     public QueryResults<ServiceTypePojo> searchServiceType(PlateNumberRequestSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         JPAQuery<ServiceType> serviceTypeJPAQuery = appRepository.startJPAQuery(QServiceType.serviceType)
                 .where(predicateExtractor.getPredicate(filter))
@@ -133,7 +132,6 @@ public class RequestController {
     @GetMapping("/search/work-flow-stage")
     @Transactional
     public QueryResults<WorkFLowStagePojo> searchWorkFlowStage(PlateNumberRequestSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         JPAQuery<WorkFlowStage> workFlowStageJPAQuery = appRepository.startJPAQuery(QWorkFlowStage.workFlowStage)
                 .where(predicateExtractor.getPredicate(filter))
