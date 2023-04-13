@@ -20,4 +20,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByVehicle(Vehicle vehicle);
 
     Optional<Invoice> findByPaymentRefIgnoreCase(String number);
+
+    Invoice findFirstByInvoiceNumberIgnoreCase(String invoice);
 }

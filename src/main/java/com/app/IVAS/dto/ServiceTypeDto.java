@@ -3,6 +3,8 @@ package com.app.IVAS.dto;
 import com.app.IVAS.Enum.RegType;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class ServiceTypeDto {
     private Long id;
@@ -16,4 +18,10 @@ public class ServiceTypeDto {
     private String plateNumberTypeName;
     private Double amount;
     private String revenueCode;
+    private String transactionId;
+
+    private String referenceNumber;
+    private LocalDateTime dateBooked;
+    private LocalDateTime dateExpired;
+    private String itemCode;
 }
