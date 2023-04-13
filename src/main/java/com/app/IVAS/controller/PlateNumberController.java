@@ -48,11 +48,11 @@ public class PlateNumberController {
     private final PlateNumberSubTypeRepository plateNumberSubTypeRepository;
     private final PlateNumberRepository plateNumberRepository;
     private final JwtService jwtService;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping("/search/stock")
     @Transactional
     public QueryResults<StockPojo> searchStock(StockSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         JPAQuery<Stock> stockJPAQuery = appRepository.startJPAQuery(QStock.stock)
                 .where(predicateExtractor.getPredicate(filter))
@@ -75,7 +75,6 @@ public class PlateNumberController {
     @GetMapping("/search/plate-number")
     @Transactional
     public QueryResults<PlateNumberPojo> searchPlateNumber(PlateNumberSearchFilter filter){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         OrderSpecifier<?> sortedColumn = null;
 
         JPAQuery<PlateNumber> plateNumberJPAQuery = appRepository.startJPAQuery(QPlateNumber.plateNumber1)

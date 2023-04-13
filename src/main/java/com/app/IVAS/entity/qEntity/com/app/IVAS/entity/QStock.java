@@ -34,13 +34,13 @@ public class QStock extends EntityPathBase<Stock> {
 
     public final NumberPath<Long> quantity = createNumber("quantity", Long.class);
 
-    public final com.app.IVAS.entity.QPrefix startCode;
+    public final QPrefix startCode;
 
     public final NumberPath<Long> startRange = createNumber("startRange", Long.class);
 
-    public final com.app.IVAS.entity.QPlateNumberSubType subType;
+    public final QPlateNumberSubType subType;
 
-    public final com.app.IVAS.entity.QPlateNumberType type;
+    public final QPlateNumberType type;
 
     public QStock(String variable) {
         this(Stock.class, forVariable(variable), INITS);
