@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -236,6 +237,20 @@ public class SalesCtrl {
     public ResponseEntity<List<ServiceType>> getServiceByCatandPlate(@RequestParam Long cat, @RequestParam Long plate) {
         return ResponseEntity.ok(service.getServiceByCatandPlate(cat, plate));
     }
+
+    @GetMapping("/sale/view")
+    public ResponseEntity<?> viewSale(@RequestParam Long rowId){
+
+        return ResponseEntity.ok(service.viewSale(rowId));
+    }
+
+    /**Incomplete Edit function**/
+//    @PostMapping("/edit-sales-invoice")
+//    @Transactional
+//    public ResponseEntity<?> editSalesInvoice(@RequestBody SalesDto dto){
+//        service.editSalesInvoice(dto);
+//        return ResponseEntity.ok("");
+//    }
 
 
 }

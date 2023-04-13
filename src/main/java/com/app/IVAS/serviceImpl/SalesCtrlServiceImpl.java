@@ -67,7 +67,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
         Double totalAmount = 0.0;
 
-
         PlateNumberType types = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
@@ -195,6 +194,66 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         }).collect(Collectors.toList());
 
     }
+
+    @Override
+    public SalesDto viewSale(Long id) {
+        Optional<Sales> sale = salesRepository.findById(id);
+
+        SalesDto dto = new SalesDto();
+        dto.setFirstname(sale.get().getVehicle().getPortalUser().getDisplayName());
+        dto.setAddress(sale.get().getVehicle().getPortalUser().getAddress());
+        dto.setAsin(sale.get().getVehicle().getPortalUser().getAsin());
+        dto.setEmail(sale.get().getVehicle().getPortalUser().getEmail());
+        dto.setChasis(sale.get().getVehicle().getChasisNumber());
+        dto.setEngine(sale.get().getVehicle().getEngineNumber());
+        dto.setColor(sale.get().getVehicle().getColor());
+        dto.setModel(sale.get().getVehicle().getVehicleModel().getName());
+        dto.setMake(sale.get().getVehicle().getVehicleModel().getVehicleMake().getName());
+        dto.setCategory(sale.get().getVehicle().getVehicleCategory().getName());
+        dto.setPlate(sale.get().getVehicle().getPlateNumber().getPlateNumber());
+        dto.setMla(sale.get().getCreatedBy().getDisplayName());
+        dto.setDate(sale.get().getCreatedAt());
+        dto.setAmount(sale.get().getInvoice().getAmount());
+        dto.setStatus(sale.get().getInvoice().getPaymentStatus());
+        dto.setApprovalStatus(sale.get().getApprovalStatus());
+        dto.setCategoryId(sale.get().getVehicle().getVehicleCategory().getId());
+        dto.setId(sale.get().getId());
+        dto.setInvoice(sale.get().getInvoice().getId());
+        dto.setPlatecat(sale.get().getVehicle().getPlateNumber().getType().getName());
+
+        return dto;
+
+    }
+
+
+/**Incomplete Edit function**/
+//    @Override
+//    public Void editSalesInvoice(SalesDto dto) {
+//
+//        Optional<Sales> initialSale = salesRepository.findById(dto.getId());
+//        Invoice initialInvoice = initialSale.get().getInvoice();
+//        Invoice duplicateInvoice = new Invoice();
+//
+//        duplicateInvoice.setEditCopy(true);
+//        duplicateInvoice.setCreatedBy(jwtService.user);
+//        duplicateInvoice.setStatus(GenericStatusConstant.INACTIVE);
+//        duplicateInvoice.setParentInvoiceNumber(initialInvoice.getInvoiceNumber());
+//        duplicateInvoice.setAmount(initialInvoice.getAmount());
+//        duplicateInvoice.setPayer(initialInvoice.getPayer());
+//        duplicateInvoice.setVehicle(initialInvoice.getVehicle());
+//        duplicateInvoice.setPaymentDate(initialInvoice.getPaymentDate());
+//        duplicateInvoice.setCreatedAt(LocalDateTime.now());
+//        duplicateInvoice.setLastUpdatedAt(LocalDateTime.now());
+//        duplicateInvoice.setLastUpdatedBy(jwtService.user);
+//        duplicateInvoice.setPaymentRef(initialInvoice.getPaymentRef());
+//
+//        if(dto.getPlatetype() != null){
+//            PlateNumberType type = plateNumberTypeRepository.findById(dto.getPlatetype()).get();
+//        }
+//
+//
+//
+//    }
 
     @Override
     public AsinDto ValidateAsin(String asin) {
@@ -331,6 +390,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         }).collect(Collectors.toList());
     }
+
+
 
     @Override
     public SalesDto AddVehicle(SalesDto sales) {
@@ -473,4 +534,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, plateNumber, RegType.REGISTRATION, RegType.COMPULSARY);
         return serviceTypes;
     }
+
+
 }

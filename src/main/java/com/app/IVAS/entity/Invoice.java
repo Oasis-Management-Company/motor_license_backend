@@ -37,4 +37,7 @@ public class Invoice extends StatusEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Vehicle vehicle;
 
+    private Boolean editCopy = false;
+    private String parentInvoiceNumber;
+
 }
