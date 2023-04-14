@@ -38,6 +38,8 @@ public class QInvoice extends EntityPathBase<Invoice> {
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser deactivatedBy;
 
+    public final BooleanPath editCopy = createBoolean("editCopy");
+
     //inherited
     public final NumberPath<Long> id;
 
@@ -48,6 +50,8 @@ public class QInvoice extends EntityPathBase<Invoice> {
 
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser lastUpdatedBy;
+
+    public final StringPath parentInvoiceNumber = createString("parentInvoiceNumber");
 
     public final com.app.IVAS.entity.userManagement.QPortalUser payer;
 

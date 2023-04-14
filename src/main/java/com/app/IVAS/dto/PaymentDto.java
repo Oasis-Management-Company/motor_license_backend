@@ -8,11 +8,11 @@ import java.util.List;
 @Data
 public class PaymentDto {
     List<ExternalPaymentDto> serviceTypeDtos;
-    private String description;
-    private Double totalamount;
-    private String firstname;
-    private String lastname;
+    private String ParentDescription;
+    private Double TotalAmount;
+    private String FirstName;
+    private String LastName;
     private String email;
-    private String transactionId;
+    private String TransactionId;
 
 }
