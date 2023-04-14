@@ -5,5 +5,6 @@ public enum RegType {
     REGISTRATION,
     NON_VEHICLE,
     OTHERS,
-    COMPULSARY
+    COMPULSARY,
+    OFFENCE
 }
