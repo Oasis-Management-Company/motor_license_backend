@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @CrossOrigin(origins = "*", maxAge = 5600)
 @RequiredArgsConstructor
 @RestController
@@ -19,7 +21,7 @@ public class PaymentCtrl {
     private PaymentService paymentService;
 
     @PostMapping("/payment/send")
-    public ResponseEntity<String> sendPaymentToCBS(@RequestParam String invoice){
+    public ResponseEntity<String> sendPaymentToCBS(@RequestParam String invoice, HttpServletResponse response){
         String dto = paymentService.sendPaymentTax(invoice);
         return ResponseEntity.ok(dto);
     }

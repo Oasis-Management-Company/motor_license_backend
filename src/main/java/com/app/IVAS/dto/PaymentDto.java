@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class PaymentDto {
-    List<ServiceTypeDto> serviceTypeDtos;
+    List<ExternalPaymentDto> serviceTypeDtos;
     private String description;
     private Double totalamount;
     private String firstname;

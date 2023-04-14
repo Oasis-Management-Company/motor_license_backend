@@ -265,11 +265,11 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("barcode", qrCode);
             extraParameter.put("capacity", card.getVehicle().getPassengers());
             extraParameter.put("weight", card.getVehicle().getLoad());
-            extraParameter.put("policy", card.getVehicle().getInsurance().getName());
+            extraParameter.put("policy", card.getVehicle().getInsurance().getName().substring(0, 20)+"...");
             extraParameter.put("insurance", card.getVehicle().getInsuranceNumber());
             extraParameter.put("permit", card.getVehicle().getPermit());
             extraParameter.put("invoice", card.getInvoice().getInvoiceNumber());
-            extraParameter.put("expiry", card.getExpiryDate());
+            extraParameter.put("expiry", card.getExpiryDate().format(df));
 
 
             PdfDto pojo = new PdfDto();
