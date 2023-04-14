@@ -26,4 +26,10 @@ public class VerificationController {
         return ResponseEntity.ok(verificationService.getScannedInvoice(invoiceNumber));
     }
 
+    @GetMapping("/invoice/view/plate/{plateNumber}")
+    public ResponseEntity<?> getInvoiceDetailsByPlateNumber(@PathVariable String plateNumber){
+
+        return ResponseEntity.ok(verificationService.getInvoiceByPlateNumber(plateNumber));
+    }
+
 }
