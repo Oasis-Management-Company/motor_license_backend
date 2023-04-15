@@ -175,7 +175,7 @@ public class SalesCtrl {
         return new QueryResults<>(service.searchAllForVIO(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
     }
 
-    @PostMapping("/get/vehicles")
+    @GetMapping("/search/vehicles")
     public QueryResults<VehicleDto> searchAllVehicles(VehicleSerachFilter filter) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
