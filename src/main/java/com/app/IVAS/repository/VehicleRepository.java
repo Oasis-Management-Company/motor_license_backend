@@ -19,4 +19,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     List<Vehicle> findByPortalUser(PortalUser user);
 
     Vehicle findFirstByPlateNumber(PlateNumber plateNumber);
+
+    Vehicle findVehicleByPlateNumberId(Long id);
 }
