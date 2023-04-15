@@ -40,6 +40,7 @@ public class SalesDto {
     private String plate;
     private String mla;
     private LocalDateTime date;
+    private String myDate;
     private Double amount;
     private PaymentStatus status;
     private ApprovalStatus approvalStatus;

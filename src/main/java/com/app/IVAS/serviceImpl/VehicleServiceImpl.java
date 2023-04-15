@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.sound.sampled.Port;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -274,6 +275,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<SalesDto> searchTaxpayerAssessments(List<Sales> results) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return results.stream().map(sales -> {
             SalesDto dto = new SalesDto();
             dto.setFirstname(sales.getInvoice().getPayer().getDisplayName());
@@ -286,6 +288,8 @@ public class VehicleServiceImpl implements VehicleService {
             dto.setAmount(sales.getInvoice().getAmount());
             dto.setStatus(sales.getInvoice().getPaymentStatus());
             dto.setApprovalStatus(sales.getApprovalStatus());
+            dto.setInsuranceNumber(sales.getInvoice().getInvoiceNumber());
+            dto.setMyDate(sales.getCreatedAt().format(df));
             dto.setId(sales.getId());
             return dto;
 

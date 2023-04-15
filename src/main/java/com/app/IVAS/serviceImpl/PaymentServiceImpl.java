@@ -26,8 +26,14 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -72,7 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             MultiValueMap<String, String> headersAuth = new LinkedMultiValueMap<String, String>();
             Map map = new HashMap<String, String>();
-            map.put("Content-Type", "text/xml");
+            map.put("Content-Type", "application/json");
             map.put("Authorization", "Bearer "+responseToken.getToken());
             headersAuth.setAll(map);
 
@@ -138,8 +144,14 @@ public class PaymentServiceImpl implements PaymentService {
             return null;
         }
     }
-    public static String convert(String json, String root) throws JSONException {
+    public static String convert(String json, String root) throws JSONException, ParserConfigurationException, IOException, SAXException {
         JSONObject jsonObject = new JSONObject(json);
+
+        Document doc = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(new InputSource(new StringReader(json)));
+
+
         String xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-15\"?>\n<"+root+">" + XML.toString(jsonObject) + "</"+root+">";
         return xml;
     }

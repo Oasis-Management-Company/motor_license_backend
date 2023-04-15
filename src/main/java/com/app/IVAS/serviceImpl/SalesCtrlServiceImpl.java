@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -167,6 +168,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Override
     public List<SalesDto> GetSales(List<Sales> results) {
 
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return results.stream().map(sales -> {
             SalesDto dto = new SalesDto();
             dto.setFirstname(sales.getVehicle().getPortalUser().getDisplayName());
@@ -182,6 +184,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setPlate(sales.getVehicle().getPlateNumber().getPlateNumber());
             dto.setMla(sales.getCreatedBy().getDisplayName());
             dto.setDate(sales.getCreatedAt());
+            dto.setMyDate(sales.getCreatedAt().format(df));
             dto.setAmount(sales.getInvoice().getAmount());
             dto.setStatus(sales.getInvoice().getPaymentStatus());
             dto.setApprovalStatus(sales.getApprovalStatus());

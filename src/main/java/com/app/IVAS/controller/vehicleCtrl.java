@@ -13,6 +13,7 @@ import com.app.IVAS.entity.QSales;
 import com.app.IVAS.filter.InvoiceSearchFilter;
 import com.app.IVAS.filter.SalesSearchFilter;
 import com.app.IVAS.repository.app.AppRepository;
+import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VehicleService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -36,6 +37,7 @@ public class vehicleCtrl {
 
     private final AppRepository appRepository;
     private final PredicateExtractor predicateExtractor;
+    private final JwtService jwtService;
 
     @GetMapping("/home")
     public String all(){
@@ -115,6 +117,7 @@ public class vehicleCtrl {
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
                 .where(QSales.sales.plateType.eq(RegType.NON_VEHICLE))
+                .where(QSales.sales.createdBy.id.eq(jwtService.user.getId()))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
