@@ -48,8 +48,9 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.SaveSales(sales));
     }
 
+
     @GetMapping("/get/sales")
-    public QueryResults<SalesDto> searchDirectTax(SalesSearchFilter filter) {
+    public QueryResults<SalesDto> searchAllSales(SalesSearchFilter filter) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
@@ -184,14 +185,14 @@ public class SalesCtrl {
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
-        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
-            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
-        }
-        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
-            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
-        }
+//        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
+//            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
+//            userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
+//        }
+//        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
+//            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
+//            userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+//        }
 
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QVehicle.vehicle);
         QueryResults<Vehicle> userQueryResults = userJPAQuery.select(QVehicle.vehicle).distinct().orderBy(sortedColumn).fetchResults();
