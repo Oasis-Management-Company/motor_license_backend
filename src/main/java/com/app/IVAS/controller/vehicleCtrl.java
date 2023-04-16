@@ -1,15 +1,16 @@
 package com.app.IVAS.controller;
 
+import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
-import com.app.IVAS.dto.AsinDto;
-import com.app.IVAS.dto.InvoiceDto;
-import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.*;
+import com.app.IVAS.dto.filters.PortalUserSearchFilter;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QSales;
+import com.app.IVAS.entity.userManagement.PortalUser;
+import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.filter.InvoiceSearchFilter;
 import com.app.IVAS.filter.SalesSearchFilter;
 import com.app.IVAS.repository.app.AppRepository;
@@ -109,29 +110,19 @@ public class vehicleCtrl {
     }
 
     @GetMapping("/get/sales/assessments")
-    public QueryResults<SalesDto> searchTaxpayerAssessments(SalesSearchFilter filter) {
+    public QueryResults<PortalUserPojo> searchTaxpayerAssessments(PortalUserSearchFilter filter) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
+        JPAQuery<PortalUser> userJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QSales.sales.plateType.eq(RegType.NON_VEHICLE))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
+        userJPAQuery.where(QPortalUser.portalUser.role.id.eq(4L));
 
-        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
-            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
-        }
-        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
-            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
-
-        }
-
-        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
-        QueryResults<Sales> userQueryResults = userJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
-        return new QueryResults<>(vehicleService.searchTaxpayerAssessments(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QPortalUser.portalUser);
+        QueryResults<PortalUser> userQueryResults = userJPAQuery.select(QPortalUser.portalUser).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(vehicleService.searchTaxpayerAssessment(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
     }
 
     @GetMapping("/get/all/invoice")

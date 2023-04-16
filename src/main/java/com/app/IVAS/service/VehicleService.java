@@ -1,13 +1,11 @@
 package com.app.IVAS.service;
 
-import com.app.IVAS.dto.AsinDto;
-import com.app.IVAS.dto.InvoiceDto;
-import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Sales;
 import com.app.IVAS.entity.ServiceType;
 import com.app.IVAS.entity.Vehicle;
+import com.app.IVAS.entity.userManagement.PortalUser;
 
 import java.util.List;
 
@@ -37,6 +35,8 @@ public interface VehicleService {
     Invoice saveTaxPayerServiceType(Long id, List<Long> ids);
 
     List<SalesDto> searchTaxpayerAssessments(List<Sales> results);
+
+    List<PortalUserPojo> searchTaxpayerAssessment(List<PortalUser> results);
 
     List<InvoiceDto> searchAllInvoice(List<Invoice> results);
 }

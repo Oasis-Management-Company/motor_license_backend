@@ -2,10 +2,7 @@ package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
-import com.app.IVAS.dto.AsinDto;
-import com.app.IVAS.dto.InvoiceDto;
-import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.sound.sampled.Port;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -291,6 +289,25 @@ public class VehicleServiceImpl implements VehicleService {
 
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<PortalUserPojo> searchTaxpayerAssessment(List<PortalUser> results) {
+        return results.stream().map(user -> {
+            PortalUserPojo dto = new PortalUserPojo();
+
+            dto.setName(user.getDisplayName());
+            dto.setPhoneNumber(user.getPhoneNumber());
+            dto.setEmail(user.getEmail());
+            dto.setId(user.getId());
+            LocalDateTime dateTime = LocalDateTime.parse(user.getCreatedAt().toString(), DateTimeFormatter.ISO_DATE_TIME);
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+            dto.setDateCreated(dateTime.format(outputFormatter));
+
+            return dto;
+
+        }).collect(Collectors.toList());
+    }
+
 
     @Override
     public List<InvoiceDto> searchAllInvoice(List<Invoice> invoices) {
