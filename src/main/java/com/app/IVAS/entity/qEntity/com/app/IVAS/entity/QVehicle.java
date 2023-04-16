@@ -69,6 +69,8 @@ public class QVehicle extends EntityPathBase<Vehicle> {
 
     public final com.app.IVAS.entity.userManagement.QPortalUser portalUser;
 
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
+
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 

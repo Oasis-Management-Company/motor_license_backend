@@ -25,14 +25,14 @@ public class VehicleDto {
     private String insurance;
     private String company;
     private String plateType;
-
+    private Long parent;
 
     private String firstname;
     private String lastname;
     private String address;
     private String phonenumber;
     private String email;
-
     private Long categoryId;
+    private String createdBy;
 
 }

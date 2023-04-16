@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -185,16 +184,17 @@ public class SalesCtrl {
 
         JPAQuery<Vehicle> userJPAQuery = appRepository.startJPAQuery(QVehicle.vehicle)
                 .where(predicateExtractor.getPredicate(filter))
+                .where(QVehicle.vehicle.regType.ne(RegType.EDIT))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
         if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
             LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
+            userJPAQuery.where( QVehicle.vehicle.createdAt.goe(startDate.atStartOfDay()));
         }
         if (filter.getBefore() != null && !filter.getBefore().equals("")) {
             LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+            userJPAQuery.where( QVehicle.vehicle.createdAt.loe(endDate.atTime(LocalTime.MAX)));
         }
 
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QVehicle.vehicle);

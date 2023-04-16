@@ -389,6 +389,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setDate(sales.getCreatedAt());
             dto.setYear(sales.getYear());
             dto.setPlateType(sales.getPlateNumber().getType().getName());
+            dto.setParent(sales.getId());
             return dto;
 
         }).collect(Collectors.toList());
@@ -488,19 +489,20 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public VehicleDto viewVehicle(String chassisNo) {
-        Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findByChasisNumberIgnoreCase(chassisNo));
+        Vehicle vehicle = vehicleRepository.findById(Long.valueOf(chassisNo)).get();
 
         VehicleDto dto = new VehicleDto();
 
-        dto.setChasis(vehicle.get().getChasisNumber());
-        dto.setEngine(vehicle.get().getEngineNumber());
-        dto.setColor(vehicle.get().getColor());
-        dto.setModel(vehicle.get().getVehicleModel().getName());
-        dto.setMake(vehicle.get().getVehicleModel().getVehicleMake().getName());
-        dto.setCategory(vehicle.get().getVehicleCategory().getName());
-        dto.setCategoryId(vehicle.get().getVehicleCategory().getId());
-        dto.setPlate(vehicle.get().getPlateNumber().getPlateNumber());
-        dto.setYear(vehicle.get().getYear());
+        dto.setChasis(vehicle.getChasisNumber());
+        dto.setEngine(vehicle.getEngineNumber());
+        dto.setColor(vehicle.getColor());
+        dto.setModel(vehicle.getVehicleModel().getName());
+        dto.setMake(vehicle.getVehicleModel().getVehicleMake().getName());
+        dto.setCategory(vehicle.getVehicleCategory().getName());
+        dto.setCategoryId(vehicle.getVehicleCategory().getId());
+        dto.setPlate(vehicle.getPlateNumber().getPlateNumber());
+        dto.setYear(vehicle.getYear());
+        dto.setParent(vehicle.getId());
 
         return dto;
     }

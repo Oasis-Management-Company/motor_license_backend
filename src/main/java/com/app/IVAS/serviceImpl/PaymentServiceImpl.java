@@ -86,8 +86,8 @@ public class PaymentServiceImpl implements PaymentService {
             String url ="http://localhost:8787/api/notification/amvas/handle-assessment-multiple";
 
             ResponseEntity<Object> responseRC = null;
-            PaymentDto paymentDto = new PaymentDto();
-            List<ExternalPaymentDto> serviceTypes = new ArrayList<>();
+            ParentRequest paymentDto = new ParentRequest();
+            List<ChildRequest> serviceTypes = new ArrayList<>();
 
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
             Invoice invoice1 = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoice);
@@ -101,7 +101,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice1);
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
-                ExternalPaymentDto dto = new ExternalPaymentDto();
+                ChildRequest dto = new ChildRequest();
                 dto.setAmount(invoiceServiceType.getServiceType().getPrice());
                 dto.setItemCode(invoiceServiceType.getRevenuecode());
                 dto.setName(invoiceServiceType.getServiceType().getName());

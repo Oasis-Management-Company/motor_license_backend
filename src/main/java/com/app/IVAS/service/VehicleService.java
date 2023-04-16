@@ -1,9 +1,6 @@
 package com.app.IVAS.service;
 
-import com.app.IVAS.dto.AsinDto;
-import com.app.IVAS.dto.InvoiceDto;
-import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Sales;
 import com.app.IVAS.entity.ServiceType;
@@ -39,4 +36,10 @@ public interface VehicleService {
     List<SalesDto> searchTaxpayerAssessments(List<Sales> results);
 
     List<InvoiceDto> searchAllInvoice(List<Invoice> results);
+
+    List<VehicleDto> searchAllVehicleForApproval(List<Vehicle> results);
+
+    VehicleEditDto getAllEditVehicle(Long id);
+
+    String approveEdittedVehicle(Long id, String type);
 }
