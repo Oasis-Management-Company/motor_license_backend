@@ -12,9 +12,9 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 @Setter
 @NoArgsConstructor
 public class SalesReportSearchFilter extends BaseSearchDto implements QuerydslBinderCustomizer<QSales> {
-
     private String createdAfter;
     private String createdBefore;
+    private String downloadType;
 
 
     @Override

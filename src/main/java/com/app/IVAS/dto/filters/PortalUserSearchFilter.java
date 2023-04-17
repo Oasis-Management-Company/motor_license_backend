@@ -14,6 +14,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 public class PortalUserSearchFilter extends BaseSearchDto implements QuerydslBinderCustomizer<QPortalUser> {
     private String createdAfter;
     private String createdBefore;
+    private String downloadType;
 
     @Override
     public void customize(QuerydslBindings bindings, QPortalUser root) {
