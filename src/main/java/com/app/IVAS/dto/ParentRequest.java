@@ -8,10 +8,10 @@ import java.util.List;
 public class ParentRequest {
     List<ChildRequest> childRequests;
     private String parentDescription;
-    private Double TotalAmount;
-    private String FirstName;
-    private String LastName;
+    private Double totalAmount;
+    private String firstName;
+    private String lastName;
     private String email;
-    private String TransactionId;
-    private String CustReference;
+    private String transactionId;
+    private String custReference;
 }

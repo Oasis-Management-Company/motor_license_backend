@@ -72,7 +72,6 @@ public class PaymentServiceImpl implements PaymentService {
 
             String result = restTemplate.postForObject(baseUrl, paymentLoginDto, String.class);
 
-
             Gson gson = new Gson();
             PaymentRespondDto responseToken = gson.fromJson(result, PaymentRespondDto.class);
 
@@ -83,7 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
             headersAuth.setAll(map);
 
             String url ="http://41.207.248.189:8084/api/notification/handle-assessment-ivas";
-//            String url ="http://localhost:8787/api/notification/amvas/handle-assessment-multiple";
+//            String url ="http://localhost:8787/api/notification/handle-assessment-ivas";
 
             ResponseEntity<Object> responseRC = null;
             ParentRequest paymentDto = new ParentRequest();
@@ -93,6 +92,8 @@ public class PaymentServiceImpl implements PaymentService {
             Invoice invoice1 = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoice);
 
             List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice1);
+
+
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
                 ChildRequest dto = new ChildRequest();
                 dto.setAmount(invoiceServiceType.getServiceType().getPrice());
@@ -109,15 +110,18 @@ public class PaymentServiceImpl implements PaymentService {
             paymentDto.setLastName(invoice1.getPayer().getDisplayName());
             paymentDto.setEmail(invoice1.getPayer().getEmail());
             paymentDto.setParentDescription("Vehicle Registration Licenese and General Motor Registration");
-            paymentDto.setChildRequests(childRequests);
+
+            TopParentRequest topParentRequest = new TopParentRequest();
+            topParentRequest.setParentRequest(paymentDto);
+            topParentRequest.setChildRequestList(childRequests);
 
 
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
 
-            HttpEntity entity = new HttpEntity(new Gson().toJson(paymentDto), headersAuth);
-            System.out.println(entity);
+            HttpEntity entity = new HttpEntity(new Gson().toJson(topParentRequest), headersAuth);
+            System.out.println(entity.getBody());
             try {
-                String personResultAsJsonStr = restTemplate.postForObject(builder.toUriString(), entity, String.class);
+                String personResultAsJsonStr = restTemplate.postForObject(url, entity, String.class);
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {
                     @Override
                     public boolean hasError(ClientHttpResponse response) throws IOException {
