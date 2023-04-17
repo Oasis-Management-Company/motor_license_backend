@@ -12,6 +12,7 @@ import com.app.IVAS.filter.VehicleSerachFilter;
 import com.app.IVAS.repository.RoleRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.security.QrCodeServices;
 import com.app.IVAS.service.SalesCtrlService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -39,6 +40,8 @@ public class SalesCtrl {
     private SalesCtrlService service;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private QrCodeServices qrCodeService;
 
     private final JwtService jwtService;
     private final AppRepository appRepository;
@@ -256,4 +259,11 @@ public class SalesCtrl {
 //    }
 
 
+    @GetMapping("/generate/qrcode")
+    public SalesDto GetQRCode(@RequestParam String invoiceNo){
+        SalesDto salesDto = new SalesDto();
+        salesDto.setQrCode(qrCodeService.base64CertificateQrCode(invoiceNo));
+
+        return salesDto;
+    }
 }

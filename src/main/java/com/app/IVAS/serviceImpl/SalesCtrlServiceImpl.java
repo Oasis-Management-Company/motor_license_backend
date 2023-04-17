@@ -155,7 +155,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         cardService.createCard(savedInvoice, savedVehicle);
 
         try{
-            System.out.println("reached here for uplad to tax");
+            System.out.println("reached here for upload to tax");
             paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
         }catch (Exception e){
             System.out.println(e);
