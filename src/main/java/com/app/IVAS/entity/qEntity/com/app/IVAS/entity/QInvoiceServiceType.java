@@ -26,15 +26,17 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final QInvoice invoice;
+    public final com.app.IVAS.entity.QInvoice invoice;
 
     public final DateTimePath<java.time.LocalDateTime> PaymentDate = createDateTime("PaymentDate", java.time.LocalDateTime.class);
 
     public final StringPath reference = createString("reference");
 
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
+
     public final StringPath revenuecode = createString("revenuecode");
 
-    public final QServiceType serviceType;
+    public final com.app.IVAS.entity.QServiceType serviceType;
 
     public QInvoiceServiceType(String variable) {
         this(InvoiceServiceType.class, forVariable(variable), INITS);
