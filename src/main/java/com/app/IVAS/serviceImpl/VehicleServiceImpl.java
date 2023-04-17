@@ -321,6 +321,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<InvoiceDto> searchAllInvoice(List<Invoice> invoices) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMMM-dd HH:mm");
         return invoices.stream().map(invoice -> {
             InvoiceDto dto = new InvoiceDto();
             dto.setFirstname(invoice.getPayer().getDisplayName());
@@ -334,6 +335,7 @@ public class VehicleServiceImpl implements VehicleService {
             dto.setInvoiceNumber(invoice.getInvoiceNumber());
             dto.setReference(invoice.getPaymentRef());
             dto.setId(invoice.getId());
+            dto.setDateString(invoice.getCreatedAt().format(formatter));
             return dto;
         }).collect(Collectors.toList());
     }
