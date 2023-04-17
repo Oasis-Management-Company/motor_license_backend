@@ -54,9 +54,9 @@ public class PaymentServiceImpl implements PaymentService {
         System.out.println("Steepped into this");
         try{
 
-//            String baseUrl = "http://41.207.248.189:8084/api/external/authenticate";
+            String baseUrl = "http://41.207.248.189:8084/api/external/authenticate";
 //            String baseUrl = "http://localhost:8787/api/external/authenticate";
-            String baseUrl = "http://localhost:8787/api/informal/sector/public/createasin";
+//            String baseUrl = "http://localhost:8787/api/informal/sector/public/createasin";
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
@@ -79,22 +79,15 @@ public class PaymentServiceImpl implements PaymentService {
             map.put("Authorization", "Bearer "+responseToken.getToken());
             headersAuth.setAll(map);
 
-//            String url ="http://41.207.248.189:8084/api/notification/amvas/handle-assessment-multiple";
-            String url ="http://localhost:8787/api/notification/amvas/handle-assessment-multiple";
+            String url ="http://41.207.248.189:8084/api/notification/handle-assessment-ivas";
+//            String url ="http://localhost:8787/api/notification/amvas/handle-assessment-multiple";
 
             ResponseEntity<Object> responseRC = null;
             ParentRequest paymentDto = new ParentRequest();
-            List<ChildRequest> serviceTypes = new ArrayList<>();
+            List<ChildRequest> childRequests = new ArrayList<>();
 
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
             Invoice invoice1 = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoice);
-
-            paymentDto.setServiceTypeDtos(serviceTypes);
-            paymentDto.setTotalAmount(invoice1.getAmount());
-            paymentDto.setFirstName(invoice1.getPayer().getFirstName());
-            paymentDto.setLastName(invoice1.getPayer().getDisplayName());
-            paymentDto.setEmail(invoice1.getPayer().getEmail());
-            paymentDto.setParentDescription(invoice1.getInvoiceNumber());
 
             List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice1);
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
@@ -105,14 +98,20 @@ public class PaymentServiceImpl implements PaymentService {
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setDateBooked(invoiceServiceType.getInvoice().getCreatedAt().format(df));
 
-                serviceTypes.add(dto);
+                childRequests.add(dto);
             }
+
+            paymentDto.setTotalAmount(invoice1.getAmount());
+            paymentDto.setFirstName(invoice1.getPayer().getFirstName());
+            paymentDto.setLastName(invoice1.getPayer().getDisplayName());
+            paymentDto.setEmail(invoice1.getPayer().getEmail());
+            paymentDto.setParentDescription("Vehicle Registration Licenese and General Motor Registration");
+            paymentDto.setChildRequests(childRequests);
 
 
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
-            String xml = convert(new Gson().toJson(paymentDto), "Parent");
 
-            HttpEntity entity = new HttpEntity(xml, headersAuth);
+            HttpEntity entity = new HttpEntity(new Gson().toJson(paymentDto), headersAuth);
             System.out.println(entity);
             try {
                 String personResultAsJsonStr = restTemplate.postForObject(builder.toUriString(), entity, String.class);

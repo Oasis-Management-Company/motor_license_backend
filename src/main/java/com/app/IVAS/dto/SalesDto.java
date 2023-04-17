@@ -50,5 +50,6 @@ public class SalesDto {
     private String insuranceNumber;
     private String platecat;
     private String invoiceNo;
+    private String qrCode;
 
 }

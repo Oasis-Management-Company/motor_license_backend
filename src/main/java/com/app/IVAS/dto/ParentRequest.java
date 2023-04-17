@@ -6,12 +6,12 @@ import java.util.List;
 
 @Data
 public class ParentRequest {
-    List<ChildRequest> serviceTypeDtos;
+    List<ChildRequest> childRequests;
     private String parentDescription;
-    private Double totalAmount;
-    private String firstName;
-    private String lastName;
+    private Double TotalAmount;
+    private String FirstName;
+    private String LastName;
     private String email;
-    private String transactionId;
-    private String custReference;
+    private String TransactionId;
+    private String CustReference;
 }
