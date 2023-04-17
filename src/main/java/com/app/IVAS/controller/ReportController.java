@@ -268,7 +268,7 @@ public class ReportController {
 
     @PostMapping(path = "/download-service-sales-report")
     @Transactional
-    public ResponseEntity<Resource> exportServiceSalesReport(SalesReportSearchFilter filter, HttpServletRequest request) throws Exception {
+    public ResponseEntity<Resource> exportServiceSalesReport(ServiceReportSearchFilter filter, HttpServletRequest request) throws Exception {
         List<SalesReportPojo> pojos = getServiceSalesPojo(filter);
         Resource resource = reportService.exportServiceSalesReport(pojos, filter.getDownloadType());
         String contentType = null;
