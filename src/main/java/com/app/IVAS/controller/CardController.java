@@ -8,6 +8,8 @@ import com.app.IVAS.dto.PrintDto;
 import com.app.IVAS.dto.filters.CardSearchFilter;
 import com.app.IVAS.entity.Card;
 import com.app.IVAS.entity.QCard;
+import com.app.IVAS.entity.userManagement.ZonalOffice;
+import com.app.IVAS.repository.ZonalOfficeRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.CardService;
 import com.querydsl.core.QueryResults;
@@ -28,6 +30,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -40,6 +44,7 @@ public class CardController {
     private final AppRepository appRepository;
     private final PredicateExtractor predicateExtractor;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final ZonalOfficeRepository zonalOfficeRepository;
 
 
     @GetMapping("/get_full_details/{invoiceNumber}")
@@ -52,6 +57,15 @@ public class CardController {
     public ResponseEntity<?> updateCardByPayment(@PathVariable String invoiceNumber, @PathVariable Double amount){
 
         return ResponseEntity.ok(cardService.updateCardByPayment(invoiceNumber, amount));
+    }
+
+    @GetMapping("/list/zones")
+    public ResponseEntity<List<ZonalOffice>> getZoneList(){
+
+        List<ZonalOffice> zonalOffices = zonalOfficeRepository.findAll();
+        Collections.sort(zonalOffices, Comparator.comparing(ZonalOffice::getName));
+
+        return ResponseEntity.ok(zonalOffices);
     }
 
     @GetMapping("/search")

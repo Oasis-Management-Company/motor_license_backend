@@ -17,7 +17,8 @@ public class CardSearchFilter extends BaseSearchDto implements QuerydslBinderCus
     @Override
     public void customize(QuerydslBindings bindings, QCard root) {
         bindings.bind(root.cardStatus).as("status").first((path, value) -> path.eq(value));
-        bindings.bind(root.cardType).as("cardType").first((path, value) -> path.eq(value));
-        bindings.including(root.cardStatus);
+        bindings.bind(root.cardType).as("type").first((path, value) -> path.eq(value));
+        bindings.bind(root.createdBy.office.id).as("zonalId").first((path, value) -> path.eq(value));
+        bindings.including(root.cardStatus, root.cardType, root.createdBy);
     }
 }
