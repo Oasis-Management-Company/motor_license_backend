@@ -32,6 +32,8 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public final StringPath reference = createString("reference");
 
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
+
     public final StringPath revenuecode = createString("revenuecode");
 
     public final com.app.IVAS.entity.QServiceType serviceType;

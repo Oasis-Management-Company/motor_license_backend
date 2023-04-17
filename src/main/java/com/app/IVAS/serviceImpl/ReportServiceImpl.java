@@ -111,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
             pojo.setMla(invoiceService.getInvoice().getCreatedBy().getDisplayName());
             pojo.setTaxPayer(invoiceService.getInvoice().getPayer().getDisplayName());
             pojo.setServiceType(invoiceService.getServiceType().getName());
-            pojo.setRegType(invoiceService.getServiceType().getRegType());
+            pojo.setRegType(invoiceService.getRegType());
             pojo.setInvoiceID(invoiceService.getReference());
             pojo.setMlaStation(invoiceService.getInvoice().getCreatedBy().getOffice().getName());
             pojo.setDateSold(invoiceService.getPaymentDate().format(df));
