@@ -59,6 +59,8 @@ public class QVehicle extends EntityPathBase<Vehicle> {
 
     public final StringPath load = createString("load");
 
+    public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
+
     public final NumberPath<Long> passengers = createNumber("passengers", Long.class);
 
     public final StringPath permit = createString("permit");

@@ -49,5 +49,6 @@ public class SalesDto {
     private Long invoice;
     private String insuranceNumber;
     private String platecat;
+    private String invoiceNo;
 
 }

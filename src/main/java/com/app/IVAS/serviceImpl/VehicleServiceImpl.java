@@ -9,6 +9,7 @@ import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VehicleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import javax.sound.sampled.Port;
 import java.time.LocalDateTime;
@@ -300,6 +301,25 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    public List<PortalUserPojo> searchTaxpayerAssessment(List<PortalUser> results) {
+        return results.stream().map(user -> {
+            PortalUserPojo dto = new PortalUserPojo();
+
+            dto.setName(user.getDisplayName());
+            dto.setPhoneNumber(user.getPhoneNumber());
+            dto.setEmail(user.getEmail());
+            dto.setId(user.getId());
+            LocalDateTime dateTime = LocalDateTime.parse(user.getCreatedAt().toString(), DateTimeFormatter.ISO_DATE_TIME);
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+            dto.setDateCreated(dateTime.format(outputFormatter));
+
+            return dto;
+
+        }).collect(Collectors.toList());
+    }
+
+
+    @Override
     public List<InvoiceDto> searchAllInvoice(List<Invoice> invoices) {
         return invoices.stream().map(invoice -> {
             InvoiceDto dto = new InvoiceDto();
@@ -391,25 +411,23 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public String approveEdittedVehicle(Long id, String type) {
-
+    public HttpStatus approveEdittedVehicle(Long id, String type) {
         Vehicle old = vehicleRepository.findById(id).get();
         Vehicle news = vehicleRepository.findFirstByParentId(id);
 
-        if (type == "Approval"){
+        if (type.equalsIgnoreCase("Approval")){
             old.setVehicleCategory(news.getVehicleCategory() == old.getVehicleCategory() ? old.getVehicleCategory() : news.getVehicleCategory());
-            old.setColor(news.getColor().equals(old.getColor()) ? old.getColor() : news.getColor());
-            old.setChasisNumber(news.getChasisNumber().equals(old.getChasisNumber()) ? old.getChasisNumber() : news.getChasisNumber());
-            old.setEngineNumber(news.getEngineNumber().equals(old.getEngineNumber()) ? old.getEngineNumber() : news.getEngineNumber());
-            old.setYear(news.getYear().equals(old.getYear()) ? old.getYear() : news.getYear());
+            old.setColor(news.getColor() == old.getColor() ? old.getColor() : news.getColor());
+            old.setChasisNumber(news.getChasisNumber()== old.getChasisNumber() ? old.getChasisNumber() : news.getChasisNumber());
+            old.setEngineNumber(news.getEngineNumber()==old.getEngineNumber() ? old.getEngineNumber() : news.getEngineNumber());
+            old.setYear(news.getYear()==old.getYear() ? old.getYear() : news.getYear());
 
             vehicleRepository.save(old);
-
             vehicleRepository.delete(news);
-            return "Successfully Approved";
+            return HttpStatus.OK;
         }else{
             vehicleRepository.delete(news);
-            return "Successfully Rejected";
+            return HttpStatus.OK;
         }
     }
 }

@@ -168,7 +168,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Override
     public List<SalesDto> GetSales(List<Sales> results) {
 
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy/hh:mm:ss");
         return results.stream().map(sales -> {
             SalesDto dto = new SalesDto();
             dto.setFirstname(sales.getVehicle().getPortalUser().getDisplayName());
@@ -192,6 +192,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setId(sales.getId());
             dto.setInvoice(sales.getInvoice().getId());
             dto.setPlatecat(sales.getVehicle().getPlateNumber().getType().getName());
+            dto.setInvoiceNo(sales.getInvoice().getInvoiceNumber());
             return dto;
 
         }).collect(Collectors.toList());

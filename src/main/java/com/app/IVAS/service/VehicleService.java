@@ -5,6 +5,8 @@ import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.Sales;
 import com.app.IVAS.entity.ServiceType;
 import com.app.IVAS.entity.Vehicle;
+import com.app.IVAS.entity.userManagement.PortalUser;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -35,11 +37,13 @@ public interface VehicleService {
 
     List<SalesDto> searchTaxpayerAssessments(List<Sales> results);
 
+    List<PortalUserPojo> searchTaxpayerAssessment(List<PortalUser> results);
+
     List<InvoiceDto> searchAllInvoice(List<Invoice> results);
 
     List<VehicleDto> searchAllVehicleForApproval(List<Vehicle> results);
 
     VehicleEditDto getAllEditVehicle(Long id);
 
-    String approveEdittedVehicle(Long id, String type);
+    HttpStatus approveEdittedVehicle(Long id, String type);
 }
