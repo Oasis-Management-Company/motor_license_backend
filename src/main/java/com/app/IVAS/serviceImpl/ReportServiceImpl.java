@@ -111,6 +111,7 @@ public class ReportServiceImpl implements ReportService {
             pojo.setMla(invoiceService.getInvoice().getCreatedBy().getDisplayName());
             pojo.setTaxPayer(invoiceService.getInvoice().getPayer().getDisplayName());
             pojo.setServiceType(invoiceService.getServiceType().getName());
+            pojo.setRegType(invoiceService.getServiceType().getRegType());
             pojo.setInvoiceID(invoiceService.getReference());
             pojo.setMlaStation(invoiceService.getInvoice().getCreatedBy().getOffice().getName());
             pojo.setDateSold(invoiceService.getPaymentDate().format(df));
@@ -221,7 +222,7 @@ public class ReportServiceImpl implements ReportService {
 
             Document doc = new Document(pdfDoc);
 
-            Table table = new Table(8);
+            Table table = new Table(9);
             int i = 1;
 
             Paragraph header = new Paragraph("SERVICE SALES REPORT")
@@ -237,6 +238,7 @@ public class ReportServiceImpl implements ReportService {
             table.addHeaderCell("STATION");
             table.addHeaderCell("BUYER");
             table.addHeaderCell("SERVICE TYPE");
+            table.addHeaderCell("REGISTRATION TYPE");
             table.addHeaderCell("TRANSACTION DATE");
             table.addHeaderCell("AMOUNT");
             table.getHeader().setBorder(new SolidBorder(2)).setTextAlignment(TextAlignment.CENTER);
@@ -248,6 +250,7 @@ public class ReportServiceImpl implements ReportService {
                 table.addCell(reportPojo.getMlaStation());
                 table.addCell(reportPojo.getTaxPayer());
                 table.addCell(reportPojo.getServiceType());
+                table.addCell(reportPojo.getRegType().name());
                 table.addCell(reportPojo.getDateSold());
                 table.addCell("N" + reportPojo.getAmount().toString());
             }
@@ -266,8 +269,9 @@ public class ReportServiceImpl implements ReportService {
             final int STATION = 4;
             final int BUYER = 5;
             final int SERVICE_TYPE = 6;
-            final int TRANSACTION_DATE = 7;
-            final int AMOUNT = 8;
+            final int REGISTRATION_TYPE = 7;
+            final int TRANSACTION_DATE = 8;
+            final int AMOUNT = 9;
 
             String uploadTemplatePath = "/excel/service_sales_report.xlsx";
             InputStream inputStream = getClass().getResourceAsStream(uploadTemplatePath);
@@ -282,7 +286,7 @@ public class ReportServiceImpl implements ReportService {
             for (SalesReportPojo reportPojo : pojos) {
                 row = sheet.createRow(firstRow++);
                 int columnNumber = 0;
-                for (int i = 0; i <= 9; i++) {
+                for (int i = 0; i <= 10; i++) {
                     cell = row.createCell(columnNumber++);
                     switch (columnNumber) {
                         case SN:
@@ -302,6 +306,9 @@ public class ReportServiceImpl implements ReportService {
                             break;
                         case SERVICE_TYPE:
                             cell.setCellValue(reportPojo.getServiceType());
+                            break;
+                        case REGISTRATION_TYPE:
+                            cell.setCellValue(reportPojo.getRegType().name());
                             break;
                         case TRANSACTION_DATE:
                             cell.setCellValue(reportPojo.getDateSold());
