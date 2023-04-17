@@ -1,6 +1,8 @@
 package com.app.IVAS.entity;
 
 
+import com.app.IVAS.Enum.ApprovalStatus;
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.StatusEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,10 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -47,4 +46,10 @@ public class Vehicle extends StatusEntity {
     private String capacity;
     private String insuranceNumber;
     private String permit;
+
+    private Long parentId;
+
+    @Enumerated(EnumType.STRING)
+    private RegType regType = RegType.REGISTRATION;
+
 }

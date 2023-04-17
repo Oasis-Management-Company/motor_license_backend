@@ -59,6 +59,8 @@ public class QVehicle extends EntityPathBase<Vehicle> {
 
     public final StringPath load = createString("load");
 
+    public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
+
     public final NumberPath<Long> passengers = createNumber("passengers", Long.class);
 
     public final StringPath permit = createString("permit");
@@ -68,6 +70,8 @@ public class QVehicle extends EntityPathBase<Vehicle> {
     public final StringPath policySector = createString("policySector");
 
     public final com.app.IVAS.entity.userManagement.QPortalUser portalUser;
+
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
 
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;

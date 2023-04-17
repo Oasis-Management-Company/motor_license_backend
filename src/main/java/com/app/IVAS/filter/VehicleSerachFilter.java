@@ -16,6 +16,13 @@ public class VehicleSerachFilter extends BaseSearchDto implements QuerydslBinder
     @Override
     public void customize(QuerydslBindings bindings, QVehicle root) {
 
+        bindings.bind(root.plateNumber.plateNumber).as("plateNumber").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.portalUser.asin).as("asin").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.chasisNumber).as("chassisNumber").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.engineNumber).as("engineNumber").first((path, value) -> path.containsIgnoreCase(value));
+
+        bindings.including(root.plateNumber, root.portalUser, root.chasisNumber, root.engineNumber);
+
     }
 
 }

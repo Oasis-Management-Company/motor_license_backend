@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PlateNumberRepository extends JpaRepository<PlateNumber, Long> {
@@ -26,4 +27,6 @@ public interface PlateNumberRepository extends JpaRepository<PlateNumber, Long> 
     List<PlateNumber> findByAgentAndPlateNumberStatus(PortalUser user, PlateNumberStatus status);
 
     List<PlateNumber> findByPlateNumberStatus(PlateNumberStatus status);
+
+    Optional<PlateNumber> findPlateNumberByPlateNumberIgnoreCase(String plateNumber);
 }

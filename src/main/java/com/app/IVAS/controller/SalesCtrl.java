@@ -11,6 +11,7 @@ import com.app.IVAS.filter.SalesSearchFilter;
 import com.app.IVAS.filter.VehicleSerachFilter;
 import com.app.IVAS.repository.RoleRepository;
 import com.app.IVAS.repository.app.AppRepository;
+import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.SalesCtrlService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,6 +40,7 @@ public class SalesCtrl {
     @Autowired
     private RoleRepository roleRepository;
 
+    private final JwtService jwtService;
     private final AppRepository appRepository;
     private final PredicateExtractor predicateExtractor;
 
@@ -48,13 +49,15 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.SaveSales(sales));
     }
 
+
     @GetMapping("/get/sales")
-    public QueryResults<SalesDto> searchDirectTax(SalesSearchFilter filter) {
+    public QueryResults<SalesDto> searchAllSales(SalesSearchFilter filter) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
                 .where(QSales.sales.plateType.eq(RegType.REGISTRATION))
+                .where(QSales.sales.createdBy.id.eq(jwtService.user.getId()))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
@@ -81,6 +84,7 @@ public class SalesCtrl {
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
                 .where(QSales.sales.plateType.eq(RegType.RENEWAL))
+                .where(QSales.sales.createdBy.id.eq(jwtService.user.getId()))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
@@ -175,24 +179,23 @@ public class SalesCtrl {
         return new QueryResults<>(service.searchAllForVIO(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
     }
 
-    @PostMapping("/get/vehicles")
+    @GetMapping("/search/vehicles")
     public QueryResults<VehicleDto> searchAllVehicles(VehicleSerachFilter filter) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         JPAQuery<Vehicle> userJPAQuery = appRepository.startJPAQuery(QVehicle.vehicle)
                 .where(predicateExtractor.getPredicate(filter))
+                .where(QVehicle.vehicle.regType.ne(RegType.EDIT))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
-
         if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
             LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
+            userJPAQuery.where( QVehicle.vehicle.createdAt.goe(startDate.atStartOfDay()));
         }
         if (filter.getBefore() != null && !filter.getBefore().equals("")) {
             LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
-            userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+            userJPAQuery.where( QVehicle.vehicle.createdAt.loe(endDate.atTime(LocalTime.MAX)));
         }
-
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QVehicle.vehicle);
         QueryResults<Vehicle> userQueryResults = userJPAQuery.select(QVehicle.vehicle).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(service.searchAllVehicles(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());

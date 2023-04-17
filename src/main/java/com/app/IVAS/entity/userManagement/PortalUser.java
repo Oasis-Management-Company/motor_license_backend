@@ -62,7 +62,8 @@ public class PortalUser extends StatusEntity {
     @Column(
             name = "generated_password",
             table = "portal_user",
-            length = 1024
+            length = 1024,
+            unique = true
     )
     private String generatedPassword;
     private String asin;

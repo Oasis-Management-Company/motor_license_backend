@@ -6,5 +6,6 @@ public enum RegType {
     NON_VEHICLE,
     OTHERS,
     COMPULSARY,
-    OFFENCE
+    OFFENCE,
+    EDIT
 }

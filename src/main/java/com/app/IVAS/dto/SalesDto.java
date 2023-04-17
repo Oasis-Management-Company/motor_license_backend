@@ -40,6 +40,7 @@ public class SalesDto {
     private String plate;
     private String mla;
     private LocalDateTime date;
+    private String myDate;
     private Double amount;
     private PaymentStatus status;
     private ApprovalStatus approvalStatus;
@@ -48,5 +49,6 @@ public class SalesDto {
     private Long invoice;
     private String insuranceNumber;
     private String platecat;
+    private String invoiceNo;
 
 }

@@ -2,20 +2,19 @@ package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
-import com.app.IVAS.dto.AsinDto;
-import com.app.IVAS.dto.InvoiceDto;
-import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VehicleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import javax.sound.sampled.Port;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,19 +72,25 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Vehicle saveEditedVehicle(VehicleDto vehicleDto) {
+        Vehicle editVehicle = new Vehicle();
+        Vehicle vehicle = vehicleRepository.findById(vehicleDto.getParent()).get();
 
-        Vehicle vehicle = vehicleRepository.findByChasisNumber(vehicleDto.getChasis());
+        editVehicle.setYear(vehicleDto.getYear());
+        editVehicle.setColor(vehicleDto.getColor());
+        editVehicle.setChasisNumber(vehicleDto.getChasis());
+        editVehicle.setEngineNumber(vehicleDto.getEngine());
+        editVehicle.setVehicleCategory(vehicleCategoryRepository.findById(Long.valueOf(vehicleDto.getCategory())).get());
+        editVehicle.setLastUpdatedAt(LocalDateTime.now());
+        editVehicle.setRegType(RegType.EDIT);
+        editVehicle.setParentId(vehicle.getId());
+        editVehicle.setCreatedBy(jwtService.user);
+        editVehicle.setPortalUser(vehicle.getPortalUser());
+        editVehicle.setPlateNumber(vehicle.getPlateNumber());
+        editVehicle.setVehicleModel(vehicle.getVehicleModel());
 
-        vehicle.setYear(vehicleDto.getYear());
-        vehicle.setColor(vehicleDto.getColor());
-        vehicle.setChasisNumber(vehicleDto.getChasis());
-        vehicle.setEngineNumber(vehicleDto.getEngine());
-        vehicle.setVehicleCategory(vehicleCategoryRepository.findById(Long.valueOf(vehicleDto.getCategory())).get());
-        vehicle.setLastUpdatedAt(LocalDateTime.now());
+        vehicleRepository.save(editVehicle);
 
-        vehicleRepository.save(vehicle);
-
-        return vehicle;
+        return editVehicle;
     }
 
     public VehicleDto getVehicleDetailsByPlate(String plate) {
@@ -274,6 +279,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<SalesDto> searchTaxpayerAssessments(List<Sales> results) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return results.stream().map(sales -> {
             SalesDto dto = new SalesDto();
             dto.setFirstname(sales.getInvoice().getPayer().getDisplayName());
@@ -286,11 +292,32 @@ public class VehicleServiceImpl implements VehicleService {
             dto.setAmount(sales.getInvoice().getAmount());
             dto.setStatus(sales.getInvoice().getPaymentStatus());
             dto.setApprovalStatus(sales.getApprovalStatus());
+            dto.setInsuranceNumber(sales.getInvoice().getInvoiceNumber());
+            dto.setMyDate(sales.getCreatedAt().format(df));
             dto.setId(sales.getId());
             return dto;
 
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<PortalUserPojo> searchTaxpayerAssessment(List<PortalUser> results) {
+        return results.stream().map(user -> {
+            PortalUserPojo dto = new PortalUserPojo();
+
+            dto.setName(user.getDisplayName());
+            dto.setPhoneNumber(user.getPhoneNumber());
+            dto.setEmail(user.getEmail());
+            dto.setId(user.getId());
+            LocalDateTime dateTime = LocalDateTime.parse(user.getCreatedAt().toString(), DateTimeFormatter.ISO_DATE_TIME);
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+            dto.setDateCreated(dateTime.format(outputFormatter));
+
+            return dto;
+
+        }).collect(Collectors.toList());
+    }
+
 
     @Override
     public List<InvoiceDto> searchAllInvoice(List<Invoice> invoices) {
@@ -309,5 +336,98 @@ public class VehicleServiceImpl implements VehicleService {
             dto.setId(invoice.getId());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VehicleDto> searchAllVehicleForApproval(List<Vehicle> results) {
+        return results.stream().map(vehicle -> {
+            VehicleDto dto = new VehicleDto();
+
+            dto.setFirstname(vehicle.getPortalUser().getDisplayName());
+            dto.setPhonenumber(vehicle.getPortalUser().getPhoneNumber());
+            dto.setEmail(vehicle.getPortalUser().getEmail());
+            dto.setDate(vehicle.getCreatedAt());
+            dto.setCreatedBy(vehicle.getCreatedBy().getDisplayName());
+            dto.setChasis(vehicle.getChasisNumber());
+            dto.setParent(vehicle.getParentId());
+            dto.setPlateType(vehicle.getPlateNumber().getType().getName());
+            dto.setPlate(vehicle.getPlateNumber().getPlateNumber());
+            dto.setColor(vehicle.getColor());
+            dto.setEngine(vehicle.getEngineNumber());
+            dto.setMake(vehicle.getVehicleModel().getVehicleMake().getName());
+            dto.setModel(vehicle.getVehicleModel().getName());
+            dto.setCategory(vehicle.getVehicleCategory().getName());
+            dto.setYear(vehicle.getYear());
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public VehicleEditDto getAllEditVehicle(Long id) {
+        VehicleDto oldDetails = new VehicleDto();
+        VehicleDto newDetails = new VehicleDto();
+        VehicleEditDto vehicleEditDto = new VehicleEditDto();
+
+        Vehicle old = vehicleRepository.findById(id).get();
+        Vehicle news = vehicleRepository.findFirstByParentId(id);
+
+        oldDetails.setFirstname(old.getPortalUser().getDisplayName());
+        oldDetails.setPhonenumber(old.getPortalUser().getPhoneNumber());
+        oldDetails.setEmail(old.getPortalUser().getEmail());
+        oldDetails.setDate(old.getCreatedAt());
+        oldDetails.setCreatedBy(old.getCreatedBy().getDisplayName());
+        oldDetails.setChasis(old.getChasisNumber());
+        oldDetails.setParent(old.getParentId());
+        oldDetails.setPlateType(old.getPlateNumber().getType().getName());
+        oldDetails.setPlate(old.getPlateNumber().getPlateNumber());
+        oldDetails.setColor(old.getColor());
+        oldDetails.setEngine(old.getEngineNumber());
+        oldDetails.setMake(old.getVehicleModel().getVehicleMake().getName());
+        oldDetails.setModel(old.getVehicleModel().getName());
+        oldDetails.setCategory(old.getVehicleCategory().getName());
+        oldDetails.setYear(old.getYear());
+
+        newDetails.setFirstname(news.getPortalUser().getDisplayName());
+        newDetails.setPhonenumber(news.getPortalUser().getPhoneNumber());
+        newDetails.setEmail(news.getPortalUser().getEmail());
+        newDetails.setDate(news.getCreatedAt());
+        newDetails.setCreatedBy(news.getCreatedBy().getDisplayName());
+        newDetails.setChasis(news.getChasisNumber());
+        newDetails.setParent(news.getParentId());
+        newDetails.setPlateType(news.getPlateNumber().getType().getName());
+        newDetails.setPlate(news.getPlateNumber().getPlateNumber());
+        newDetails.setColor(news.getColor());
+        newDetails.setEngine(news.getEngineNumber());
+        newDetails.setMake(news.getVehicleModel().getVehicleMake().getName());
+        newDetails.setModel(news.getVehicleModel().getName());
+        newDetails.setCategory(news.getVehicleCategory().getName());
+        newDetails.setYear(news.getYear());
+
+        vehicleEditDto.setOldDetails(oldDetails);
+        vehicleEditDto.setNewDetails(newDetails);
+
+        return vehicleEditDto;
+    }
+
+    @Override
+    public HttpStatus approveEdittedVehicle(Long id, String type) {
+        Vehicle old = vehicleRepository.findById(id).get();
+        Vehicle news = vehicleRepository.findFirstByParentId(id);
+
+        if (type.equalsIgnoreCase("Approval")){
+            old.setVehicleCategory(news.getVehicleCategory() == old.getVehicleCategory() ? old.getVehicleCategory() : news.getVehicleCategory());
+            old.setColor(news.getColor() == old.getColor() ? old.getColor() : news.getColor());
+            old.setChasisNumber(news.getChasisNumber()== old.getChasisNumber() ? old.getChasisNumber() : news.getChasisNumber());
+            old.setEngineNumber(news.getEngineNumber()==old.getEngineNumber() ? old.getEngineNumber() : news.getEngineNumber());
+            old.setYear(news.getYear()==old.getYear() ? old.getYear() : news.getYear());
+
+            vehicleRepository.save(old);
+            vehicleRepository.delete(news);
+            return HttpStatus.OK;
+        }else{
+            vehicleRepository.delete(news);
+            return HttpStatus.OK;
+        }
     }
 }

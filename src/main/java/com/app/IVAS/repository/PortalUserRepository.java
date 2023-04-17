@@ -26,4 +26,6 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
     PortalUser findFirstByPhoneNumber(String number);
 
     List<PortalUser> findAllByRole(Optional<Role> role);
+
+
 }

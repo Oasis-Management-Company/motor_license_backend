@@ -17,8 +17,9 @@ public class SalesSearchFilter extends BaseSearchDto implements QuerydslBinderCu
 
     @Override
     public void customize(QuerydslBindings bindings, QSales root) {
-//        bindings.bind(root.).as("reviewedBy").first((path, value) -> path.eq(value));
-//
-//        bindings.including(root.assessor);
+        bindings.bind(root.vehicle.plateNumber.plateNumber).as("plateNumber").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.vehicle.portalUser.asin).as("asin").first((path, value) -> path.containsIgnoreCase(value));
+
+        bindings.including(root.vehicle);
     }
 }
