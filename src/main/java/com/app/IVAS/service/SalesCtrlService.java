@@ -12,6 +12,10 @@ public interface SalesCtrlService {
 
     List<SalesDto> GetSales(List<Sales> results);
 
+    PortalUser viewPortalUser(Long id);
+
+    PortalUser editPortalUser(PortalUserPojo pojo);
+
     AsinDto ValidateAsin(String asin);
 
     List<VehicleMake> getVehicleMake();

@@ -250,6 +250,18 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.viewSale(rowId));
     }
 
+    @GetMapping("/taxPayer/view")
+    public ResponseEntity<PortalUser> viewTaxPayer(@RequestParam Long rowId){
+
+        return ResponseEntity.ok(service.viewPortalUser(rowId));
+    }
+
+    @PostMapping("/taxPayer/edit")
+    public ResponseEntity<?> editTaxPayer(@RequestBody PortalUserPojo portalUserPojo){
+
+        return ResponseEntity.ok(service.editPortalUser(portalUserPojo));
+    }
+
     /**Incomplete Edit function**/
 //    @PostMapping("/edit-sales-invoice")
 //    @Transactional

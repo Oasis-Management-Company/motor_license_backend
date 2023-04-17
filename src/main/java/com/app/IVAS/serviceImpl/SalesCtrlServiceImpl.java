@@ -13,6 +13,7 @@ import com.app.IVAS.service.SalesCtrlService;
 import com.app.IVAS.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     private final VehicleRepository vehicleRepository;
@@ -228,6 +232,69 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         return dto;
 
     }
+
+    @Override
+    public PortalUser viewPortalUser(Long id) {
+        Optional<PortalUser> taxPayer = portalUserRepository.findById(id);
+
+        return taxPayer.get();
+    }
+
+    @Override
+    public PortalUser editPortalUser(PortalUserPojo pojo) {
+        Optional<PortalUser> existingUser = portalUserRepository.findById(pojo.getId());
+
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy");
+
+        if (!existingUser.isPresent()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        PortalUser existing = existingUser.get();
+
+        PortalUser edit = new PortalUser();
+
+        edit.setUsername(existing.getFirstName());
+        edit.setParentUserName(existing.getUsername());
+        if(pojo.getEmail().equalsIgnoreCase(existing.getEmail())){
+            edit.setParentEmail(existing.getEmail());
+            edit.setEmail(pojo.getFirstName());
+        }else {
+            edit.setEmail(pojo.getEmail());
+        }
+        edit.setFirstName(pojo.getFirstName() != null ? pojo.getFirstName() : existing.getFirstName());
+        edit.setLastName(pojo.getLastName() != null ? pojo.getLastName() : existing.getLastName());
+        edit.setOtherNames(pojo.getOtherNames() != null ? pojo.getOtherNames() : existing.getOtherNames());
+        edit.setParentId(existing.getId());
+        edit.setAddress(pojo.getAddress() != null ? pojo.getAddress() : existing.getAddress());
+
+        edit.setPhoneNumber(pojo.getPhoneNumber() != null ? pojo.getPhoneNumber() : existing.getPhoneNumber());
+        edit.setAsin(pojo.getAsin() != null ? pojo.getAsin() : existing.getAsin());
+        try {
+            edit.setDateOfBirth(pojo.getDateOfBirth() != null ? format.parse(pojo.getDateOfBirth()) : existing.getDateOfBirth());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        edit.setRegType(RegType.EDIT);
+        edit.setCreatedBy(jwtService.user);
+        edit.setCreatedAt(LocalDateTime.now());
+
+        if (edit.getFirstName() != null && edit.getLastName() != null) {
+            edit.setDisplayName(edit.getFirstName() + ' ' + edit.getLastName());
+        } else if (edit.getFirstName() != null && edit.getLastName() == null) {
+            edit.setDisplayName(edit.getFirstName());
+        } else if (edit.getFirstName() == null && edit.getLastName() != null) {
+            edit.setDisplayName(edit.getLastName());
+        }
+
+        portalUserRepository.save(edit);
+
+        return edit;
+    }
+
+
+
+
 
 
 /**Incomplete Edit function**/
