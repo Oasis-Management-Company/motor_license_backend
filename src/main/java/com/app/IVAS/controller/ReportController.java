@@ -9,10 +9,8 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.QSales;
-import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.QPortalUser;
-import com.app.IVAS.repository.PlateNumberRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.ReportService;
@@ -22,11 +20,17 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import javax.activation.MimeType;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -198,16 +202,164 @@ public class ReportController {
         return new QueryResultsPojo<>(reportService.getServiceSales(invoiceServiceTypeQueryResults.getResults()), invoiceServiceTypeQueryResults.getLimit(), invoiceServiceTypeQueryResults.getOffset(), invoiceServiceTypeQueryResults.getTotal(), invoiceServiceTypeQueryResults.isEmpty(), null, prices.stream().mapToDouble(Double::doubleValue).sum());
     }
 
-//    @GetMapping("/get-service-types")
-//    @Transactional
-//    public List<String> getServices(){
-//        List<ServiceType> serviceTypes = appRepository.startJPAQuery(QServiceType.serviceType)
-//                .where(QServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER REGISTRATION"))
-//                .fetch();
-//        List<String> services = new ArrayList<>();
-//        for (ServiceType type: serviceTypes){
-//            services.add(type.getName());
-//        }
-//        return services;
-//    }
+    @PostMapping(path = "/download-stock-report")
+    @Transactional
+    public ResponseEntity<Resource> exportStockReport(PortalUserSearchFilter filter, HttpServletRequest request) throws Exception {
+        List<StockReportPojo> pojos = getStockReportPojo(filter);
+        Resource resource = reportService.exportStockReport(pojos, filter.getDownloadType());
+        String contentType = null;
+        String fileName = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.error("Could not determine file type.");
+        }
+        // Fallback to the default content type if type could not be determined
+        if (contentType == null){
+            if (filter.getDownloadType().equalsIgnoreCase("pdf")){
+                contentType = "application/pdf";
+            } else {
+                contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            }
+        }
+
+        if (filter.getDownloadType().equalsIgnoreCase("pdf")){
+            fileName = "mla_stock_report.pdf";
+        } else {
+            fileName = "mla_stock_report.xlsx";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .body(resource);
+    }
+
+    @PostMapping(path = "/download-plate-number-sales-report")
+    @Transactional
+    public ResponseEntity<Resource> exportPlateNumberSalesReport(SalesReportSearchFilter filter, HttpServletRequest request) throws Exception {
+        List<SalesReportDto> pojos = getSalesReportDto(filter);
+        Resource resource = reportService.exportPlateNumberSalesReport(pojos, filter.getDownloadType());
+        String contentType = null;
+        String fileName = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.error("Could not determine file type.");
+        }
+        // Fallback to the default content type if type could not be determined
+        if (contentType == null){
+            if (filter.getDownloadType().equalsIgnoreCase("pdf")){
+                contentType = "application/pdf";
+            } else {
+                contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            }
+        }
+
+        if (filter.getDownloadType().equalsIgnoreCase("pdf")){
+            fileName = "plate-number_sales_report.pdf";
+        } else {
+            fileName = "plate-number_sales_report.xlsx";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .body(resource);
+    }
+
+    @PostMapping(path = "/download-service-sales-report")
+    @Transactional
+    public ResponseEntity<Resource> exportServiceSalesReport(SalesReportSearchFilter filter, HttpServletRequest request) throws Exception {
+        List<SalesReportPojo> pojos = getServiceSalesPojo(filter);
+        Resource resource = reportService.exportServiceSalesReport(pojos, filter.getDownloadType());
+        String contentType = null;
+        String fileName = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.error("Could not determine file type.");
+        }
+        // Fallback to the default content type if type could not be determined
+        if (contentType == null){
+            if (filter.getDownloadType().equalsIgnoreCase("pdf")){
+                contentType = "application/pdf";
+            } else {
+                contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            }
+        }
+
+        if (filter.getDownloadType().equalsIgnoreCase("pdf")){
+            fileName = "service_sales_report.pdf";
+        } else {
+            fileName = "service_sales_report.xlsx";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .body(resource);
+    }
+
+// TODO:  <============================================================ private print methods ============================================================>
+
+    private List<StockReportPojo> getStockReportPojo(PortalUserSearchFilter filter){
+
+        JPAQuery<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QPortalUser.portalUser.role.name.equalsIgnoreCase("MLA"));
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QPortalUser.portalUser);
+        QueryResults<PortalUser> portalUserQueryResults = portalUserJPAQuery.select(QPortalUser.portalUser).distinct().orderBy(sortedColumn).fetchResults();
+        return reportService.getStockReport(portalUserQueryResults.getResults());
+    }
+
+    private List<SalesReportPojo> getServiceSalesPojo(SalesReportSearchFilter filter){
+
+        JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull());
+
+
+        if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.invoice.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
+        }
+
+        if (filter.getCreatedAfter() != null){
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+        }
+
+        if (filter.getCreatedBefore() != null){
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("PaymentDate"), QInvoiceServiceType.invoiceServiceType);
+        QueryResults<InvoiceServiceType> invoiceServiceTypeQueryResults = invoiceServiceTypeJPAQuery.select(QInvoiceServiceType.invoiceServiceType).distinct().orderBy(sortedColumn).fetchResults();
+        return reportService.getServiceSales(invoiceServiceTypeQueryResults.getResults());
+    }
+
+    private List<SalesReportDto> getSalesReportDto(SalesReportSearchFilter filter){
+
+        JPAQuery<Sales> salesJPAQuery = appRepository.startJPAQuery(QSales.sales)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QSales.sales.invoice.paymentDate.isNotNull())
+                .where(QSales.sales.vehicle.isNotNull());
+
+        if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
+            salesJPAQuery.where(QSales.sales.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
+        }
+
+        if (filter.getCreatedAfter() != null){
+            salesJPAQuery.where(QSales.sales.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+        }
+
+        if (filter.getCreatedBefore() != null){
+            salesJPAQuery.where(QSales.sales.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
+        QueryResults<Sales> salesQueryResults = salesJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
+        return reportService.getSales(salesQueryResults.getResults());
+    }
 }

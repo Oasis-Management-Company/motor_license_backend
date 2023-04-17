@@ -6,6 +6,7 @@ import lombok.Data;
 public class SalesReportDto {
     private String mla;
     private String plateNumber;
+    private String plateType;
     private String mlaStation;
     private String dateSold;
     private Double amount;
