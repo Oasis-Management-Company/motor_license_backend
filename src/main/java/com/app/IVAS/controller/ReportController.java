@@ -26,11 +26,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.activation.MimeType;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -163,7 +161,7 @@ public class ReportController {
 
     @GetMapping("/search/service-type-sales")
     @Transactional
-    public QueryResultsPojo<SalesReportPojo> searchServiceSales(SalesReportSearchFilter filter){
+    public QueryResultsPojo<SalesReportPojo> searchServiceSales(ServiceReportSearchFilter filter){
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
@@ -314,7 +312,7 @@ public class ReportController {
         return reportService.getStockReport(portalUserQueryResults.getResults());
     }
 
-    private List<SalesReportPojo> getServiceSalesPojo(SalesReportSearchFilter filter){
+    private List<SalesReportPojo> getServiceSalesPojo(ServiceReportSearchFilter filter){
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
