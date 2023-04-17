@@ -497,6 +497,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         dto.setCategory(vehicle.get().getVehicleCategory().getName());
         dto.setCategoryId(vehicle.get().getVehicleCategory().getId());
         dto.setPlate(vehicle.get().getPlateNumber().getPlateNumber());
+        dto.setYear(vehicle.get().getYear());
 
         return dto;
     }
