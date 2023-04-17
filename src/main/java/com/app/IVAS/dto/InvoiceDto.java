@@ -33,4 +33,5 @@ public class InvoiceDto {
     private Double amount;
     private PaymentStatus status;
     private Long id;
+    private String dateString;
 }
