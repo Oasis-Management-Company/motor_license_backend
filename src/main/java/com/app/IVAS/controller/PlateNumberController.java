@@ -148,4 +148,18 @@ public class PlateNumberController {
         plateNumberService.assignCustomPlateNumber(mlaId, requestId);
         return ResponseEntity.ok("");
     }
+
+    @PostMapping("/delete-stock")
+    @Transactional
+    public ResponseEntity<?> deleteStock(@RequestParam Long id){
+        plateNumberService.deleteStock(id);
+        return ResponseEntity.ok("");
+    }
+
+    @PostMapping("/recall-plate-number")
+    @Transactional
+    public ResponseEntity<?> recallPlateNumber(@RequestParam Long id){
+        plateNumberService.recallPlateNumber(id);
+        return ResponseEntity.ok("");
+    }
 }

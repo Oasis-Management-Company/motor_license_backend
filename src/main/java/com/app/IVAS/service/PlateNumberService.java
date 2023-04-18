@@ -21,4 +21,8 @@ public interface PlateNumberService {
     void assignPlateNumbers(List<Long> plateNumbers, Long mlaId, Long requestId);
 
     void assignCustomPlateNumber(Long mlaId, Long requestId);
+
+    void deleteStock(Long stockId);
+
+    void recallPlateNumber(Long id);
 }
