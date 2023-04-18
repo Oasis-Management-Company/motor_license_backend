@@ -71,18 +71,17 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
     // inherited
     public final QPortalUser lastUpdatedBy;
 
-    public final QLga lga;
+    public final com.app.IVAS.entity.userManagement.QLga lga;
 
     public final StringPath nationalIdentificationNumber = createString("nationalIdentificationNumber");
 
-    public final QZonalOffice office;
+    public final com.app.IVAS.entity.userManagement.QZonalOffice office;
 
     public final StringPath otherNames = createString("otherNames");
 
     public final StringPath phoneNumber = createString("phoneNumber");
 
     public final StringPath preferredName = createString("preferredName");
-
     public final QRole role;
     public final NumberPath<Long> stateId = createNumber("stateId", Long.class);
 

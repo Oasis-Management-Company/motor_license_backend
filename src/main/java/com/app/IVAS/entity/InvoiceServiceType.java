@@ -1,5 +1,6 @@
 package com.app.IVAS.entity;
 
+import com.app.IVAS.Enum.RegType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,4 +34,7 @@ public class InvoiceServiceType {
     private String reference;
     private String revenuecode;
     private Double amount;
+
+    @Enumerated(EnumType.STRING)
+    private RegType regType;
 }

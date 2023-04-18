@@ -19,6 +19,9 @@ public class SalesReportSearchFilter extends BaseSearchDto implements QuerydslBi
 
     @Override
     public void customize(QuerydslBindings bindings, QSales root){
+        bindings.bind(root.createdBy.displayName).as("name").first((path, value) -> path.equalsIgnoreCase(value));
+        bindings.bind(root.createdBy.office.id).as("zone").first((path, value) -> path.eq(value));
 
+        bindings.including(root.createdBy);
     }
 }
