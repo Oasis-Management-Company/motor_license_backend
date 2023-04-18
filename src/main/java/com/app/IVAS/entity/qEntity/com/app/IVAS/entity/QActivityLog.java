@@ -24,11 +24,7 @@ public class QActivityLog extends EntityPathBase<ActivityLog> {
 
     public final com.app.IVAS.entity.userManagement.QStatusEntity _super;
 
-    public final StringPath action = createString("action");
-
-    public final EnumPath<com.app.IVAS.Enum.ActivityStatusConstant> activityStatus = createEnum("activityStatus", com.app.IVAS.Enum.ActivityStatusConstant.class);
-
-    public final com.app.IVAS.entity.userManagement.QPortalUser actor;
+    public final EnumPath<com.app.IVAS.Enum.ActivityStatusConstant> action = createEnum("action", com.app.IVAS.Enum.ActivityStatusConstant.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
@@ -53,8 +49,6 @@ public class QActivityLog extends EntityPathBase<ActivityLog> {
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser lastUpdatedBy;
 
-    public final com.app.IVAS.entity.userManagement.QPortalUser recipient;
-
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
@@ -77,7 +71,6 @@ public class QActivityLog extends EntityPathBase<ActivityLog> {
     public QActivityLog(Class<? extends ActivityLog> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new com.app.IVAS.entity.userManagement.QStatusEntity(type, metadata, inits);
-        this.actor = inits.isInitialized("actor") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("actor"), inits.get("actor")) : null;
         this.createdAt = _super.createdAt;
         this.createdBy = _super.createdBy;
         this.dateDeactivated = _super.dateDeactivated;
@@ -85,7 +78,6 @@ public class QActivityLog extends EntityPathBase<ActivityLog> {
         this.id = _super.id;
         this.lastUpdatedAt = _super.lastUpdatedAt;
         this.lastUpdatedBy = _super.lastUpdatedBy;
-        this.recipient = inits.isInitialized("recipient") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("recipient"), inits.get("recipient")) : null;
         this.status = _super.status;
     }
 
