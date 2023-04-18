@@ -40,6 +40,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Transactional
 @RequestMapping("/api/user")
 public class UserController {
 

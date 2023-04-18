@@ -16,6 +16,8 @@ public interface SalesCtrlService {
 
     PortalUser editPortalUser(PortalUserPojo pojo);
 
+    void approveTaxPayerEdit(Long id, String approval);
+
     AsinDto ValidateAsin(String asin);
 
     List<VehicleMake> getVehicleMake();

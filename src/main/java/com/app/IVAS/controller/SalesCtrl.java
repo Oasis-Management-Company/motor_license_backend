@@ -262,6 +262,13 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.editPortalUser(portalUserPojo));
     }
 
+    @PostMapping("/taxPayer/edit/approval")
+    public ResponseEntity<?> approveEditTaxPayer(@RequestParam Long id, @RequestParam String approval){
+        service.approveTaxPayerEdit(id, approval );
+
+        return ResponseEntity.ok(" ");
+    }
+
     /**Incomplete Edit function**/
 //    @PostMapping("/edit-sales-invoice")
 //    @Transactional

@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserManagementServiceImpl implements UserManagementService {
 
     private final PortalUserRepository portalUserRepository;

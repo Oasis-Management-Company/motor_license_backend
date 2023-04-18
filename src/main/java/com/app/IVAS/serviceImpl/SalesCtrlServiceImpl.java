@@ -44,8 +44,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final InvoiceRepository invoiceRepository;
     private final JwtService jwtService;
     private final RoleRepository roleRepository;
-    @Value("${asin_verification}")
-    private String asinVerification;
     private final VehicleMakeRepository vehicleMakeRepository;
     private final VehicleModelRepository vehicleModelRepository;
     private final PlateNumberRepository plateNumberRepository;
@@ -58,8 +56,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final InsuranceRepository insuranceRepository;
     private final RrrGenerationService rrrGenerationService;
     private final PaymentServiceImpl paymentService;
-
-
+    @Value("${asin_verification}")
+    private String asinVerification;
 
     @Override
     @Transactional
@@ -82,11 +80,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         PortalUser portalUser = null;
 
         PortalUser user = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
-        if (foundVehicle != null){
+        if (foundVehicle != null) {
             return null;
         }
 
-        if (user == null){
+        if (user == null) {
             dto.setAddress(sales.getAddress());
             dto.setEmail(sales.getEmail());
             dto.setFirstName(sales.getFirstname());
@@ -98,7 +96,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
             Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
             portalUser = userManagementService.createUser(dto, jwtService.user, role);
-        }else{
+        } else {
             portalUser = user;
         }
 
@@ -139,7 +137,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             serviceType.setServiceType(type);
             serviceType.setInvoice(savedInvoice);
             serviceType.setReference(rrrGenerationService.generateNewReferenceNumber());
-            if (type.getRevenueCode() != null){
+            if (type.getRevenueCode() != null) {
                 serviceType.setRevenuecode(type.getRevenueCode());
             }
             invoiceServiceTypeArrayList.add(serviceType);
@@ -158,10 +156,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Sales saved = salesRepository.save(sales1);
         cardService.createCard(savedInvoice, savedVehicle);
 
-        try{
+        try {
             System.out.println("reached here for upload to tax");
             paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
@@ -244,8 +242,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     public PortalUser editPortalUser(PortalUserPojo pojo) {
         Optional<PortalUser> existingUser = portalUserRepository.findById(pojo.getId());
 
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyy");
-
         if (!existingUser.isPresent()) {
             throw new IllegalArgumentException("User not found");
         }
@@ -256,10 +252,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         edit.setUsername(existing.getFirstName());
         edit.setParentUserName(existing.getUsername());
-        if(pojo.getEmail().equalsIgnoreCase(existing.getEmail())){
+        if (pojo.getEmail().equalsIgnoreCase(existing.getEmail())) {
             edit.setParentEmail(existing.getEmail());
             edit.setEmail(pojo.getFirstName());
-        }else {
+        } else {
             edit.setEmail(pojo.getEmail());
         }
         edit.setFirstName(pojo.getFirstName() != null ? pojo.getFirstName() : existing.getFirstName());
@@ -270,11 +266,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         edit.setPhoneNumber(pojo.getPhoneNumber() != null ? pojo.getPhoneNumber() : existing.getPhoneNumber());
         edit.setAsin(pojo.getAsin() != null ? pojo.getAsin() : existing.getAsin());
-        try {
-            edit.setDateOfBirth(pojo.getDateOfBirth() != null ? format.parse(pojo.getDateOfBirth()) : existing.getDateOfBirth());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         edit.setRegType(RegType.EDIT);
         edit.setCreatedBy(jwtService.user);
         edit.setCreatedAt(LocalDateTime.now());
@@ -292,12 +283,78 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         return edit;
     }
 
+    @Override
+    public void approveTaxPayerEdit(Long id, String approval) {
+
+        Optional<PortalUser> editedUser = portalUserRepository.findById(id);
 
 
+        if (!editedUser.isPresent()) {
+            throw new IllegalArgumentException("Edited User not found");
+        }
+
+        Optional<PortalUser> initialUser = portalUserRepository.findById(editedUser.get().getParentId());
+
+        if (!initialUser.isPresent()) {
+            throw new IllegalArgumentException("Initial User not found");
+        }
+        PortalUser edit = editedUser.get();
+        PortalUser user = initialUser.get();
+
+        if (approval.equalsIgnoreCase("Reject")) {
+            portalUserRepository.delete(editedUser.get());
+        } else if (approval.equalsIgnoreCase("Approve")) {
+
+            edit.setLastUpdatedAt(LocalDateTime.now());
+
+            if (edit.getFirstName() != null) {
+                user.setFirstName(edit.getFirstName());
+            }
+            if (edit.getLastName() != null) {
+                user.setLastName(edit.getLastName());
+            }
+
+            if (edit.getAddress() != null) {
+                user.setAddress(edit.getAddress());
+            }
+
+            if (edit.getAsin() != null) {
+                user.setAsin(edit.getAsin());
+            }
+            if (edit.getPhoneNumber() != null) {
+                user.setPhoneNumber(edit.getPhoneNumber());
+            }
+
+            if (edit.getParentEmail() != null) {
+                user.setEmail(edit.getParentEmail());
+            }
+
+            if (edit.getOtherNames() != null) {
+                user.setOtherNames(edit.getOtherNames());
+            }
+
+            if (edit.getFirstName() != null && edit.getLastName() != null) {
+                user.setDisplayName(edit.getFirstName() + ' ' + edit.getLastName());
+            } else if (edit.getFirstName() != null && edit.getLastName() == null) {
+                user.setDisplayName(edit.getFirstName());
+            } else if (edit.getFirstName() == null && edit.getLastName() != null) {
+                user.setDisplayName(edit.getLastName());
+            }
+
+            portalUserRepository.save(user);
+
+            portalUserRepository.delete(editedUser.get());
 
 
+        }
 
-/**Incomplete Edit function**/
+
+    }
+
+
+    /**
+     * Incomplete Edit function
+     **/
 //    @Override
 //    public Void editSalesInvoice(SalesDto dto) {
 //
@@ -325,7 +382,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 //
 //
 //    }
-
     @Override
     public AsinDto ValidateAsin(String asin) {
 
@@ -343,7 +399,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
 
         try {
-            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET,entity, UserDemographyDto.class);
+            responseRC = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, UserDemographyDto.class);
 
             userinfo1 = responseRC.getBody();
         } catch (Exception e) {
@@ -376,7 +432,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Override
     public List<PlateNumber> getUserPlateNumbers(Long id) {
         PlateNumberType type = plateNumberTypeRepository.findById(id).get();
-        List<PlateNumber> plateNumbers = plateNumberRepository.findAllByAgentAndPlateNumberStatusAndTypeAndOwnerIsNull(jwtService.user, PlateNumberStatus.ASSIGNED,type);
+        List<PlateNumber> plateNumbers = plateNumberRepository.findAllByAgentAndPlateNumberStatusAndTypeAndOwnerIsNull(jwtService.user, PlateNumberStatus.ASSIGNED, type);
         return plateNumbers;
     }
 
@@ -397,14 +453,14 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
     @Override
-    public String getApprovalStatus(Long id, String action,  Optional<String> reason) {
+    public String getApprovalStatus(Long id, String action, Optional<String> reason) {
         Sales sales = salesRepository.findById(id).orElseThrow(RuntimeException::new);
 
-        if (action.equalsIgnoreCase("APPROVED")){
+        if (action.equalsIgnoreCase("APPROVED")) {
             sales.setApprovalStatus(ApprovalStatus.APPROVED);
             sales.setApprovedDate(LocalDateTime.now());
             sales.setApprovedBy(jwtService.user);
-        } else if (action.equalsIgnoreCase("QUERIED")){
+        } else if (action.equalsIgnoreCase("QUERIED")) {
             sales.setApprovalStatus(ApprovalStatus.QUERIED);
             sales.setApprovedDate(LocalDateTime.now());
             sales.setApprovedBy(jwtService.user);
@@ -464,7 +520,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
 
-
     @Override
     public SalesDto AddVehicle(SalesDto sales) {
         System.out.println(sales);
@@ -479,7 +534,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
         portalUser = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
 
-        if (portalUser == null){
+        if (portalUser == null) {
             dto.setAddress(sales.getAddress());
             dto.setEmail(sales.getEmail());
             dto.setFirstName(sales.getFirstname());
@@ -587,7 +642,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         invoiceDto.setEmail(invoice.getPayer().getEmail());
         invoiceDto.setInvoiceNumber(invoice.getInvoiceNumber());
         invoiceDto.setReference(invoice.getPaymentRef());
-        if(invoice.getVehicle() != null){
+        if (invoice.getVehicle() != null) {
             invoiceDto.setCategory(invoice.getVehicle().getVehicleCategory().getName());
             invoiceDto.setPlatenumber(invoice.getVehicle().getPlateNumber().getPlateNumber());
             invoiceDto.setMake(invoice.getVehicle().getVehicleModel().getVehicleMake().getName());
