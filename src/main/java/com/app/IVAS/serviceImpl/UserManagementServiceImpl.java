@@ -2,6 +2,7 @@ package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.api_response.LoginResponse;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.userManagement.*;
@@ -54,6 +55,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         portalUser.setGeneratedPassword(passwordService.hashPassword(user.getPassword()));
         portalUser.setImage(user.getPhoto());
         portalUser.setAddress(user.getAddress());
+        portalUser.setRegType(RegType.REGISTRATION);
         if (user.getLga() != null){
             portalUser.setLga(lgaRepository.findById(user.getLga()).orElseThrow(RuntimeException::new));
         }
