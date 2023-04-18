@@ -21,7 +21,7 @@ public class PaymentCtrl {
     private PaymentService paymentService;
 
     @PostMapping("/payment/send")
-    public ResponseEntity<String> sendPaymentToCBS(@RequestParam String invoice, HttpServletResponse response){
+    public ResponseEntity<?> sendPaymentToCBS(@RequestParam String invoice){
         String dto = paymentService.sendPaymentTax(invoice);
         return ResponseEntity.ok(dto);
     }

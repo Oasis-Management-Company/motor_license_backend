@@ -15,6 +15,11 @@ public class InvoiceSearchFilter extends BaseSearchDto implements QuerydslBinder
 
     @Override
     public void customize(QuerydslBindings bindings, QInvoice root) {
+        bindings.bind(root.payer.firstName).as("firstName").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.payer.lastName).as("lastName").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.invoiceNumber).as("invoiceNo").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.createdBy.displayName).as("createdBy").first((path, value) -> path.containsIgnoreCase(value));
 
+        bindings.including(root.payer, root.invoiceNumber, root.createdBy);
     }
 }
