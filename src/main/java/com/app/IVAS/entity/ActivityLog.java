@@ -19,18 +19,7 @@ import javax.persistence.*;
 public class ActivityLog extends StatusEntity {
 
     private String description;
-    private String action;
 
     @Enumerated(EnumType.STRING)
-    private ActivityStatusConstant activityStatus;
-
-    @JsonIgnore
-    @JoinColumn(name = "ACTOR_ID", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private PortalUser actor;
-
-    @JsonIgnore
-    @JoinColumn(name = "RECIPIENT_ID", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private PortalUser recipient;
+    private ActivityStatusConstant action;
 }

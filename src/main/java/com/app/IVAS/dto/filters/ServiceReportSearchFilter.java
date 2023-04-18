@@ -24,6 +24,6 @@ public class ServiceReportSearchFilter extends BaseSearchDto implements Querydsl
             bindings.bind(root.invoice.createdBy.office.id).as("zone").first((path, value) -> path.eq(value));
         }
 
-        bindings.including(root.invoice.createdBy);
+        bindings.including(root.invoice.createdBy, root.serviceType, root.regType);
     }
 }

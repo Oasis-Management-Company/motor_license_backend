@@ -1,5 +1,6 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.ActivityStatusConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.api_response.LoginResponse;
@@ -8,6 +9,7 @@ import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.security.PasswordService;
+import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.SmsService;
 import com.app.IVAS.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     private final PasswordService passwordService;
     private final ZonalOfficeRepository zonalOfficeRepository;
     private final SmsService smsService;
+    private final ActivityLogService activityLogService;
     private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
 
     @Override
@@ -66,6 +69,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         portalUser.setRole(role);
 
         portalUserRepository.save(portalUser);
+        activityLogService.createActivityLog((portalUser.getDisplayName() + " was created with role: " + portalUser.getRole().getName()), ActivityStatusConstant.CREATE);
         return portalUser;
     }
 
@@ -79,6 +83,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         portalUser.setLastUpdatedAt(now);
         portalUser.setLastUpdatedBy(jwtService.user);
         portalUserRepository.save(portalUser);
+        activityLogService.createActivityLog((portalUser.getDisplayName() + " was deactivated"), ActivityStatusConstant.DEACTIVATION);
     }
 
     @Override
@@ -90,6 +95,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         portalUser.setLastUpdatedAt(LocalDateTime.now());
         portalUser.setLastUpdatedBy(jwtService.user);
         portalUserRepository.save(portalUser);
+        activityLogService.createActivityLog((portalUser.getDisplayName() + " was activated"), ActivityStatusConstant.ACTIVATION);
     }
 
     @Override
@@ -109,6 +115,7 @@ public class UserManagementServiceImpl implements UserManagementService {
            loginResponse.setRole(user.getRole().getName());
            loginResponse.setPermissions(getPermission(user.getRole()));
 
+           activityLogService.createActivityLog((user.getDisplayName() + " logged in"), ActivityStatusConstant.LOGIN);
            return loginResponse;
        } else throw new Exception("Invalid Password");
     }
@@ -121,6 +128,7 @@ public class UserManagementServiceImpl implements UserManagementService {
             newRole.setName(name);
             roleRepository.save(newRole);
             createPermission(permissionTypeConstants, newRole);
+            activityLogService.createActivityLog(("Role with name: " + name + " was created"), ActivityStatusConstant.CREATE);
             return newRole;
         });
     }
@@ -130,6 +138,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         Role role = roleRepository.findByNameIgnoreCase(name).get();
         deletePermission(role);
         createPermission(permissionTypeConstants, role);
+        activityLogService.createActivityLog(("Role with name: " + name + " was updated"), ActivityStatusConstant.UPDATE);
         return role;
     }
 

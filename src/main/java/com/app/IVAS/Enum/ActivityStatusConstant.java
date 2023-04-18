@@ -1,7 +1,13 @@
 package com.app.IVAS.Enum;
 
 public enum ActivityStatusConstant {
-        PENDING,
-        FAILED,
-        SUCCESSFUL,
+        CREATE,
+        UPDATE,
+        DELETE,
+        DEACTIVATION,
+        ACTIVATION,
+        RECALL,
+        LOGIN,
+        APPROVAL,
+        DISAPPROVAL
 }
