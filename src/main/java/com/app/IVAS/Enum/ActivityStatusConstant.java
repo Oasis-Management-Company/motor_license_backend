@@ -6,8 +6,9 @@ public enum ActivityStatusConstant {
         DELETE,
         DEACTIVATION,
         ACTIVATION,
-        RECALL,
         LOGIN,
         APPROVAL,
-        DISAPPROVAL
+        DISAPPROVAL,
+        ASSIGNED,
+        UNASSIGNED
 }

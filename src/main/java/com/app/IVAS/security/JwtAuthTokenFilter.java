@@ -1,7 +1,6 @@
 package com.app.IVAS.security;
 
-import com.app.IVAS.entity.userManagement.PortalUser;
-import lombok.RequiredArgsConstructor;
+import com.app.IVAS.configuration.CachingConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
 
 public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
@@ -25,7 +26,8 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private SystemUserDetailsService systemUserDetailsService;
 
-
+    @Autowired
+    private CachingConfig cachingConfig;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthTokenFilter.class);
 
@@ -49,7 +51,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            logger.error("Can NOT set user authentication -> MonieMessage: {}", e);
+            logger.error("Cannot set user authentication -> Message: {}", e);
         }
 
         filterChain.doFilter(request, response);

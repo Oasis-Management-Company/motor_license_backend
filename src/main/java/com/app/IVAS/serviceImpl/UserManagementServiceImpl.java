@@ -5,7 +5,10 @@ import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.api_response.LoginResponse;
-import com.app.IVAS.dto.*;
+import com.app.IVAS.dto.LoginRequestDto;
+import com.app.IVAS.dto.PasswordDto;
+import com.app.IVAS.dto.PortalUserPojo;
+import com.app.IVAS.dto.UserDto;
 import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
@@ -14,6 +17,7 @@ import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.SmsService;
 import com.app.IVAS.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,7 +29,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -121,6 +125,12 @@ public class UserManagementServiceImpl implements UserManagementService {
            activityLogService.createActivityLog((user.getDisplayName() + " logged in"), ActivityStatusConstant.LOGIN);
            return loginResponse;
        } else throw new Exception("Invalid Password");
+    }
+
+    @Override
+    public void logout(){
+        jwtService.invalidateToken(jwtService.user.getId());
+        jwtService.user = null;
     }
 
     @Override
@@ -253,6 +263,7 @@ public class UserManagementServiceImpl implements UserManagementService {
             portalUser.setOffice(zonalOfficeRepository.findById(user.getZonalOffice()).orElseThrow(RuntimeException::new));
         }
         portalUserRepository.save(portalUser);
+        activityLogService.createActivityLog((portalUser.getDisplayName() +" was updated"), ActivityStatusConstant.UPDATE);
         return get(portalUser);
     }
 
@@ -263,6 +274,7 @@ public class UserManagementServiceImpl implements UserManagementService {
             permission.setPermissionTypeConstant(permissionTypeConstant);
             permission.setRole(role);
             permissionRepository.save(permission);
+            activityLogService.createActivityLog(("Permission: " + permissionTypeConstant.name() + "has been added to role : " + role.getName()), ActivityStatusConstant.UPDATE);
         });
     }
 
