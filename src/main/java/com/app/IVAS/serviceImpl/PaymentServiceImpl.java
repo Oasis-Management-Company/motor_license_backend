@@ -42,6 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -175,13 +176,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void PaymentReturn(PaymentResponse respondDto) {
+        System.out.println(respondDto);
         PaymentHistory paymentHistory = new PaymentHistory();
         Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
         List<Card> card = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.getInvoiceNumber()).get();
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
+
         invoice.setPaymentStatus(PaymentStatus.PAID);
-        invoice.setPaymentDate(respondDto.getPaymentDate());
+        invoice.setPaymentDate(dateTime);
         invoice.setPaymentRef(respondDto.getPaymentReference());
         invoiceRepository.save(invoice);
 
@@ -189,14 +194,14 @@ public class PaymentServiceImpl implements PaymentService {
             card1.setCardStatus(CardStatusConstant.NOT_PRINTED);
             card1.setStatus(GenericStatusConstant.ACTIVE);
             if (card1.getVehicle().getPlateNumber().getType().getName().contains("Commercial")){
-                card1.setExpiryDate(respondDto.getPaymentDate().plusDays(185));
+                card1.setExpiryDate(dateTime.plusDays(185));
             }else{
-                card1.setExpiryDate(respondDto.getPaymentDate().plusDays(365));
+                card1.setExpiryDate(dateTime.plusDays(365));
             }
             cardRepository.save(card1);
         }
         for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
-            invoiceServiceType.setPaymentDate(respondDto.getPaymentDate());
+            invoiceServiceType.setPaymentDate(dateTime);
 
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }

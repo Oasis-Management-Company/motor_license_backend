@@ -2,7 +2,6 @@ package com.app.IVAS.entity.userManagement;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.app.IVAS.Enum.RegType;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -30,8 +29,6 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
     public final QArea area;
 
     public final StringPath asin = createString("asin");
-
-    public final EnumPath<RegType> regType = createEnum("regType", RegType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
@@ -74,15 +71,23 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final StringPath nationalIdentificationNumber = createString("nationalIdentificationNumber");
 
-    public final com.app.IVAS.entity.userManagement.QZonalOffice office;
+    public final QZonalOffice office;
 
     public final StringPath otherNames = createString("otherNames");
+
+    public final StringPath parentEmail = createString("parentEmail");
+
+    public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
+
+    public final StringPath parentUserName = createString("parentUserName");
 
     public final StringPath phoneNumber = createString("phoneNumber");
 
     public final StringPath preferredName = createString("preferredName");
 
-    public final com.app.IVAS.entity.userManagement.QRole role;
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
+
+    public final QRole role;
 
     public final NumberPath<Long> stateId = createNumber("stateId", Long.class);
 

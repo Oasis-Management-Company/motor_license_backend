@@ -61,6 +61,8 @@ public class QInvoice extends EntityPathBase<Invoice> {
 
     public final EnumPath<com.app.IVAS.Enum.PaymentStatus> paymentStatus = createEnum("paymentStatus", com.app.IVAS.Enum.PaymentStatus.class);
 
+    public final BooleanPath sentToTax = createBoolean("sentToTax");
+
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 

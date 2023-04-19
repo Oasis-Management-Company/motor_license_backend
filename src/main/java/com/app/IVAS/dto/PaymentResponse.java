@@ -16,7 +16,7 @@ public class PaymentResponse {
     private String terminalId;
     private String channelName;
     private String location;
-    private LocalDateTime paymentDate;
+    private String paymentDate;
     private String institutionId;
     private String institutionName;
     private String branchName;

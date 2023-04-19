@@ -18,7 +18,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 5600)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(name = "/api/payment")
+@RequestMapping("/api/payment")
 public class PaymentCtrl {
 
     @Autowired
@@ -36,7 +36,7 @@ public class PaymentCtrl {
     }
 
     @PostMapping(value = "/respondse/payment")
-    public HttpStatus PaymentReturn(@RequestBody PaymentResponse respondDto) {
+    public HttpStatus PaymentReturn(PaymentResponse respondDto) {
          paymentService.PaymentReturn(respondDto);
         return HttpStatus.OK;
     }
