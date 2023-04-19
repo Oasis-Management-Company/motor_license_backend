@@ -21,8 +21,6 @@ public class VerificationController {
 
     @GetMapping("/invoice/view/{invoiceNumber}")
     public ResponseEntity<?> getInvoiceDetails(@PathVariable String invoiceNumber){
-
-        paymentService.sendPaymentTax("4184919028224");
         return ResponseEntity.ok(verificationService.getScannedInvoice(invoiceNumber));
     }
 

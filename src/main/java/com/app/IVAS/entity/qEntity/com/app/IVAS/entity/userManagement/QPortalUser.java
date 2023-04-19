@@ -2,6 +2,7 @@ package com.app.IVAS.entity.userManagement;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.app.IVAS.Enum.RegType;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -29,6 +30,8 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
     public final QArea area;
 
     public final StringPath asin = createString("asin");
+
+    public final EnumPath<RegType> regType = createEnum("regType", RegType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;

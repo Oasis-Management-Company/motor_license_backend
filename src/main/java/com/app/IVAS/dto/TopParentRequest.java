@@ -8,5 +8,5 @@ import java.util.List;
 public class TopParentRequest
 {
     private ParentRequest parentRequest;
-    private List<ChildRequest> childRequestList;
+    private List<ChildRequest> childRequest;
 }

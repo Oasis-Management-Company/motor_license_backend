@@ -247,7 +247,6 @@ public class RequestServiceImpl implements RequestService {
             serviceTypeDto.setPlateNumberTypeName(serviceType.getPlateNumberType().getName());
         }
 
-
         return serviceTypeDto;
 
     }
@@ -271,6 +270,7 @@ public class RequestServiceImpl implements RequestService {
             type.setStatus(GenericStatusConstant.ACTIVE);
             type.setCreatedBy(jwtService.user);
             serviceTypeRepository.save(type);
+            activityLogService.createActivityLog((type.getName() + " service type was created"), ActivityStatusConstant.CREATE);
         } else {
             if (dto.getName() != null) {
                 serviceType.get().setName(dto.getName());
@@ -294,6 +294,7 @@ public class RequestServiceImpl implements RequestService {
                 serviceType.get().setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
             }
             serviceTypeRepository.save(serviceType.get());
+            activityLogService.createActivityLog((serviceType.get().getName() + " service type was updated"), ActivityStatusConstant.UPDATE);
         }
     }
 
