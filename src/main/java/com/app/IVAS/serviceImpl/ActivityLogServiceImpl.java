@@ -29,7 +29,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
         return activityLogs.stream().map(activityLog -> {
             ActivityLogPojo pojo = new ActivityLogPojo();
-            pojo.setActor(activityLog.getCreatedBy().getDisplayName());
+            pojo.setActor(activityLog.getCreatedBy() != null ? activityLog.getCreatedBy().getDisplayName() : "System");
             pojo.setDescription(activityLog.getDescription());
             pojo.setCreatedAt(activityLog.getCreatedAt().format(df));
             pojo.setAction(activityLog.getAction());
@@ -43,7 +43,9 @@ public class ActivityLogServiceImpl implements ActivityLogService {
         log.setDescription(description);
         log.setAction(action);
         log.setStatus(GenericStatusConstant.ACTIVE);
-        log.setCreatedBy(jwtService.user);
+        if (action.equals(ActivityStatusConstant.LOGIN)){
+            log.setCreatedBy(jwtService.user);
+        }
         activityLogRepository.save(log);
     }
 }

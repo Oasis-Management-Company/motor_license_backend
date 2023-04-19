@@ -2,6 +2,7 @@ package com.app.IVAS.security;
 
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.configuration.AppConfigurationProperties;
+import com.app.IVAS.configuration.CachingConfig;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.PortalUserRepository;
 import com.auth0.jwt.JWT;
@@ -10,12 +11,16 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 
 
 /**
@@ -30,6 +35,7 @@ import java.util.Date;
 public class JwtService {
     private final AppConfigurationProperties appConfigurationProperties;
     private final PortalUserRepository portalUserRepository;
+    private final CachingConfig cachingConfig;
     public PortalUser user;
 
     public String generateJwtToken(Long id){
@@ -41,6 +47,8 @@ public class JwtService {
                     .withExpiresAt((new Date((new Date()).getTime() + appConfigurationProperties.getJwtExpiration() * 1000L)))
                     .withIssuer("")
                     .sign(algorithm);
+
+            cachingConfig.cacheManager().getCache("tokens").putIfAbsent(id, token);
 
         } catch (JWTCreationException exception){
             exception.printStackTrace();
@@ -58,6 +66,10 @@ public class JwtService {
         requestPrincipal(jwt.getClaim("userId").asLong());
 
         return portalUserRepository.findByIdAndStatus(jwt.getClaim("userId").asLong(), GenericStatusConstant.ACTIVE).get().getUsername();
+    }
+
+    public void invalidateToken(Long id){
+        cachingConfig.cacheManager().getCache("tokens").evict(id);
     }
 
     private void requestPrincipal(Long id){
@@ -79,6 +91,7 @@ public class JwtService {
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token -> Message: {}", e);
         } catch (ExpiredJwtException e) {
+            Objects.requireNonNull(cachingConfig.cacheManager().getCache("tokens")).evictIfPresent(user.getId());
             log.error("Expired JWT token -> Message: {}", e);
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token -> Message: {}", e);

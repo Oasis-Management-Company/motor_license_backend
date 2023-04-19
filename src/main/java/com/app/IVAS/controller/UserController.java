@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URISyntaxException;
@@ -83,6 +84,13 @@ public class UserController {
         return ResponseEntity.ok(response);
 
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(){
+        userManagementService.logout();
+        return ResponseEntity.ok("");
+    }
+
     @PostMapping("/create")
     public PortalUserPojo createUser(@RequestBody @Valid UserDto dto) {
         Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);

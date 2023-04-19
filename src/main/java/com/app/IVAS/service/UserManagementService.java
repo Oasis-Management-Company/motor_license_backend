@@ -8,6 +8,7 @@ import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -26,6 +27,8 @@ public interface UserManagementService {
     void activateUser(Long userId);
 
     LoginResponse authenticateUser(LoginRequestDto dto) throws Exception;
+
+    void logout();
 
     Role createRole(String name, List<PermissionTypeConstant> permissionTypeConstants);
 

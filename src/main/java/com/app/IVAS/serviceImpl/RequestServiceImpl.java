@@ -1,17 +1,15 @@
 package com.app.IVAS.serviceImpl;
 
-import com.app.IVAS.Enum.AssignmentStatusConstant;
+import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.PlateNumberRequest;
 import com.app.IVAS.entity.VehicleCategory;
 import com.app.IVAS.entity.userManagement.PortalUser;
 
-import com.app.IVAS.Enum.GenericStatusConstant;
-import com.app.IVAS.Enum.WorkFlowApprovalStatus;
-import com.app.IVAS.Enum.WorkFlowType;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.RequestService;
 import com.app.IVAS.service.SmsService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +42,7 @@ public class RequestServiceImpl implements RequestService {
     private final WorkFlowLogRepository workFlowLogRepository;
     private final PlateNumberRepository plateNumberRepository;
     private final SmsService smsService;
+    private final ActivityLogService activityLogService;
 
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
@@ -141,6 +140,7 @@ public class RequestServiceImpl implements RequestService {
         request.setAssignmentStatus(AssignmentStatusConstant.NOT_ASSIGNED);
         request.setCreatedBy(jwtService.user);
         PlateNumberRequest plateNumberRequest = plateNumberRequestRepository.save(request);
+        activityLogService.createActivityLog(("Plate number request with tracking id: " + request.getTrackingId() + " has been created"), ActivityStatusConstant.ASSIGNED);
 
         if (!dto.getPreferredPlates().isEmpty()) {
             dto.getPreferredPlates().forEach(preferredPlateDto -> {
@@ -171,6 +171,9 @@ public class RequestServiceImpl implements RequestService {
         newStage.setStatus(GenericStatusConstant.ACTIVE);
         newStage.setCreatedBy(jwtService.user);
         workFlowStageRepository.save(newStage);
+        activityLogService.createActivityLog(("WorkFlow step: " + newStage.getStep() + " has been created with approving officer: "
+                + newStage.getApprovingOfficer().getDisplayName()), ActivityStatusConstant.CREATE);
+
     }
 
     @Override
@@ -309,6 +312,7 @@ public class RequestServiceImpl implements RequestService {
         WorkFlow workFlow = request.getWorkFlow();
         if ((!workFlow.getStage().getIsFinalStage() && !workFlow.getStage().getIsSuperApprover()) && action.equalsIgnoreCase("APPROVED")) {
             workFlow.setStage(workFlowStageRepository.findByTypeAndStep(workFlow.getType(), workFlow.getStage().getStep() + 1).get());
+            activityLogService.createActivityLog(("Plate number request with tracking id: " + request.getTrackingId() + " has been approved"), ActivityStatusConstant.APPROVAL);
         } else if (action.equalsIgnoreCase("DISAPPROVED")) {
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.DENIED);
             workFlow.setFinalApprover(jwtService.user);
@@ -317,7 +321,7 @@ public class RequestServiceImpl implements RequestService {
             plateNumberRequestRepository.save(request);
 
             smsService.sendSms(request.getCreatedBy().getPhoneNumber(), "Your plate number request with tracking id: " + request.getTrackingId() + " has been disapproved");
-
+            activityLogService.createActivityLog(("Plate number request with tracking id: " + request.getTrackingId() + " has been disapproved"), ActivityStatusConstant.DISAPPROVAL);
         } else if ((workFlow.getStage().getIsFinalStage() || canApproveRequest()) && action.equalsIgnoreCase("APPROVED")) {
             workFlow.setWorkFlowApprovalStatus(WorkFlowApprovalStatus.APPROVED);
             workFlow.setFinalApprover(jwtService.user);
@@ -326,6 +330,7 @@ public class RequestServiceImpl implements RequestService {
             plateNumberRequestRepository.save(request);
 
             smsService.sendSms(request.getCreatedBy().getPhoneNumber(), "Your plate number request with tracking id: " + request.getTrackingId() + " has been approved");
+            activityLogService.createActivityLog(("Plate number request with tracking id: " + request.getTrackingId() + " has been approved"), ActivityStatusConstant.APPROVAL);
         }
 
         workFlow.setLastUpdatedBy(jwtService.user);
