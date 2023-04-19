@@ -37,4 +37,5 @@ public class InvoiceServiceType {
 
     @Enumerated(EnumType.STRING)
     private RegType regType;
+    private LocalDateTime expiryDate;
 }
