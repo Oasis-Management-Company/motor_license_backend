@@ -25,7 +25,7 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
 
     PortalUser findFirstByPhoneNumber(String number);
 
-    PortalUser findByEmailIgnoreCase(String email);
+    PortalUser findByPhoneNumberIgnoreCase(String number);
 
     List<PortalUser> findAllByRole(Optional<Role> role);
 
