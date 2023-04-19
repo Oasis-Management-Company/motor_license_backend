@@ -256,6 +256,11 @@ public class UserController {
         return new QueryResults<>(userManagementService.searchOtherUsers(portalUserQueryResults.getResults()), portalUserQueryResults.getLimit(), portalUserQueryResults.getOffset(), portalUserQueryResults.getTotal());
     }
 
+    @GetMapping("/get-user/phone")
+    public PortalUser getPortalUserByPhone(@RequestParam String phone){
+        return portalUserRepository.findByPhoneNumberIgnoreCase(phone);
+    }
+
 
 
 }
