@@ -74,7 +74,7 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final StringPath nationalIdentificationNumber = createString("nationalIdentificationNumber");
 
-    public final QZonalOffice office;
+    public final com.app.IVAS.entity.userManagement.QZonalOffice office;
 
     public final StringPath otherNames = createString("otherNames");
 
@@ -82,7 +82,7 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final StringPath preferredName = createString("preferredName");
 
-    public final QRole role;
+    public final com.app.IVAS.entity.userManagement.QRole role;
 
     public final NumberPath<Long> stateId = createNumber("stateId", Long.class);
 

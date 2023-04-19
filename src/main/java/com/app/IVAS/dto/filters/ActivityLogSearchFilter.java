@@ -18,6 +18,6 @@ public class ActivityLogSearchFilter extends BaseSearchDto implements QuerydslBi
     public void customize(QuerydslBindings bindings, QActivityLog root){
         bindings.bind(root.createdBy.displayName).as("name").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.action).as("action").first((path, value) -> path.eq(value));
-        bindings.including(root.createdBy);
+        bindings.including(root.createdBy, root.action);
     }
 }
