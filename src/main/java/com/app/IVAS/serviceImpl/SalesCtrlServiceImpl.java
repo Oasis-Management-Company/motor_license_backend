@@ -120,9 +120,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             totalAmount += type.getPrice();
         }
 
+        String invoiceNumber = rrrGenerationService.generateNewRrrNumber();
         invoice.setPayer(portalUser);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
-        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
+        invoice.setInvoiceNumber(invoiceNumber);
         invoice.setAmount(totalAmount);
         invoice.setVehicle(savedVehicle);
         invoice.setCreatedBy(jwtService.user);
@@ -134,11 +135,14 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             InvoiceServiceType serviceType = new InvoiceServiceType();
             serviceType.setServiceType(type);
             serviceType.setInvoice(savedInvoice);
-            serviceType.setReference(rrrGenerationService.generateNewReferenceNumber());
+            serviceType.setReference(invoiceNumber);
             if (type.getRevenueCode() != null){
                 serviceType.setRevenuecode(type.getRevenueCode());
             }
+            serviceType.setRegType(RegType.REGISTRATION);
+
             invoiceServiceTypeArrayList.add(serviceType);
+
         }
         invoiceServiceTypeRepository.saveAll(invoiceServiceTypeArrayList);
 
@@ -400,7 +404,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public SalesDto AddVehicle(SalesDto sales) {
-        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         UserDto dto = new UserDto();
         PlateNumber number = new PlateNumber();

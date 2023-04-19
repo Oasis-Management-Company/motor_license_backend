@@ -128,11 +128,12 @@ public class VehicleServiceImpl implements VehicleService {
             ServiceType serviceType = serviceTypeRepository.findById(id).get();
             totalAmount += serviceType.getPrice();
         }
+        String invoiceNumber = rrrGenerationService.generateNewRrrNumber();
 
         Invoice invoice = new Invoice();
         invoice.setVehicle(vehicle);
         invoice.setPayer(vehicle.getPortalUser());
-        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
+        invoice.setInvoiceNumber(invoiceNumber);
         invoice.setPayer(vehicle.getPortalUser());
         invoice.setAmount(totalAmount);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
@@ -146,7 +147,8 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference(rrrGenerationService.generateNewReferenceNumber());
+            invoiceServiceType.setReference(invoiceNumber);
+            invoiceServiceType.setRegType(RegType.RENEWAL);
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
@@ -196,9 +198,10 @@ public class VehicleServiceImpl implements VehicleService {
             totalAmount += serviceType.getPrice();
         }
 
+        String invoiceNumber = rrrGenerationService.generateNewRrrNumber();
         Invoice invoice = new Invoice();
         invoice.setPayer(portalUser);
-        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
+        invoice.setInvoiceNumber(invoiceNumber);
         invoice.setAmount(totalAmount);
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
@@ -211,7 +214,7 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference(rrrGenerationService.generateNewReferenceNumber());
+            invoiceServiceType.setReference(invoiceNumber);
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
         return savedInvoice;
@@ -247,10 +250,11 @@ public class VehicleServiceImpl implements VehicleService {
             totalAmount += serviceType.getPrice();
         }
 
+        String invoiceNumber = rrrGenerationService.generateNewRrrNumber();
         Invoice invoice = new Invoice();
         invoice.setPayer(portalUser);
         invoice.setAmount(totalAmount);
-        invoice.setInvoiceNumber(rrrGenerationService.generateNewRrrNumber());
+        invoice.setInvoiceNumber(invoiceNumber);
         invoice.setCreatedBy(jwtService.user);
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
@@ -263,12 +267,12 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference(rrrGenerationService.generateNewReferenceNumber());
+            invoiceServiceType.setReference(invoiceNumber);
+            invoiceServiceType.setRegType(RegType.NON_VEHICLE);
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
         Sales sales1 = new Sales();
-//        sales1.setVehicle(vehicle);
         sales1.setInvoice(savedInvoice);
         sales1.setCreatedBy(jwtService.user);
         sales1.setPlateType(RegType.NON_VEHICLE);

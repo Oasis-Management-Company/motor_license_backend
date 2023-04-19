@@ -90,7 +90,6 @@ public class PaymentServiceImpl implements PaymentService {
 
             List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice1);
 
-
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
                 ChildRequest dto = new ChildRequest();
                 dto.setAmount(invoiceServiceType.getServiceType().getPrice());
@@ -106,7 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentDto.setFirstName(invoice1.getPayer().getFirstName());
             paymentDto.setLastName(invoice1.getPayer().getDisplayName());
             paymentDto.setEmail(invoice1.getPayer().getEmail());
-            paymentDto.setParentDescription("Vehicle Registration Licenese and General Motor Registration");
+            paymentDto.setParentDescription("Vehicle Registration Licence and General Motor Registration");
 
             TopParentRequest topParentRequest = new TopParentRequest();
             topParentRequest.setParentRequest(paymentDto);
@@ -138,21 +137,8 @@ public class PaymentServiceImpl implements PaymentService {
                 e.printStackTrace();
             }
             return result;
-
-
         }catch(Exception e){
             return null;
         }
-    }
-    public static String convert(String json, String root) throws JSONException, ParserConfigurationException, IOException, SAXException {
-        JSONObject jsonObject = new JSONObject(json);
-
-        Document doc = DocumentBuilderFactory.newInstance()
-                .newDocumentBuilder()
-                .parse(new InputSource(new StringReader(json)));
-
-
-        String xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-15\"?>\n<"+root+">" + XML.toString(jsonObject) + "</"+root+">";
-        return xml;
     }
 }
