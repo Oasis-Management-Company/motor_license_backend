@@ -1,5 +1,6 @@
 package com.app.IVAS.entity.userManagement;
 
+import com.app.IVAS.Enum.RegType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -137,5 +138,12 @@ public class PortalUser extends StatusEntity {
     @ManyToOne
     @JoinColumn(name = "OFFICE_ID", referencedColumnName = "id")
     private ZonalOffice office;
+
+    @Enumerated(EnumType.STRING)
+    private RegType regType = RegType.REGISTRATION;
+
+    private Long parentId;
+    private String parentEmail;
+    private String parentUserName;
 
 }

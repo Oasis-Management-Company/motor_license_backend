@@ -1,5 +1,6 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.ActivityStatusConstant;
 import com.app.IVAS.Enum.CardStatusConstant;
 import com.app.IVAS.Enum.CardTypeConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
@@ -15,6 +16,7 @@ import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.security.QrCodeServices;
+import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.CardService;
 import com.itextpdf.text.DocumentException;
 import lombok.NonNull;
@@ -46,6 +48,7 @@ public class CardServiceImpl implements CardService {
     private final VehicleRepository vehicleRepository;
     private final JwtService jwtService;
     private final CardRepository cardRepository;
+    private final ActivityLogService activityLogService;
 
     @Value("${asin_verify}")
     private String asin_verify;
@@ -168,6 +171,7 @@ public class CardServiceImpl implements CardService {
         card1.setInvoice(invoice);
         card1.setVehicle(vehicle);
         cardRepository.save(card1);
+        activityLogService.createActivityLog(("Card for " + invoice.getPayer().getDisplayName()  + " was created"), ActivityStatusConstant.CREATE);
 
 
         card2.setCardType(CardTypeConstant.STICKER);
@@ -178,6 +182,7 @@ public class CardServiceImpl implements CardService {
         card2.setLastUpdatedBy(jwtService.user);
         card2.setInvoice(invoice);
         card2.setVehicle(vehicle);
+        activityLogService.createActivityLog(("Card copy for " + invoice.getPayer().getDisplayName()  + " was created"), ActivityStatusConstant.CREATE);
         return cardRepository.save(card2);
 
     }
@@ -197,9 +202,11 @@ public class CardServiceImpl implements CardService {
 
                         card.setStatus(GenericStatusConstant.ACTIVE);
                         card.setCardStatus(CardStatusConstant.NOT_PRINTED);
-                        card.setExpiryDate(LocalDateTime.now().plusYears(1));
+                        card.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
 
                         cardRepository.save(card);
+                        activityLogService.createActivityLog(("Card for " + card.getInvoice().getPayer()  + " was updated"), ActivityStatusConstant.UPDATE);
+
                     }
 
                     return cards.get();
@@ -208,8 +215,8 @@ public class CardServiceImpl implements CardService {
             }
 
         }
-        return null;
 
+        return null;
     }
 
     @Override

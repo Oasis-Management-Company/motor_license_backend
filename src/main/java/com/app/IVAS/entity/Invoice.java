@@ -39,5 +39,6 @@ public class Invoice extends StatusEntity {
 
     private Boolean editCopy = false;
     private String parentInvoiceNumber;
+    private Boolean sentToTax;
 
 }

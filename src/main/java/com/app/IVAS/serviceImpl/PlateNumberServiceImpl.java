@@ -150,6 +150,30 @@ public class PlateNumberServiceImpl implements PlateNumberService {
         plateNumberRequestRepository.save(request);
     }
 
+    @Override
+    public void deleteStock(Long stockId) {
+       Stock stock = stockRepository.findById(stockId).orElseThrow(RuntimeException::new);
+
+       List<PlateNumber> plateNumberList = plateNumberRepository.findByStock(stock);
+
+        int count = (int) plateNumberList.stream().filter(plateNumber -> plateNumber.getPlateNumberStatus().equals(PlateNumberStatus.ASSIGNED) ||
+                plateNumber.getPlateNumberStatus().equals(PlateNumberStatus.SOLD)).count();
+
+        if (count == 0){
+            plateNumberRepository.deleteAll(plateNumberList);
+            stockRepository.delete(stock);
+        }
+    }
+
+    @Override
+    public void recallPlateNumber(Long id) {
+        PlateNumber plateNumber = plateNumberRepository.findById(id).orElseThrow(RuntimeException::new);
+
+        plateNumber.setPlateNumberStatus(PlateNumberStatus.UNASSIGNED);
+        plateNumber.setAgent(null);
+        plateNumberRepository.save(plateNumber);
+    }
+
 
     private void generatePlateNumbers(Stock stock){
         for (int i = 0; i<=(stock.getQuantity().intValue() - 1); i++){

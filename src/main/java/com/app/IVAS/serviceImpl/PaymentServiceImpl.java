@@ -1,11 +1,14 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Utils.OkHttp3Util;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.InvoiceServiceType;
 import com.app.IVAS.repository.InvoiceRepository;
 import com.app.IVAS.repository.InvoiceServiceTypeRepository;
+import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.PaymentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
@@ -48,6 +51,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final InvoiceRepository invoiceRepository;
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
+
+    @Value("${payment.domain}")
+    private String paymentDomain;
+
+    private final OkHttp3Util okHttp3Util;
+    private final JwtService jwtService;
+
+
 
     @Override
     public String sendPaymentTax(String invoice) {
@@ -106,33 +117,33 @@ public class PaymentServiceImpl implements PaymentService {
             paymentDto.setLastName(invoice1.getPayer().getDisplayName());
             paymentDto.setEmail(invoice1.getPayer().getEmail());
             paymentDto.setParentDescription("Vehicle Registration Licence and General Motor Registration");
+            paymentDto.setTransactionId(invoice1.getInvoiceNumber());
+            paymentDto.setCustReference("167371977051");
 
             TopParentRequest topParentRequest = new TopParentRequest();
             topParentRequest.setParentRequest(paymentDto);
-            topParentRequest.setChildRequestList(childRequests);
-
+            topParentRequest.setChildRequest(childRequests);
 
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
 
             HttpEntity entity = new HttpEntity(new Gson().toJson(topParentRequest), headersAuth);
-            System.out.println(entity.getBody());
             try {
                 String personResultAsJsonStr = restTemplate.postForObject(url, entity, String.class);
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {
                     @Override
                     public boolean hasError(ClientHttpResponse response) throws IOException {
-                        System.out.println(response);
                         return false;
                     }
 
                     @Override
                     public void handleError(ClientHttpResponse response) throws IOException {
-                        System.out.println(response);
                         // do nothing, or something
                     }
                 });
 
-                System.out.println("Here is the response:::" + responseRC.getBody());
+                invoice1.setSentToTax(true);
+                invoiceRepository.save(invoice1);
+                System.out.println("Here is the response:::" + personResultAsJsonStr);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -140,5 +151,23 @@ public class PaymentServiceImpl implements PaymentService {
         }catch(Exception e){
             return null;
         }
+    }
+
+    @Override
+    public List<PaymentHistoryDto> verifyPayment(String invoice) throws IOException {
+
+        List<PaymentHistoryDto> historyList = new ArrayList<>();
+
+        String result = this.okHttp3Util.get(paymentDomain+invoice);
+        ObjectMapper objectMappe = new ObjectMapper();
+        InformalResponsePojo nins= objectMappe.readValue(result, InformalResponsePojo.class);
+        historyList.addAll(nins.getData());
+
+
+        return historyList;
+    }
+
+    public ResponseEntity<?> PaymentReturn(){
+        return null;
     }
 }
