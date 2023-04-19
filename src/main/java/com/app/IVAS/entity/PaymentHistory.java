@@ -1,11 +1,22 @@
-package com.app.IVAS.dto;
+package com.app.IVAS.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import javax.persistence.*;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class PaymentResponse {
+@Entity
+@Table(name = "PAYMENT_HISTORY")
+public class PaymentHistory {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private Long id;
+
     private String itemName;
     private String itemAmount;
     private String paymentLogId;
@@ -16,7 +27,7 @@ public class PaymentResponse {
     private String terminalId;
     private String channelName;
     private String location;
-    private LocalDateTime paymentDate;
+    private String paymentDate;
     private String institutionId;
     private String institutionName;
     private String branchName;
@@ -38,4 +49,8 @@ public class PaymentResponse {
     private String thirdPartyCode;
     private String originalPaymentReference;
     private String teller;
+
+    @Column(name = "LOG",  length = 10000)
+    private  String log;
+
 }

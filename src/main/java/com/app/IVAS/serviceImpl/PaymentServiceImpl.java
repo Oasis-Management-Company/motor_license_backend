@@ -1,11 +1,18 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.CardStatusConstant;
+import com.app.IVAS.Enum.GenericStatusConstant;
+import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Utils.OkHttp3Util;
 import com.app.IVAS.dto.*;
+import com.app.IVAS.entity.Card;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.InvoiceServiceType;
+import com.app.IVAS.entity.PaymentHistory;
+import com.app.IVAS.repository.CardRepository;
 import com.app.IVAS.repository.InvoiceRepository;
 import com.app.IVAS.repository.InvoiceServiceTypeRepository;
+import com.app.IVAS.repository.PaymentHistoryRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.PaymentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +58,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final InvoiceRepository invoiceRepository;
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
+    private final PaymentHistoryRepository paymentHistoryRepository;
+    private final CardRepository cardRepository;
 
     @Value("${payment.domain}")
     private String paymentDomain;
@@ -66,8 +75,6 @@ public class PaymentServiceImpl implements PaymentService {
         try{
 
             String baseUrl = "http://41.207.248.189:8084/api/external/authenticate";
-//            String baseUrl = "http://localhost:8787/api/external/authenticate";
-//            String baseUrl = "http://localhost:8787/api/informal/sector/public/createasin";
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
@@ -90,7 +97,6 @@ public class PaymentServiceImpl implements PaymentService {
             headersAuth.setAll(map);
 
             String url ="http://41.207.248.189:8084/api/notification/handle-assessment-ivas";
-//            String url ="http://localhost:8787/api/notification/handle-assessment-ivas";
 
             ResponseEntity<Object> responseRC = null;
             ParentRequest paymentDto = new ParentRequest();
@@ -167,7 +173,34 @@ public class PaymentServiceImpl implements PaymentService {
         return historyList;
     }
 
-    public ResponseEntity<?> PaymentReturn(){
-        return null;
+    @Override
+    public void PaymentReturn(PaymentResponse respondDto) {
+        PaymentHistory paymentHistory = new PaymentHistory();
+        Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
+        List<Card> card = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.getInvoiceNumber()).get();
+        List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+        invoice.setPaymentStatus(PaymentStatus.PAID);
+        invoice.setPaymentDate(respondDto.getPaymentDate());
+        invoice.setPaymentRef(respondDto.getPaymentReference());
+        invoiceRepository.save(invoice);
+
+        for (Card card1 : card) {
+            card1.setCardStatus(CardStatusConstant.NOT_PRINTED);
+            card1.setStatus(GenericStatusConstant.ACTIVE);
+            if (card1.getVehicle().getPlateNumber().getType().getName().contains("Commercial")){
+                card1.setExpiryDate(respondDto.getPaymentDate().plusDays(185));
+            }else{
+                card1.setExpiryDate(respondDto.getPaymentDate().plusDays(365));
+            }
+            cardRepository.save(card1);
+        }
+        for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
+            invoiceServiceType.setPaymentDate(respondDto.getPaymentDate());
+
+            invoiceServiceTypeRepository.save(invoiceServiceType);
+        }
+
+        System.out.println(respondDto);
     }
 }
