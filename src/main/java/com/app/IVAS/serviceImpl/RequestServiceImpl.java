@@ -1,17 +1,15 @@
 package com.app.IVAS.serviceImpl;
 
-import com.app.IVAS.Enum.AssignmentStatusConstant;
+import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.PlateNumberRequest;
 import com.app.IVAS.entity.VehicleCategory;
 import com.app.IVAS.entity.userManagement.PortalUser;
 
-import com.app.IVAS.Enum.GenericStatusConstant;
-import com.app.IVAS.Enum.WorkFlowApprovalStatus;
-import com.app.IVAS.Enum.WorkFlowType;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.RequestService;
 import com.app.IVAS.service.SmsService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +42,7 @@ public class RequestServiceImpl implements RequestService {
     private final WorkFlowLogRepository workFlowLogRepository;
     private final PlateNumberRepository plateNumberRepository;
     private final SmsService smsService;
+    private final ActivityLogService activityLogService;
 
     @Override
     public List<PlateNumberRequestPojo> getPlateNumberRequest(List<PlateNumberRequest> requests) {
@@ -244,7 +243,6 @@ public class RequestServiceImpl implements RequestService {
             serviceTypeDto.setPlateNumberTypeName(serviceType.getPlateNumberType().getName());
         }
 
-
         return serviceTypeDto;
 
     }
@@ -268,6 +266,7 @@ public class RequestServiceImpl implements RequestService {
             type.setStatus(GenericStatusConstant.ACTIVE);
             type.setCreatedBy(jwtService.user);
             serviceTypeRepository.save(type);
+            activityLogService.createActivityLog((type.getName() + " service type was created"), ActivityStatusConstant.CREATE);
         } else {
             if (dto.getName() != null) {
                 serviceType.get().setName(dto.getName());
@@ -291,6 +290,7 @@ public class RequestServiceImpl implements RequestService {
                 serviceType.get().setPlateNumberType(plateNumberTypeRepository.findById(dto.getPlateNumberType()).get());
             }
             serviceTypeRepository.save(serviceType.get());
+            activityLogService.createActivityLog((serviceType.get().getName() + " service type was updated"), ActivityStatusConstant.UPDATE);
         }
     }
 

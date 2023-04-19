@@ -204,9 +204,9 @@ public class CardServiceImpl implements CardService {
                         card.setCardStatus(CardStatusConstant.NOT_PRINTED);
                         card.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
 
+                        cardRepository.save(card);
                         activityLogService.createActivityLog(("Card for " + card.getInvoice().getPayer()  + " was updated"), ActivityStatusConstant.UPDATE);
 
-                        cardRepository.save(card);
                     }
 
                     return cards.get();

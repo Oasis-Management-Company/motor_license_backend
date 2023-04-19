@@ -7,10 +7,7 @@ import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
-import com.app.IVAS.service.CardService;
-import com.app.IVAS.service.PaymentService;
-import com.app.IVAS.service.SalesCtrlService;
-import com.app.IVAS.service.UserManagementService;
+import com.app.IVAS.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -58,6 +55,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final PaymentServiceImpl paymentService;
     @Value("${asin_verification}")
     private String asinVerification;
+    private final ActivityLogService activityLogService;
 
     @Override
     @Transactional
@@ -280,6 +278,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         portalUserRepository.save(edit);
 
+        activityLogService.createActivityLog((edit.getDisplayName() + " detail was edited and sent for approval"), ActivityStatusConstant.UPDATE);
+
         return edit;
     }
 
@@ -303,6 +303,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         if (approval.equalsIgnoreCase("Reject")) {
             portalUserRepository.delete(editedUser.get());
+            activityLogService.createActivityLog((user.getDisplayName() + " edit request was disapproved"), ActivityStatusConstant.DISAPPROVAL);
+
         } else if (approval.equalsIgnoreCase("Approve")) {
 
             edit.setLastUpdatedAt(LocalDateTime.now());
@@ -345,6 +347,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
             portalUserRepository.delete(editedUser.get());
 
+            activityLogService.createActivityLog((user.getDisplayName() + " edit request was approved and saved"), ActivityStatusConstant.APPROVAL);
 
         }
 
