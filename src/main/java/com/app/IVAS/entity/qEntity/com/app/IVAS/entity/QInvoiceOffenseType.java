@@ -11,16 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QInvoiceServiceType is a Querydsl query type for InvoiceServiceType
+ * QInvoiceOffenseType is a Querydsl query type for InvoiceOffenseType
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
+public class QInvoiceOffenseType extends EntityPathBase<InvoiceOffenseType> {
 
-    private static final long serialVersionUID = -1291007976L;
+    private static final long serialVersionUID = -1637420659L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QInvoiceServiceType invoiceServiceType = new QInvoiceServiceType("invoiceServiceType");
+    public static final QInvoiceOffenseType invoiceOffenseType = new QInvoiceOffenseType("invoiceOffenseType");
 
     public final NumberPath<Double> amount = createNumber("amount", Double.class);
 
@@ -30,7 +30,7 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public final QInvoice invoice;
 
-    public final DateTimePath<java.time.LocalDateTime> PaymentDate = createDateTime("PaymentDate", java.time.LocalDateTime.class);
+    public final QOffense offense;
 
     public final StringPath reference = createString("reference");
 
@@ -38,28 +38,26 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public final StringPath revenuecode = createString("revenuecode");
 
-    public final QServiceType serviceType;
-
-    public QInvoiceServiceType(String variable) {
-        this(InvoiceServiceType.class, forVariable(variable), INITS);
+    public QInvoiceOffenseType(String variable) {
+        this(InvoiceOffenseType.class, forVariable(variable), INITS);
     }
 
-    public QInvoiceServiceType(Path<? extends InvoiceServiceType> path) {
+    public QInvoiceOffenseType(Path<? extends InvoiceOffenseType> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QInvoiceServiceType(PathMetadata metadata) {
+    public QInvoiceOffenseType(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QInvoiceServiceType(PathMetadata metadata, PathInits inits) {
-        this(InvoiceServiceType.class, metadata, inits);
+    public QInvoiceOffenseType(PathMetadata metadata, PathInits inits) {
+        this(InvoiceOffenseType.class, metadata, inits);
     }
 
-    public QInvoiceServiceType(Class<? extends InvoiceServiceType> type, PathMetadata metadata, PathInits inits) {
+    public QInvoiceOffenseType(Class<? extends InvoiceOffenseType> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.invoice = inits.isInitialized("invoice") ? new QInvoice(forProperty("invoice"), inits.get("invoice")) : null;
-        this.serviceType = inits.isInitialized("serviceType") ? new QServiceType(forProperty("serviceType"), inits.get("serviceType")) : null;
+        this.offense = inits.isInitialized("offense") ? new QOffense(forProperty("offense"), inits.get("offense")) : null;
     }
 
 }

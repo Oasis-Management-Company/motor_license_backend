@@ -182,7 +182,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<Card> card = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.getInvoiceNumber()).get();
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
 
         invoice.setPaymentStatus(PaymentStatus.PAID);
