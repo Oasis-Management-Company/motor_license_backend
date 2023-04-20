@@ -24,6 +24,7 @@ import org.json.XML;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
@@ -175,9 +176,10 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void PaymentReturn(PaymentResponse respondDto) {
-        System.out.println(respondDto);
+    public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
+        AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
+        System.out.println(respondDto);
         Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
         List<Card> card = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.getInvoiceNumber()).get();
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
@@ -189,6 +191,12 @@ public class PaymentServiceImpl implements PaymentService {
         invoice.setPaymentDate(dateTime);
         invoice.setPaymentRef(respondDto.getPaymentReference());
         invoiceRepository.save(invoice);
+
+        if (respondDto == null ){
+            assessmentResponse.setStatus("1");
+            assessmentResponse.setStatusMessage("Not Sucessful");
+            return assessmentResponse;
+        }
 
         for (Card card1 : card) {
             card1.setCardStatus(CardStatusConstant.NOT_PRINTED);
@@ -206,6 +214,10 @@ public class PaymentServiceImpl implements PaymentService {
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
-        System.out.println(respondDto);
+
+        assessmentResponse.setStatus("0");
+        assessmentResponse.setStatusMessage("Sucess");
+
+        return assessmentResponse;
     }
 }

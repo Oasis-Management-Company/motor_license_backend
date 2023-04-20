@@ -21,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/payment")
 public class PaymentCtrl {
 
+
     @Autowired
     private PaymentService paymentService;
 
@@ -35,9 +36,9 @@ public class PaymentCtrl {
         return paymentService.verifyPayment(invoice);
     }
 
-    @PostMapping(value = "/respondse/payment")
-    public HttpStatus PaymentReturn(PaymentResponse respondDto) {
-         paymentService.PaymentReturn(respondDto);
-        return HttpStatus.OK;
+    @PostMapping(value = "/respondse/payment", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<AssessmentResponse> PaymentReturn(@RequestBody PaymentResponse respondDto) {
+        AssessmentResponse assessmentResponse = paymentService.PaymentReturn(respondDto);
+        return new ResponseEntity<>(assessmentResponse, HttpStatus.OK);
     }
 }
