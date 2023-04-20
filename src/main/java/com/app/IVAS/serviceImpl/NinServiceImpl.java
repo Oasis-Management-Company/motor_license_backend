@@ -21,7 +21,6 @@ public class NinServiceImpl implements NinService {
         this.ninDao = ninDao;
     }
 
-    @Cacheable(value = "FindNINByNIN", key = "#nin", unless = "#result == null")
     public NIN findByNIN(String nin) {
         logger.info(nin);
         return this.ninDao.findByNin(nin);
@@ -50,7 +49,6 @@ public class NinServiceImpl implements NinService {
 //    }
 
 
-    @Cacheable(value = "FindNINByPhoneNumber", key = "#phoneNumber", unless = "#result == null")
     public NIN findByPhoneNumber(String phoneNumber) {
         return this.ninDao.findByTelePhoneNumber(phoneNumber);
     }
