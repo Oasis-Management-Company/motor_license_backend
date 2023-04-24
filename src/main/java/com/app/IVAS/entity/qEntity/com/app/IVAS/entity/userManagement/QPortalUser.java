@@ -87,7 +87,7 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
 
-    public final QRole role;
+    public final com.app.IVAS.entity.userManagement.QRole role;
 
     public final NumberPath<Long> stateId = createNumber("stateId", Long.class);
 

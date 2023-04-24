@@ -28,8 +28,6 @@ public interface UserManagementService {
 
     LoginResponse authenticateUser(LoginRequestDto dto) throws Exception;
 
-    void logout();
-
     Role createRole(String name, List<PermissionTypeConstant> permissionTypeConstants);
 
     Role updateRole(String name, List<PermissionTypeConstant> permissionTypeConstants, String action);

@@ -88,8 +88,9 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(){
-        userManagementService.logout();
+    public ResponseEntity<?> logout(Long id){
+        jwtService.invalidateToken(id);
+        jwtService.user = null;
         return ResponseEntity.ok("");
     }
 
