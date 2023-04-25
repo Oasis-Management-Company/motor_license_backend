@@ -1,5 +1,6 @@
 package com.app.IVAS.service;
 
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.CardDetailsDto;
 import com.app.IVAS.dto.CardDto;
 import com.app.IVAS.dto.PrintDto;
@@ -16,7 +17,7 @@ public interface CardService {
 
     CardDetailsDto getCardDetails(String invoiceNumber);
 
-    Card createCard(@NonNull Invoice invoice, @NonNull Vehicle vehicle);
+    Card createCard(@NonNull Invoice invoice, @NonNull Vehicle vehicle, RegType regType);
 
     List<CardDto> get(List<Card> cards);
 

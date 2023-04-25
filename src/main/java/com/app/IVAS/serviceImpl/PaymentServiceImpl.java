@@ -226,13 +226,22 @@ public class PaymentServiceImpl implements PaymentService {
         invoice.setPaymentRef(respondDto.getPaymentReference());
         invoiceRepository.save(invoice);
 
+        List<InvoiceServiceType> serviceType = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+        for (InvoiceServiceType invoiceServiceType : serviceType) {
+            invoiceServiceType.setPaymentDate(dateTime);
+            invoiceServiceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
+
+            invoiceServiceTypeRepository.save(invoiceServiceType);
+        }
+
         for (Card card1 : card) {
             card1.setCardStatus(CardStatusConstant.NOT_PRINTED);
             card1.setStatus(GenericStatusConstant.ACTIVE);
             if (card1.getVehicle().getPlateNumber().getType().getName().contains("Commercial")){
-                card1.setExpiryDate(dateTime.plusDays(185));
+                card1.setExpiryDate(dateTime.plusMonths(6).minusDays(1));
             }else{
-                card1.setExpiryDate(dateTime.plusDays(365));
+                card1.setExpiryDate(dateTime.plusYears(1).minusDays(1));
             }
             cardRepository.save(card1);
         }

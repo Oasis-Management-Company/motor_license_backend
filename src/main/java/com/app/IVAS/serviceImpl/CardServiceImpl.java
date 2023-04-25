@@ -1,9 +1,6 @@
 package com.app.IVAS.serviceImpl;
 
-import com.app.IVAS.Enum.ActivityStatusConstant;
-import com.app.IVAS.Enum.CardStatusConstant;
-import com.app.IVAS.Enum.CardTypeConstant;
-import com.app.IVAS.Enum.GenericStatusConstant;
+import com.app.IVAS.Enum.*;
 import com.app.IVAS.Utils.HtmlToPdfCreator;
 import com.app.IVAS.Utils.PDFRenderToMultiplePages;
 import com.app.IVAS.configuration.AppConfigurationProperties;
@@ -156,7 +153,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Card createCard(@NonNull Invoice invoice, @NonNull Vehicle vehicle) {
+    public Card createCard(@NonNull Invoice invoice, @NonNull Vehicle vehicle, RegType regType) {
         Card card1 = new Card();
         Card card2 = new Card();
 
@@ -170,6 +167,7 @@ public class CardServiceImpl implements CardService {
         card1.setLastUpdatedBy(jwtService.user);
         card1.setInvoice(invoice);
         card1.setVehicle(vehicle);
+        card1.setRegType(regType);
         cardRepository.save(card1);
         activityLogService.createActivityLog(("Card for " + invoice.getPayer().getDisplayName()  + " was created"), ActivityStatusConstant.CREATE);
 
@@ -182,6 +180,7 @@ public class CardServiceImpl implements CardService {
         card2.setLastUpdatedBy(jwtService.user);
         card2.setInvoice(invoice);
         card2.setVehicle(vehicle);
+        card2.setRegType(regType);
         activityLogService.createActivityLog(("Card copy for " + invoice.getPayer().getDisplayName()  + " was created"), ActivityStatusConstant.CREATE);
         return cardRepository.save(card2);
 
@@ -277,6 +276,7 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("permit", card.getVehicle().getPermit());
             extraParameter.put("invoice", card.getInvoice().getInvoiceNumber());
             extraParameter.put("expiry", card.getExpiryDate().format(df));
+            extraParameter.put("regType", card.getRegType());
 
 
             PdfDto pojo = new PdfDto();

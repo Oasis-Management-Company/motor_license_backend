@@ -157,7 +157,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         number.setPlateNumberStatus(PlateNumberStatus.SOLD);
         plateNumberRepository.save(number);
         Sales saved = salesRepository.save(sales1);
-        cardService.createCard(savedInvoice, savedVehicle);
+        cardService.createCard(savedInvoice, savedVehicle, RegType.REGISTRATION);
 
         try {
             paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
