@@ -180,6 +180,18 @@ public class ReportController {
             typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.invoice.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
         }
 
+        if(jwtService.user.getRole().getName().equalsIgnoreCase("VIO")){
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION")
+                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION")));
+
+            typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION")
+                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION")));
+        }
+
         if (filter.getCreatedAfter() != null){
             invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
             typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
@@ -199,6 +211,30 @@ public class ReportController {
         QueryResults<InvoiceServiceType> invoiceServiceTypeQueryResults = invoiceServiceTypeJPAQuery.select(QInvoiceServiceType.invoiceServiceType).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResultsPojo<>(reportService.getServiceSales(invoiceServiceTypeQueryResults.getResults()), invoiceServiceTypeQueryResults.getLimit(), invoiceServiceTypeQueryResults.getOffset(), invoiceServiceTypeQueryResults.getTotal(), invoiceServiceTypeQueryResults.isEmpty(), null, prices.stream().mapToDouble(Double::doubleValue).sum());
     }
+
+    @GetMapping("/search/vio-report")
+    @Transactional
+    public QueryResults<VIOReportPojo> searchVIOReport(PortalUserSearchFilter filter){
+
+        JPAQuery<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QPortalUser.portalUser.role.name.equalsIgnoreCase("VIO"))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QPortalUser.portalUser);
+        QueryResults<PortalUser> portalUserQueryResults = portalUserJPAQuery.select(QPortalUser.portalUser).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(reportService.getVIOReport(portalUserQueryResults.getResults(), filter.getCreatedBefore(), filter.getCreatedAfter()), portalUserQueryResults.getLimit(), portalUserQueryResults.getOffset(), portalUserQueryResults.getTotal());
+
+    }
+
+//    @GetMapping("/search/offense-report")
+//    @Transactional
+//    public QueryResults<OffenseReportPojo> searchOffenseReport(){
+//
+//        J
+//
+//    }
 
     @PostMapping(path = "/download-stock-report")
     @Transactional

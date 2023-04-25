@@ -1,16 +1,16 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.Utils.PDFRenderToMultiplePages;
 import com.app.IVAS.configuration.AppConfigurationProperties;
-import com.app.IVAS.dto.AssignedReportPojo;
-import com.app.IVAS.dto.SalesReportDto;
-import com.app.IVAS.dto.SalesReportPojo;
-import com.app.IVAS.dto.StockReportPojo;
+import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.userManagement.PortalUser;
+import com.app.IVAS.repository.InvoiceRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.ReportService;
 import com.itextpdf.io.font.constants.StandardFonts;
@@ -30,6 +30,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +53,7 @@ public class ReportServiceImpl implements ReportService {
         List<SalesReportDto> dtos = new ArrayList<>();
         for (Sales salesList: sales){
 
-            InvoiceServiceType invoiceService = appRepository.startJPAQuery(com.app.IVAS.entity.QInvoiceServiceType.invoiceServiceType)
+            InvoiceServiceType invoiceService = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                     .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(salesList.getInvoice()).and(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION")))
                     .fetchFirst();
 
@@ -73,7 +75,7 @@ public class ReportServiceImpl implements ReportService {
     public List<StockReportPojo> getStockReport(List<PortalUser> users) {
         return users.stream().map(portalUser -> {
 
-            JPAQuery<PlateNumber> plateNumberJPAQuery = appRepository.startJPAQuery(com.app.IVAS.entity.QPlateNumber.plateNumber1)
+            JPAQuery<PlateNumber> plateNumberJPAQuery = appRepository.startJPAQuery(QPlateNumber.plateNumber1)
                     .where(QPlateNumber.plateNumber1.request.isNotNull())
                     .where(QPlateNumber.plateNumber1.agent.eq(portalUser));
 
@@ -119,6 +121,50 @@ public class ReportServiceImpl implements ReportService {
             pojos.add(pojo);
         }
         return pojos;
+    }
+
+    @Override
+    public List<VIOReportPojo> getVIOReport(List<PortalUser> users,  String createdBefore,  String createdAfter) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        return users.stream().map(portalUser -> {
+            JPAQuery<Invoice> invoiceJPAQuery = appRepository.startJPAQuery(QInvoice.invoice)
+                    .where(QInvoice.invoice.createdBy.eq(portalUser));
+
+
+            if (createdAfter != null){
+                invoiceJPAQuery.where(QInvoice.invoice.createdAt.goe(LocalDate.parse(createdAfter, formatter).atStartOfDay()));
+            }
+
+            if (createdBefore != null){
+                invoiceJPAQuery.where(QInvoice.invoice.createdAt.loe(LocalDate.parse(createdBefore, formatter).atTime(LocalTime.MAX)));
+            }
+
+            List<Invoice> invoices =  invoiceJPAQuery.fetch();
+
+            VIOReportPojo pojo = new VIOReportPojo();
+            pojo.setName(portalUser.getDisplayName());
+            pojo.setAssessmentDone(invoices.size());
+
+            List<Double> amount = new ArrayList<>();
+            List<Double> paid = new ArrayList<>();
+            List<Double> owed = new ArrayList<>();
+
+            for(Invoice invoice:invoices){
+                amount.add(invoice.getAmount());
+                if (invoice.getPaymentStatus() == PaymentStatus.PAID){
+                    paid.add(invoice.getAmount());
+                } else {
+                    owed.add(invoice.getAmount());
+                }
+            }
+
+            pojo.setTotalAmount(amount.stream().mapToDouble(Double::doubleValue).sum());
+            pojo.setTotalPaid(paid.stream().mapToDouble(Double::doubleValue).sum());
+            pojo.setTotalOwed(owed.stream().mapToDouble(Double::doubleValue).sum());
+
+            return pojo;
+        }).collect(Collectors.toList());
     }
 
     @Override
