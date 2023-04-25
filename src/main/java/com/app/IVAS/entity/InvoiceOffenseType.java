@@ -4,6 +4,7 @@ import com.app.IVAS.Enum.RegType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,5 +34,8 @@ public class InvoiceOffenseType {
     private RegType regType;
 
     private LocalDateTime expiryDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime PaymentDate;
 
 }

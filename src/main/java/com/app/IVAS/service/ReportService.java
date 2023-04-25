@@ -1,6 +1,7 @@
 package com.app.IVAS.service;
 
 import com.app.IVAS.dto.*;
+import com.app.IVAS.entity.InvoiceOffenseType;
 import com.app.IVAS.entity.InvoiceServiceType;
 import com.app.IVAS.entity.PlateNumber;
 import com.app.IVAS.entity.Sales;
@@ -21,6 +22,8 @@ public interface ReportService {
     List<AssignedReportPojo> getAssignedPlateNumbers(List<PlateNumber> plateNumbers);
 
     List<SalesReportPojo> getServiceSales(List<InvoiceServiceType> invoiceServiceTypes);
+
+    List<OffenseReportPojo> getOffenseReport(List<InvoiceOffenseType> invoiceOffenseTypes);
 
     List<VIOReportPojo> getVIOReport(List<PortalUser> users, String createdBefore,  String createdAfter);
 

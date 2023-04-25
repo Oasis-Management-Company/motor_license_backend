@@ -54,7 +54,7 @@ public class ReportServiceImpl implements ReportService {
         for (Sales salesList: sales){
 
             InvoiceServiceType invoiceService = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(salesList.getInvoice()).and(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION")))
+                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(salesList.getInvoice()).and(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER VEHICLE")))
                     .fetchFirst();
 
            if (invoiceService != null){
@@ -121,6 +121,22 @@ public class ReportServiceImpl implements ReportService {
             pojos.add(pojo);
         }
         return pojos;
+    }
+
+    @Override
+    public List<OffenseReportPojo> getOffenseReport(List<InvoiceOffenseType> invoiceOffenseTypes) {
+        return invoiceOffenseTypes.stream().map(invoiceOffense -> {
+            OffenseReportPojo pojo = new OffenseReportPojo();
+            pojo.setVio(invoiceOffense.getInvoice().getCreatedBy().getDisplayName());
+            pojo.setTaxPayer(invoiceOffense.getInvoice().getPayer().getDisplayName());
+            pojo.setPlateNumber(invoiceOffense.getInvoice().getVehicle() != null ? invoiceOffense.getInvoice().getVehicle().getPlateNumber().getPlateNumber() : "");
+            pojo.setOffense(invoiceOffense.getOffense().getName());
+            pojo.setInvoiceID(invoiceOffense.getReference());
+            pojo.setDateSold(invoiceOffense.getPaymentDate().format(df));
+            pojo.setAmount(invoiceOffense.getAmount());
+
+            return pojo;
+        }).collect(Collectors.toList());
     }
 
     @Override
