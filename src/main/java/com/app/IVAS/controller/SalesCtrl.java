@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", maxAge = 5600)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(name = "/api")
+@RequestMapping("/api")
 public class SalesCtrl {
 
     @Autowired
@@ -269,14 +270,6 @@ public class SalesCtrl {
         return ResponseEntity.ok(" ");
     }
 
-    /**Incomplete Edit function**/
-//    @PostMapping("/edit-sales-invoice")
-//    @Transactional
-//    public ResponseEntity<?> editSalesInvoice(@RequestBody SalesDto dto){
-//        service.editSalesInvoice(dto);
-//        return ResponseEntity.ok("");
-//    }
-
 
     @GetMapping("/generate/qrcode")
     public SalesDto GetQRCode(@RequestParam String invoiceNo){
@@ -285,4 +278,5 @@ public class SalesCtrl {
 
         return salesDto;
     }
+
 }

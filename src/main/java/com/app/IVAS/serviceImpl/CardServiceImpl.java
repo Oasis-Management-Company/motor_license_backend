@@ -194,18 +194,20 @@ public class CardServiceImpl implements CardService {
         if (invoice.isPresent()) {
             if (amount >= invoice.get().getAmount()) {
                 Optional<List<Card>> cards = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.get().getInvoiceNumber());
-
+                System.out.println(cards);
     /*Update cards **/
                 if (cards.isPresent()) {
                     for (Card card: cards.get()) {
 
                         card.setStatus(GenericStatusConstant.ACTIVE);
                         card.setCardStatus(CardStatusConstant.NOT_PRINTED);
-                        card.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
-
+                        if (card.getVehicle().getPlateNumber().getType().getName().contains("Commercial")){
+                            card.setExpiryDate(LocalDateTime.now().plusMonths(6).minusDays(1));
+                        }else{
+                            card.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
+                        }
                         cardRepository.save(card);
                         activityLogService.createActivityLog(("Card for " + card.getInvoice().getPayer()  + " was updated"), ActivityStatusConstant.UPDATE);
-
                     }
 
                     return cards.get();
@@ -272,11 +274,20 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("capacity", card.getVehicle().getPassengers());
             extraParameter.put("weight", card.getVehicle().getLoad());
             extraParameter.put("policy", card.getVehicle().getInsurance().getName().substring(0, 20)+"...");
-            extraParameter.put("insurance", card.getVehicle().getInsuranceNumber());
-            extraParameter.put("permit", card.getVehicle().getPermit());
+            if(card.getVehicle().getInsuranceNumber() != null){
+                extraParameter.put("insurance", card.getVehicle().getInsuranceNumber());
+            }else{
+                extraParameter.put("insurance", "N/A");
+            }
+            if(card.getVehicle().getPermit() != null){
+                extraParameter.put("permit", card.getVehicle().getPermit());
+            }else{
+                extraParameter.put("permit", "N/A");
+            }
             extraParameter.put("invoice", card.getInvoice().getInvoiceNumber());
             extraParameter.put("expiry", card.getExpiryDate().format(df));
             extraParameter.put("regType", card.getRegType());
+            extraParameter.put("phone", card.getVehicle().getPortalUser().getPhoneNumber());
 
 
             PdfDto pojo = new PdfDto();
