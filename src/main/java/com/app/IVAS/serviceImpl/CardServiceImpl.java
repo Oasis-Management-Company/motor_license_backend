@@ -284,6 +284,13 @@ public class CardServiceImpl implements CardService {
             pojo.setExtraParameter(extraParameter);
             pojo.setCard(card);
 
+            if(card.getCardStatus() != CardStatusConstant.PRINTED){
+                card.setCardStatus(CardStatusConstant.PRINTED);
+                card.setLastUpdatedAt(LocalDateTime.now());
+                card.setLastUpdatedBy(jwtService.user);
+                cardRepository.save(card);
+            }
+
             return pojo;
 
         }).collect(Collectors.toList());

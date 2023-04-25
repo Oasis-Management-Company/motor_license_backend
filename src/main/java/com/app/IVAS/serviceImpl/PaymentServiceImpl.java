@@ -180,10 +180,29 @@ public class PaymentServiceImpl implements PaymentService {
         AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
 
+        PaymentHistory history = paymentHistoryRepository.findFirstByPaymentReference(respondDto.getPaymentReference());
+
+        if (history != null){
+            assessmentResponse.setStatusCode("003");
+            assessmentResponse.setMessage("Duplicate Transaction..");
+            assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
+            return assessmentResponse;
+        }
+
+
 
         Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
+        if (invoice == null ){
+            assessmentResponse.setStatusCode("002");
+            assessmentResponse.setMessage("Not Sucessful");
+            assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
+            return assessmentResponse;
+        }
+
+
         List<Card> card = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.getInvoiceNumber()).get();
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
+
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
@@ -206,13 +225,6 @@ public class PaymentServiceImpl implements PaymentService {
         invoice.setPaymentDate(dateTime);
         invoice.setPaymentRef(respondDto.getPaymentReference());
         invoiceRepository.save(invoice);
-
-        if (respondDto == null ){
-            assessmentResponse.setStatusCode("002");
-            assessmentResponse.setMessage("Not Sucessful");
-            assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
-            return assessmentResponse;
-        }
 
         for (Card card1 : card) {
             card1.setCardStatus(CardStatusConstant.NOT_PRINTED);

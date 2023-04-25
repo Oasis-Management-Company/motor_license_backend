@@ -33,6 +33,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final JwtService jwtService;
     private final SalesRepository salesRepository;
     private final RrrGenerationService rrrGenerationService;
+    private final PaymentServiceImpl paymentService;
 
     @Override
     public InvoiceDto getUserVehicleDetails(Long id) {
@@ -217,6 +218,14 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setReference(invoiceNumber);
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
+
+        try {
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+
         return savedInvoice;
     }
 
@@ -277,6 +286,12 @@ public class VehicleServiceImpl implements VehicleService {
         sales1.setCreatedBy(jwtService.user);
         sales1.setPlateType(RegType.NON_VEHICLE);
         salesRepository.save(sales1);
+
+        try {
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         return savedInvoice;
     }

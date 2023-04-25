@@ -162,9 +162,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         try {
             paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
         } catch (Exception e) {
-            System.out.println(e);
         }
-
 
         return savedInvoice;
     }
