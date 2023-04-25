@@ -1,6 +1,7 @@
 package com.app.IVAS.controller;
 
 
+import com.app.IVAS.Enum.ActivityStatusConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.Enum.RegType;
@@ -16,6 +17,7 @@ import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.UserManagementService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -54,6 +56,7 @@ public class UserController {
     private final ZoneRepository zoneRepository;
     private final ZonalOfficeRepository zonalOfficeRepository;
     private final PermissionRepository permissionRepository;
+    private final ActivityLogService activityLogService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
@@ -88,8 +91,10 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(){
-        userManagementService.logout();
+    public ResponseEntity<?> logout(Long id){
+        jwtService.invalidateToken(id);
+        activityLogService.createActivityLog((jwtService.user.getDisplayName() + " logged out"), ActivityStatusConstant.LOGOUT);
+        jwtService.user = null;
         return ResponseEntity.ok("");
     }
 

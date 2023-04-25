@@ -5,6 +5,7 @@ import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.api_response.LoginResponse;
+import com.app.IVAS.configuration.CachingConfig;
 import com.app.IVAS.dto.LoginRequestDto;
 import com.app.IVAS.dto.PasswordDto;
 import com.app.IVAS.dto.PortalUserPojo;
@@ -45,6 +46,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     private final ZonalOfficeRepository zonalOfficeRepository;
     private final SmsService smsService;
     private final ActivityLogService activityLogService;
+    private final CachingConfig cachingConfig;
     private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
 
     @Override
@@ -121,16 +123,13 @@ public class UserManagementServiceImpl implements UserManagementService {
            loginResponse.setUsername(user.getEmail());
            loginResponse.setRole(user.getRole().getName());
            loginResponse.setPermissions(getPermission(user.getRole()));
+           loginResponse.setId(user.getId());
 
+           cachingConfig.cacheManager().getCache("tokens").putIfAbsent(user.getId(), token);
            activityLogService.createActivityLog((user.getDisplayName() + " logged in"), ActivityStatusConstant.LOGIN);
+
            return loginResponse;
        } else throw new Exception("Invalid Password");
-    }
-
-    @Override
-    public void logout(){
-        jwtService.invalidateToken(jwtService.user.getId());
-        jwtService.user = null;
     }
 
     @Override

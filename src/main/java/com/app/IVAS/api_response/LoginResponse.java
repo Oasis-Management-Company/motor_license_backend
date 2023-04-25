@@ -14,4 +14,5 @@ public class LoginResponse {
     private String role;
     private List<PermissionTypeConstant> permissions;
     private String username;
+    private Long id;
 }

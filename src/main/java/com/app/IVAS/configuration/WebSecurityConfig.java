@@ -38,8 +38,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/configuration/**", 
                         "/swagger*/**", 
                         "/webjars/**",
-                        "/api/login",
-                        "/api/login/**",
                         "/api/validate",
                         "/api/validate/**",
                         "/api/verify/ucode/**",

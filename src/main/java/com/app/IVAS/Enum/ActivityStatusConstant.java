@@ -10,5 +10,6 @@ public enum ActivityStatusConstant {
         APPROVAL,
         DISAPPROVAL,
         ASSIGNED,
-        UNASSIGNED
+        UNASSIGNED,
+        LOGOUT
 }

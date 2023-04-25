@@ -26,9 +26,6 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private SystemUserDetailsService systemUserDetailsService;
 
-    @Autowired
-    private CachingConfig cachingConfig;
-
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthTokenFilter.class);
 
     public JwtAuthTokenFilter() {

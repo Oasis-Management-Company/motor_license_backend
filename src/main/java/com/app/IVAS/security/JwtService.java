@@ -48,8 +48,6 @@ public class JwtService {
                     .withIssuer("")
                     .sign(algorithm);
 
-            cachingConfig.cacheManager().getCache("tokens").putIfAbsent(id, token);
-
         } catch (JWTCreationException exception){
             exception.printStackTrace();
         }
@@ -69,7 +67,7 @@ public class JwtService {
     }
 
     public void invalidateToken(Long id){
-        cachingConfig.cacheManager().getCache("tokens").evict(id);
+        cachingConfig.cacheManager().getCache("tokens").evictIfPresent(id);
     }
 
     private void requestPrincipal(Long id){
@@ -84,14 +82,17 @@ public class JwtService {
                     .build();
             DecodedJWT jwt = verifier.verify(token);
             Claim userId = jwt.getClaim("userId");
-            log.info("USER ======" + userId.toString());
+            if (cachingConfig.cacheManager().getCache("tokens").get(userId.asLong(), (String::new)).equals("")){
+                return false;
+            }
+            log.info("USER ID: " + userId);
             return true;
         } catch (SignatureException e) {
             log.error("Invalid JWT signature -> Message: {} ", e);
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token -> Message: {}", e);
         } catch (ExpiredJwtException e) {
-            Objects.requireNonNull(cachingConfig.cacheManager().getCache("tokens")).evictIfPresent(user.getId());
+            cachingConfig.cacheManager().getCache("tokens").evictIfPresent(user.getId());
             log.error("Expired JWT token -> Message: {}", e);
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token -> Message: {}", e);
