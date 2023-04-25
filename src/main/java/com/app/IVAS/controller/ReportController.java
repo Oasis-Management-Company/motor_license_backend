@@ -6,6 +6,7 @@ import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.dto.filters.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoiceOffenseType;
 import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.QSales;
@@ -86,7 +87,7 @@ public class ReportController {
 
         for (Sales sales:salesListJPAQuery.fetch()){
             InvoiceServiceType invoiceService = appRepository.startJPAQuery(com.app.IVAS.entity.QInvoiceServiceType.invoiceServiceType)
-                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(sales.getInvoice()).and(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER REGISTRATION")))
+                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(sales.getInvoice()).and(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER VEHICLE")))
                     .fetchFirst();
             if (invoiceService != null){
                 prices.add(invoiceService.getServiceType().getPrice());
@@ -165,14 +166,14 @@ public class ReportController {
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER VEHICLE"))
                 .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull())
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
         JPAQuery<InvoiceServiceType> typeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER VEHICLE"))
                 .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull());
 
         if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
@@ -228,13 +229,39 @@ public class ReportController {
 
     }
 
-//    @GetMapping("/search/offense-report")
-//    @Transactional
-//    public QueryResults<OffenseReportPojo> searchOffenseReport(){
-//
-//        J
-//
-//    }
+    @GetMapping("/search/offense-report")
+    @Transactional
+    public QueryResultsPojo<OffenseReportPojo> searchOffenseReport(PortalUserSearchFilter filter){
+
+        JPAQuery<InvoiceOffenseType> invoiceOffenseTypeJPAQuery = appRepository.startJPAQuery(QInvoiceOffenseType.invoiceOffenseType)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QInvoiceOffenseType.invoiceOffenseType.PaymentDate.isNotNull())
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        JPAQuery<InvoiceOffenseType> typeJPAQuery = appRepository.startJPAQuery(QInvoiceOffenseType.invoiceOffenseType)
+                .where(predicateExtractor.getPredicate(filter));
+
+        if (filter.getCreatedAfter() != null){
+            invoiceOffenseTypeJPAQuery.where(QInvoiceOffenseType.invoiceOffenseType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+            typeJPAQuery.where(QInvoiceOffenseType.invoiceOffenseType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+        }
+
+        if (filter.getCreatedBefore() != null){
+            invoiceOffenseTypeJPAQuery.where(QInvoiceOffenseType.invoiceOffenseType.PaymentDate.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+            typeJPAQuery.where(QInvoiceOffenseType.invoiceOffenseType.PaymentDate.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+        }
+
+        List<Double> prices = new ArrayList<>();
+        for(InvoiceOffenseType offenseType:typeJPAQuery.fetch()){
+            prices.add(offenseType.getAmount());
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("PaymentDate"), QInvoiceOffenseType.invoiceOffenseType);
+        QueryResults<InvoiceOffenseType> invoiceOffenseTypeQueryResults = invoiceOffenseTypeJPAQuery.select(QInvoiceOffenseType.invoiceOffenseType).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResultsPojo<>(reportService.getOffenseReport(invoiceOffenseTypeQueryResults.getResults()), invoiceOffenseTypeQueryResults.getLimit(), invoiceOffenseTypeQueryResults.getOffset(), invoiceOffenseTypeQueryResults.getTotal(), invoiceOffenseTypeQueryResults.isEmpty(), null, prices.stream().mapToDouble(Double::doubleValue).sum());
+
+    }
 
     @PostMapping(path = "/download-stock-report")
     @Transactional
@@ -352,7 +379,7 @@ public class ReportController {
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER REGISTRATION"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER VEHICLE"))
                 .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull());
 
 

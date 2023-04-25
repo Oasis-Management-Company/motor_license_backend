@@ -32,6 +32,8 @@ public class QInvoiceOffenseType extends EntityPathBase<InvoiceOffenseType> {
 
     public final QOffense offense;
 
+    public final DateTimePath<java.time.LocalDateTime> PaymentDate = createDateTime("PaymentDate", java.time.LocalDateTime.class);
+
     public final StringPath reference = createString("reference");
 
     public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
