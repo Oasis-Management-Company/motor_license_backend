@@ -179,7 +179,8 @@ public class PaymentServiceImpl implements PaymentService {
     public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
         AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
-        System.out.println(respondDto);
+
+
         Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
         List<Card> card = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.getInvoiceNumber()).get();
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
@@ -187,14 +188,29 @@ public class PaymentServiceImpl implements PaymentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
 
+        paymentHistory.setAmount(respondDto.getAmount());
+        paymentHistory.setPaymentDate(dateTime.format(formatter));
+        paymentHistory.setPaymentReference(respondDto.getPaymentReference());
+        paymentHistory.setCustomerName(respondDto.getCustomerName());
+        paymentHistory.setReceiptNo(respondDto.getReceiptNo());
+        paymentHistory.setCustomerPhoneNumber(respondDto.getCustomerPhoneNumber());
+        paymentHistory.setBankName(respondDto.getBankName());
+        paymentHistory.setCollectionsAccount(respondDto.getCollectionsAccount());
+        paymentHistory.setItemName(respondDto.getItemName());
+        paymentHistory.setLog(respondDto.toString());
+
+        paymentHistoryRepository.save(paymentHistory);
+
+
         invoice.setPaymentStatus(PaymentStatus.PAID);
         invoice.setPaymentDate(dateTime);
         invoice.setPaymentRef(respondDto.getPaymentReference());
         invoiceRepository.save(invoice);
 
         if (respondDto == null ){
-            assessmentResponse.setStatus("1");
-            assessmentResponse.setStatusMessage("Not Sucessful");
+            assessmentResponse.setStatusCode("002");
+            assessmentResponse.setMessage("Not Sucessful");
+            assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
             return assessmentResponse;
         }
 
@@ -214,9 +230,9 @@ public class PaymentServiceImpl implements PaymentService {
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
-
-        assessmentResponse.setStatus("0");
-        assessmentResponse.setStatusMessage("Sucess");
+        assessmentResponse.setStatusCode("000");
+        assessmentResponse.setMessage("Success");
+        assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
 
         return assessmentResponse;
     }

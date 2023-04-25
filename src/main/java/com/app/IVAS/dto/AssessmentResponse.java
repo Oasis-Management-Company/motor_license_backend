@@ -4,6 +4,11 @@ import lombok.Data;
 
 @Data
 public class AssessmentResponse {
-    private String Status;
-    private String StatusMessage;
+
+    private String statusCode;
+    private String message;
+    private String paymentReference;
+
+
+
 }
