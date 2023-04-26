@@ -22,6 +22,7 @@ public class PortalUserSearchFilter extends BaseSearchDto implements QuerydslBin
         bindings.bind(root.email).as("email").first((path, value) -> path.eq(value));
         bindings.bind(root.firstName).as("firstName").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.lastName).as("lastName").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.displayName).as("name").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.role.name).as("role").first((path, value) -> path.equalsIgnoreCase(value));
         bindings.bind(root.office.zone.id).as("zone").first((path, value) -> path.eq(value));
         bindings.including(root.status, root.email, root.firstName, root.lastName, root.role.name);

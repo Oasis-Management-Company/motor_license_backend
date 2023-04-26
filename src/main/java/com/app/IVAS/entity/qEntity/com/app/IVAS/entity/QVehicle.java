@@ -65,7 +65,7 @@ public class QVehicle extends EntityPathBase<Vehicle> {
 
     public final StringPath permit = createString("permit");
 
-    public final QPlateNumber plateNumber;
+    public final com.app.IVAS.entity.QPlateNumber plateNumber;
 
     public final StringPath policySector = createString("policySector");
 
@@ -76,9 +76,9 @@ public class QVehicle extends EntityPathBase<Vehicle> {
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
-    public final QVehicleCategory vehicleCategory;
+    public final com.app.IVAS.entity.QVehicleCategory vehicleCategory;
 
-    public final QVehicleModel vehicleModel;
+    public final com.app.IVAS.entity.QVehicleModel vehicleModel;
 
     public final StringPath year = createString("year");
 

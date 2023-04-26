@@ -10,7 +10,6 @@ import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.userManagement.PortalUser;
-import com.app.IVAS.repository.InvoiceRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.ReportService;
 import com.itextpdf.io.font.constants.StandardFonts;
@@ -469,6 +468,202 @@ public class ReportServiceImpl implements ReportService {
                             break;
                         case PLATE_TYPE:
                             cell.setCellValue(reportPojo.getPlateType());
+                            break;
+                        case TRANSACTION_DATE:
+                            cell.setCellValue(reportPojo.getDateSold());
+                            break;
+                        case AMOUNT:
+                            cell.setCellValue("N" + reportPojo.getAmount());
+                            break;
+                    }
+                }
+            }
+            return pdfRenderToMultiplePages.loadFileAsResource(pdfRenderToMultiplePages.createDirectory(workbook));
+        }
+    }
+
+    @Override
+    public Resource exportVIOReport(List<VIOReportPojo> pojos, String type) throws IOException {
+        if (type.equals("pdf")) {
+            String file  = appConfigurationProperties.getPrintDirectory() + "vio_report.pdf";
+
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(file));
+
+            Document doc = new Document(pdfDoc);
+
+            Table table = new Table(6);
+            int i = 1;
+
+            Paragraph header = new Paragraph("VIO ASSESSMENT REPORT")
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA))
+                    .setFontSize(20)
+                    .setTextAlignment(TextAlignment.CENTER);
+
+            table.setFontSize(10);
+            table.setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA));
+            table.addHeaderCell("S/N");
+            table.addHeaderCell("VIO");
+            table.addHeaderCell("TOTAL ASSESSMENT");
+            table.addHeaderCell("TOTAL AMOUNT");
+            table.addHeaderCell("TOTAL AMOUNT PAID");
+            table.addHeaderCell("TOTAL AMOUNT OWED");
+            table.getHeader().setBorder(new SolidBorder(2)).setTextAlignment(TextAlignment.CENTER);
+
+            for (VIOReportPojo reportPojo:pojos) {
+                table.addCell(Integer.toString(i++));
+                table.addCell(reportPojo.getName()).setBorder(new SolidBorder(2)).setTextAlignment(TextAlignment.CENTER);
+                table.addCell(String.valueOf(reportPojo.getAssessmentDone()));
+                table.addCell("N" + reportPojo.getTotalAmount());
+                table.addCell("N" + reportPojo.getTotalPaid());
+                table.addCell("N" + reportPojo.getTotalOwed());
+            }
+
+            doc.add(header);
+            doc.add(table);
+            doc.close();
+            log.info("Table created successfully..");
+
+            return pdfRenderToMultiplePages.loadFileAsResource(file);
+        } else {
+
+            final int SN = 1;
+            final int VIO = 2;
+            final int TOTAL_ASSESSMENT = 3;
+            final int TOTAL_AMOUNT = 4;
+            final int TOTAL_AMOUNT_PAID = 5;
+            final int TOTAL_AMOUNT_OWED = 6;
+
+            String uploadTemplatePath = "/excel/vio_report.xlsx";
+            InputStream inputStream = getClass().getResourceAsStream(uploadTemplatePath);
+            if (inputStream == null) throw new IllegalArgumentException("File not found");
+
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheet("sheet1");
+            int firstRow = sheet.getFirstRowNum() + 2;
+            Cell cell = null;
+            Row row = null;
+
+            for (VIOReportPojo reportPojo : pojos) {
+                row = sheet.createRow(firstRow++);
+                int columnNumber = 0;
+                for (int i = 0; i <= 7; i++) {
+                    cell = row.createCell(columnNumber++);
+                    switch (columnNumber) {
+                        case SN:
+                            cell.setCellValue(row.getRowNum() - 1);
+                            break;
+                        case VIO:
+                            cell.setCellValue(reportPojo.getName());
+                            break;
+                        case TOTAL_ASSESSMENT:
+                            cell.setCellValue(reportPojo.getAssessmentDone());
+                            break;
+                        case TOTAL_AMOUNT:
+                            cell.setCellValue("N" + reportPojo.getTotalAmount());
+                            break;
+                        case TOTAL_AMOUNT_PAID:
+                            cell.setCellValue("N" + reportPojo.getTotalPaid());
+                            break;
+                        case TOTAL_AMOUNT_OWED:
+                            cell.setCellValue("N" + reportPojo.getTotalOwed());
+                            break;
+                    }
+                }
+            }
+            return pdfRenderToMultiplePages.loadFileAsResource(pdfRenderToMultiplePages.createDirectory(workbook));
+        }
+    }
+
+    @Override
+    public Resource exportOffenseReport(List<OffenseReportPojo> pojos, String type) throws IOException {
+        if (type.equals("pdf")) {
+            String file  = appConfigurationProperties.getPrintDirectory() + "offense_report.pdf";
+
+            PdfDocument pdfDoc = new PdfDocument(new PdfWriter(file));
+
+            Document doc = new Document(pdfDoc);
+
+            Table table = new Table(8);
+            int i = 1;
+
+            Paragraph header = new Paragraph("OFFENSE REPORT")
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA))
+                    .setFontSize(20)
+                    .setTextAlignment(TextAlignment.CENTER);
+
+            table.setFontSize(10);
+            table.setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA));
+            table.addHeaderCell("S/N");
+            table.addHeaderCell("PLATE NUMBER");
+            table.addHeaderCell("TRANSACTION REF");
+            table.addHeaderCell("VIO");
+            table.addHeaderCell("PAYER");
+            table.addHeaderCell("OFFENSE");
+            table.addHeaderCell("TRANSACTION DATE");
+            table.addHeaderCell("AMOUNT");
+            table.getHeader().setBorder(new SolidBorder(2)).setTextAlignment(TextAlignment.CENTER);
+
+            for (OffenseReportPojo reportPojo:pojos) {
+                table.addCell(Integer.toString(i++));
+                table.addCell(reportPojo.getPlateNumber()).setBorder(new SolidBorder(2)).setTextAlignment(TextAlignment.CENTER);
+                table.addCell(reportPojo.getInvoiceID());
+                table.addCell(reportPojo.getVio());
+                table.addCell(reportPojo.getTaxPayer());
+                table.addCell(reportPojo.getOffense());
+                table.addCell(reportPojo.getDateSold());
+                table.addCell("N" + reportPojo.getAmount().toString());
+            }
+
+            doc.add(header);
+            doc.add(table);
+            doc.close();
+            log.info("Table created successfully..");
+
+            return pdfRenderToMultiplePages.loadFileAsResource(file);
+        } else {
+
+            final int SN = 1;
+            final int PLATE_NUMBER = 2;
+            final int TRANSACTION_REF = 3;
+            final int VIO = 4;
+            final int PAYER = 5;
+            final int OFFENSE = 6;
+            final int TRANSACTION_DATE = 7;
+            final int AMOUNT = 8;
+
+            String uploadTemplatePath = "/excel/offenses_report.xlsx";
+            InputStream inputStream = getClass().getResourceAsStream(uploadTemplatePath);
+            if (inputStream == null) throw new IllegalArgumentException("File not found");
+
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheet("sheet1");
+            int firstRow = sheet.getFirstRowNum() + 2;
+            Cell cell = null;
+            Row row = null;
+
+            for (OffenseReportPojo reportPojo : pojos) {
+                row = sheet.createRow(firstRow++);
+                int columnNumber = 0;
+                for (int i = 0; i <= 9; i++) {
+                    cell = row.createCell(columnNumber++);
+                    switch (columnNumber) {
+                        case SN:
+                            cell.setCellValue(row.getRowNum() - 1);
+                            break;
+                        case PLATE_NUMBER:
+                            cell.setCellValue(reportPojo.getPlateNumber());
+                            break;
+                        case TRANSACTION_REF:
+                            cell.setCellValue(reportPojo.getInvoiceID());
+                            break;
+                        case VIO:
+                            cell.setCellValue(reportPojo.getVio());
+                            break;
+                        case PAYER:
+                            cell.setCellValue(reportPojo.getTaxPayer());
+                            break;
+                        case OFFENSE:
+                            cell.setCellValue(reportPojo.getOffense());
                             break;
                         case TRANSACTION_DATE:
                             cell.setCellValue(reportPojo.getDateSold());

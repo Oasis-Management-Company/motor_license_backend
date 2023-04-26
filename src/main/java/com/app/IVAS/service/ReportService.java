@@ -32,4 +32,8 @@ public interface ReportService {
     Resource exportServiceSalesReport(List<SalesReportPojo> pojos, String type) throws IOException;
 
     Resource exportPlateNumberSalesReport(List<SalesReportDto> pojos, String type) throws IOException;
+
+    Resource exportVIOReport(List<VIOReportPojo> pojos, String type) throws IOException;
+
+    Resource exportOffenseReport(List<OffenseReportPojo> pojos, String type) throws IOException;
 }
