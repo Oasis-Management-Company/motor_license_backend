@@ -103,6 +103,8 @@ public class PlateNumberServiceImpl implements PlateNumberService {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         return stocks.stream().map(stock -> {
             StockPojo pojo = new StockPojo();
+            long sold = plateNumberRepository.findByStockAndPlateNumberStatus(stock, PlateNumberStatus.SOLD).size();
+
             pojo.setId(stock.getId());
             pojo.setLga(stock.getStartCode().getCode());
             pojo.setRange(stock.getStartRange() + " - " + stock.getEndRange());
@@ -110,11 +112,11 @@ public class PlateNumberServiceImpl implements PlateNumberService {
             pojo.setType(stock.getType().getName());
             pojo.setSubType(stock.getSubType() != null ? stock.getSubType().getName() : null);
             pojo.setDateCreated(stock.getCreatedAt().format(df));
-            pojo.setQuantity(stock.getQuantity());
+            pojo.setQuantity(stock.getQuantity() -  sold);
             pojo.setCreatedBy(stock.getCreatedBy().getDisplayName());
             pojo.setInitialQuantity(stock.getEndRange() - stock.getStartRange() + 1);
-            pojo.setAssigned((long) plateNumberRepository.findByStockAndPlateNumberStatus(stock, PlateNumberStatus.ASSIGNED).size());
-            pojo.setSold(pojo.getInitialQuantity() - pojo.getQuantity());
+            pojo.setAssigned(((long) plateNumberRepository.findByStockAndPlateNumberStatus(stock, PlateNumberStatus.ASSIGNED).size()) + sold);
+            pojo.setSold(sold);
             return pojo;
 
         }).collect(Collectors.toList());

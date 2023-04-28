@@ -14,6 +14,7 @@ import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.ReportService;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -281,7 +282,7 @@ public class ReportServiceImpl implements ReportService {
 
             PdfDocument pdfDoc = new PdfDocument(new PdfWriter(file));
 
-            Document doc = new Document(pdfDoc);
+            Document doc = new Document(pdfDoc, PageSize.A3);
 
             Table table = new Table(9);
             int i = 1;
