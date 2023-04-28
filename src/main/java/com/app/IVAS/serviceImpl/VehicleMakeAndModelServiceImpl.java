@@ -66,8 +66,6 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
 
                 activityLogService.createActivityLog((vehicleModel.getName() + " of " + vehicleMakeOptional.get().getName() + " vehicle make was created"), ActivityStatusConstant.CREATE);
 
-
-
                 return vehicleMakeDto;
 
             }

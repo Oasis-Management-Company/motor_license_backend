@@ -269,14 +269,6 @@ public class SalesCtrl {
         return ResponseEntity.ok(" ");
     }
 
-    /**Incomplete Edit function**/
-//    @PostMapping("/edit-sales-invoice")
-//    @Transactional
-//    public ResponseEntity<?> editSalesInvoice(@RequestBody SalesDto dto){
-//        service.editSalesInvoice(dto);
-//        return ResponseEntity.ok("");
-//    }
-
 
     @GetMapping("/generate/qrcode")
     public SalesDto GetQRCode(@RequestParam String invoiceNo){
