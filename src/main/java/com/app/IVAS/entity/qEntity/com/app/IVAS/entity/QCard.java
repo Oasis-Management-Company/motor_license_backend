@@ -53,6 +53,8 @@ public class QCard extends EntityPathBase<Card> {
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser lastUpdatedBy;
 
+    public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
+
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 

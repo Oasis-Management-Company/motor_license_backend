@@ -28,9 +28,11 @@ public class QInvoiceOffenseType extends EntityPathBase<InvoiceOffenseType> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final QInvoice invoice;
+    public final com.app.IVAS.entity.QInvoice invoice;
 
-    public final QOffense offense;
+    public final com.app.IVAS.entity.QOffense offense;
+
+    public final DateTimePath<java.time.LocalDateTime> PaymentDate = createDateTime("PaymentDate", java.time.LocalDateTime.class);
 
     public final StringPath reference = createString("reference");
 

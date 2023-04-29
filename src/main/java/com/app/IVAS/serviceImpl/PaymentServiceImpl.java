@@ -3,6 +3,7 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.CardStatusConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PaymentStatus;
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.OkHttp3Util;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.Card;
@@ -14,13 +15,11 @@ import com.app.IVAS.repository.InvoiceRepository;
 import com.app.IVAS.repository.InvoiceServiceTypeRepository;
 import com.app.IVAS.repository.PaymentHistoryRepository;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.service.CardService;
 import com.app.IVAS.service.PaymentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,16 +31,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -61,6 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final CardRepository cardRepository;
+    private final CardService cardService;
 
     @Value("${payment.domain}")
     private String paymentDomain;
@@ -175,37 +166,79 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void PaymentReturn(PaymentResponse respondDto) {
-        System.out.println(respondDto);
+    public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
+        AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
+
+        PaymentHistory history = paymentHistoryRepository.findFirstByPaymentReference(respondDto.getPaymentReference());
+
+        if (history != null){
+            assessmentResponse.setStatusCode("003");
+            assessmentResponse.setMessage("Duplicate Transaction..");
+            assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
+            return assessmentResponse;
+        }
+
+
+
         Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
-        List<Card> card = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.getInvoiceNumber()).get();
+        if (invoice == null ){
+            assessmentResponse.setStatusCode("002");
+            assessmentResponse.setMessage("Not Sucessful");
+            assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
+            return assessmentResponse;
+        }
+
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
+
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
+
+        paymentHistory.setAmount(respondDto.getAmount());
+        paymentHistory.setPaymentDate(dateTime.format(formatter));
+        paymentHistory.setPaymentReference(respondDto.getPaymentReference());
+        paymentHistory.setCustomerName(respondDto.getCustomerName());
+        paymentHistory.setReceiptNo(respondDto.getReceiptNo());
+        paymentHistory.setCustomerPhoneNumber(respondDto.getCustomerPhoneNumber());
+        paymentHistory.setBankName(respondDto.getBankName());
+        paymentHistory.setCollectionsAccount(respondDto.getCollectionsAccount());
+        paymentHistory.setItemName(respondDto.getItemName());
+        paymentHistory.setLog(respondDto.toString());
+
+        paymentHistoryRepository.save(paymentHistory);
+
 
         invoice.setPaymentStatus(PaymentStatus.PAID);
         invoice.setPaymentDate(dateTime);
         invoice.setPaymentRef(respondDto.getPaymentReference());
         invoiceRepository.save(invoice);
 
-        for (Card card1 : card) {
-            card1.setCardStatus(CardStatusConstant.NOT_PRINTED);
-            card1.setStatus(GenericStatusConstant.ACTIVE);
-            if (card1.getVehicle().getPlateNumber().getType().getName().contains("Commercial")){
-                card1.setExpiryDate(dateTime.plusDays(185));
-            }else{
-                card1.setExpiryDate(dateTime.plusDays(365));
-            }
-            cardRepository.save(card1);
+        List<InvoiceServiceType> serviceType = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+        for (InvoiceServiceType invoiceServiceType : serviceType) {
+            invoiceServiceType.setPaymentDate(dateTime);
+            invoiceServiceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
+
+            invoiceServiceTypeRepository.save(invoiceServiceType);
         }
+
+        try{
+            cardService.updateCardByPayment(respondDto.getCustReference(), Double.valueOf(respondDto.getAmount()));
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
         for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
             invoiceServiceType.setPaymentDate(dateTime);
 
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
-        System.out.println(respondDto);
+        assessmentResponse.setStatusCode("000");
+        assessmentResponse.setMessage("Success");
+        assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
+
+        return assessmentResponse;
     }
 }

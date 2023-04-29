@@ -1,6 +1,7 @@
 package com.app.IVAS.service;
 
 import com.app.IVAS.dto.*;
+import com.app.IVAS.entity.InvoiceOffenseType;
 import com.app.IVAS.entity.InvoiceServiceType;
 import com.app.IVAS.entity.PlateNumber;
 import com.app.IVAS.entity.Sales;
@@ -22,6 +23,8 @@ public interface ReportService {
 
     List<SalesReportPojo> getServiceSales(List<InvoiceServiceType> invoiceServiceTypes);
 
+    List<OffenseReportPojo> getOffenseReport(List<InvoiceOffenseType> invoiceOffenseTypes);
+
     List<VIOReportPojo> getVIOReport(List<PortalUser> users, String createdBefore,  String createdAfter);
 
     Resource exportStockReport(List<StockReportPojo> pojos, String type) throws IOException;
@@ -29,4 +32,8 @@ public interface ReportService {
     Resource exportServiceSalesReport(List<SalesReportPojo> pojos, String type) throws IOException;
 
     Resource exportPlateNumberSalesReport(List<SalesReportDto> pojos, String type) throws IOException;
+
+    Resource exportVIOReport(List<VIOReportPojo> pojos, String type) throws IOException;
+
+    Resource exportOffenseReport(List<OffenseReportPojo> pojos, String type) throws IOException;
 }

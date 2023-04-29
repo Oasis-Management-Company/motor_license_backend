@@ -58,8 +58,8 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public QInvoiceServiceType(Class<? extends InvoiceServiceType> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.invoice = inits.isInitialized("invoice") ? new QInvoice(forProperty("invoice"), inits.get("invoice")) : null;
-        this.serviceType = inits.isInitialized("serviceType") ? new QServiceType(forProperty("serviceType"), inits.get("serviceType")) : null;
+        this.invoice = inits.isInitialized("invoice") ? new com.app.IVAS.entity.QInvoice(forProperty("invoice"), inits.get("invoice")) : null;
+        this.serviceType = inits.isInitialized("serviceType") ? new com.app.IVAS.entity.QServiceType(forProperty("serviceType"), inits.get("serviceType")) : null;
     }
 
 }

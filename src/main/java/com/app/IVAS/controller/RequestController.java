@@ -9,6 +9,7 @@ import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.QWorkFlowStage;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.QPortalUser;
+import com.app.IVAS.repository.OffenseRepository;
 import com.app.IVAS.repository.PrefixRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
@@ -43,6 +44,7 @@ public class RequestController {
     private final RequestService requestService;
     private final PrefixRepository prefixRepository;
     private final JwtService jwtService;
+    private final OffenseRepository offenseRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping("/search/plate-number-request")
@@ -172,6 +174,28 @@ public class RequestController {
         for (PortalUser user : portalUserJPAQuery){ mlas.add(user.getDisplayName()); }
 
         return mlas;
+    }
+
+    @GetMapping("/get-vio")
+    public List<String> getVio(){
+        List<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
+                .where(QPortalUser.portalUser.role.name.equalsIgnoreCase("VIO"))
+                .fetch();
+
+        List<String> vios= new ArrayList<>();
+        for (PortalUser user : portalUserJPAQuery){ vios.add(user.getDisplayName()); }
+
+        return vios;
+    }
+
+    @GetMapping("/get-offenses")
+    public List<String> getOffense(){
+        List<Offense> offenses = offenseRepository.findAll();
+
+        List<String> offense= new ArrayList<>();
+        for (Offense offense1 :offenses){ offense.add(offense1.getName()); }
+
+        return offense;
     }
 
     @GetMapping("/serviceType/view")

@@ -66,7 +66,7 @@ public class QInvoice extends EntityPathBase<Invoice> {
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
-    public final QVehicle vehicle;
+    public final com.app.IVAS.entity.QVehicle vehicle;
 
     public QInvoice(String variable) {
         this(Invoice.class, forVariable(variable), INITS);

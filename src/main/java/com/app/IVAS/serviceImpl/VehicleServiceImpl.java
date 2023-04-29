@@ -7,6 +7,7 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
+import com.app.IVAS.service.CardService;
 import com.app.IVAS.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,8 @@ public class VehicleServiceImpl implements VehicleService {
     private final JwtService jwtService;
     private final SalesRepository salesRepository;
     private final RrrGenerationService rrrGenerationService;
+    private final PaymentServiceImpl paymentService;
+    private final CardService cardService;
 
     @Override
     public InvoiceDto getUserVehicleDetails(Long id) {
@@ -157,6 +160,9 @@ public class VehicleServiceImpl implements VehicleService {
         sales1.setCreatedBy(jwtService.user);
         sales1.setPlateType(RegType.RENEWAL);
         salesRepository.save(sales1);
+
+        cardService.createCard(savedInvoice, vehicle, RegType.RENEWAL);
+
         return savedInvoice;
     }
 
@@ -217,6 +223,14 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setReference(invoiceNumber);
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
+
+        try {
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+
         return savedInvoice;
     }
 
@@ -277,6 +291,12 @@ public class VehicleServiceImpl implements VehicleService {
         sales1.setCreatedBy(jwtService.user);
         sales1.setPlateType(RegType.NON_VEHICLE);
         salesRepository.save(sales1);
+
+        try {
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         return savedInvoice;
     }
