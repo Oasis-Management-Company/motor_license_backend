@@ -217,6 +217,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         dto.setMake(sale.get().getVehicle().getVehicleModel().getVehicleMake().getName());
         dto.setCategory(sale.get().getVehicle().getVehicleCategory().getName());
         dto.setPlate(sale.get().getVehicle().getPlateNumber().getPlateNumber());
+        dto.setPlatetype(sale.get().getVehicle().getPlateNumber().getType().getId());
         dto.setMla(sale.get().getCreatedBy().getDisplayName());
         dto.setDate(sale.get().getCreatedAt());
         dto.setAmount(sale.get().getInvoice().getAmount());
@@ -227,6 +228,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         dto.setInvoice(sale.get().getInvoice().getId());
         dto.setPlatecat(sale.get().getVehicle().getPlateNumber().getType().getName());
         dto.setInvoiceNo(sale.get().getInvoice().getInvoiceNumber());
+
 
         return dto;
 
@@ -671,6 +673,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public Invoice SaveSalesEdit(SalesDto sales) {
+        System.out.println(sales);
         List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
         Double totalAmount = 0.0;
 
