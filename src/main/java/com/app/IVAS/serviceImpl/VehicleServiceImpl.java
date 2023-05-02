@@ -162,7 +162,10 @@ public class VehicleServiceImpl implements VehicleService {
         salesRepository.save(sales1);
 
         cardService.createCard(savedInvoice, vehicle, RegType.RENEWAL);
-
+        try {
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        } catch (Exception e) {
+        }
         return savedInvoice;
     }
 

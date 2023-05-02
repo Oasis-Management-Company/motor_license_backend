@@ -28,7 +28,7 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final com.app.IVAS.entity.QInvoice invoice;
+    public final QInvoice invoice;
 
     public final DateTimePath<java.time.LocalDateTime> PaymentDate = createDateTime("PaymentDate", java.time.LocalDateTime.class);
 
@@ -38,7 +38,7 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public final StringPath revenuecode = createString("revenuecode");
 
-    public final com.app.IVAS.entity.QServiceType serviceType;
+    public final QServiceType serviceType;
 
     public QInvoiceServiceType(String variable) {
         this(InvoiceServiceType.class, forVariable(variable), INITS);
@@ -58,8 +58,8 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public QInvoiceServiceType(Class<? extends InvoiceServiceType> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.invoice = inits.isInitialized("invoice") ? new com.app.IVAS.entity.QInvoice(forProperty("invoice"), inits.get("invoice")) : null;
-        this.serviceType = inits.isInitialized("serviceType") ? new com.app.IVAS.entity.QServiceType(forProperty("serviceType"), inits.get("serviceType")) : null;
+        this.invoice = inits.isInitialized("invoice") ? new QInvoice(forProperty("invoice"), inits.get("invoice")) : null;
+        this.serviceType = inits.isInitialized("serviceType") ? new QServiceType(forProperty("serviceType"), inits.get("serviceType")) : null;
     }
 
 }

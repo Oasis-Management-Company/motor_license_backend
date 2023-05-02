@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface SalesCtrlService {
     Invoice SaveSales(SalesDto sales);
 
+    Invoice SaveSalesEdit(SalesDto sales);
+
     List<SalesDto> GetSales(List<Sales> results);
 
     PortalUser viewPortalUser(Long id);

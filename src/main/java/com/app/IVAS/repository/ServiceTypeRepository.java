@@ -1,6 +1,7 @@
 package com.app.IVAS.repository;
 
 import com.app.IVAS.Enum.RegType;
+import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.entity.PlateNumberType;
 import com.app.IVAS.entity.ServiceType;
 import com.app.IVAS.entity.VehicleCategory;
@@ -30,4 +31,5 @@ public interface ServiceTypeRepository extends JpaRepository<ServiceType, Long> 
     List<ServiceType> findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(VehicleCategory category, PlateNumberType types, RegType registration, RegType compulsary);
 
     List<ServiceType> findAllByRegTypeOrRegType(RegType nonVehicle, RegType compulsary);
+
 }

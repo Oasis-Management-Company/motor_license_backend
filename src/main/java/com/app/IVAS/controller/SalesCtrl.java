@@ -65,7 +65,6 @@ public class SalesCtrl {
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
-
         if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
             LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
             userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
@@ -277,6 +276,11 @@ public class SalesCtrl {
         salesDto.setQrCode(qrCodeService.base64CertificateQrCode(invoiceNo));
 
         return salesDto;
+    }
+
+    @PostMapping("/save/sales/edit")
+    public ResponseEntity<Invoice> SaveSalesEdit(@RequestBody SalesDto sales){
+        return ResponseEntity.ok(service.SaveSalesEdit(sales));
     }
 
 }

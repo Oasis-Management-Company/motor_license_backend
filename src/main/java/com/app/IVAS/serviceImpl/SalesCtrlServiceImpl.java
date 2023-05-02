@@ -77,7 +77,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
         PortalUser portalUser = null;
 
-        PortalUser user = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
+        PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), sales.getEmail());
         if (foundVehicle != null) {
             return null;
         }
@@ -226,6 +226,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         dto.setId(sale.get().getId());
         dto.setInvoice(sale.get().getInvoice().getId());
         dto.setPlatecat(sale.get().getVehicle().getPlateNumber().getType().getName());
+        dto.setInvoiceNo(sale.get().getInvoice().getInvoiceNumber());
 
         return dto;
 
@@ -668,5 +669,56 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         return serviceTypes;
     }
 
+    @Override
+    public Invoice SaveSalesEdit(SalesDto sales) {
+        List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
+        Double totalAmount = 0.0;
 
+        Invoice invoiceEdited = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(sales.getInvoiceNo());
+        if (invoiceEdited == null){
+            return null;
+        }
+
+        PlateNumberType types = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
+        VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
+
+        List<InvoiceServiceType> servicesToBeDeleted = invoiceServiceTypeRepository.findByInvoice(invoiceEdited);
+
+        for (InvoiceServiceType invoiceServiceType : servicesToBeDeleted) {
+            invoiceServiceTypeRepository.delete(invoiceServiceType);
+        }
+
+
+        for (ServiceType type : serviceTypes) {
+            totalAmount += type.getPrice();
+        }
+
+        invoiceEdited.setAmount(totalAmount);
+        invoiceEdited.setLastUpdatedBy(jwtService.user);
+
+        Invoice savedInvoice = invoiceRepository.save(invoiceEdited);
+
+        for (ServiceType type : serviceTypes) {
+            InvoiceServiceType serviceType = new InvoiceServiceType();
+            serviceType.setServiceType(type);
+            serviceType.setInvoice(savedInvoice);
+
+            serviceType.setReference(invoiceEdited.getInvoiceNumber());
+            if (type.getRevenueCode() != null){
+                serviceType.setRevenuecode(type.getRevenueCode());
+            }
+            serviceType.setRegType(RegType.REGISTRATION);
+            serviceType.setAmount(type.getPrice());
+            invoiceServiceTypeArrayList.add(serviceType);
+        }
+        invoiceServiceTypeRepository.saveAll(invoiceServiceTypeArrayList);
+
+        try {
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        } catch (Exception e) {
+        }
+
+        return savedInvoice;
+    }
 }
