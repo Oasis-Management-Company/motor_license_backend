@@ -14,6 +14,7 @@ import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.filter.InvoiceSearchFilter;
 import com.app.IVAS.filter.VehicleSerachFilter;
+import com.app.IVAS.repository.VehicleCategoryRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VehicleService;
@@ -30,7 +31,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 5600)
 @RequiredArgsConstructor
@@ -41,6 +44,7 @@ public class vehicleCtrl {
     private final AppRepository appRepository;
     private final PredicateExtractor predicateExtractor;
     private final JwtService jwtService;
+    private final VehicleCategoryRepository vehicleCategoryRepository;
 
     @GetMapping("/home")
     public String all(){
@@ -193,4 +197,6 @@ public class vehicleCtrl {
     public HttpStatus approveEdittedVehicle(@RequestParam Long id, @RequestParam String type){
         return vehicleService.approveEdittedVehicle(id, type);
     }
+
+
 }

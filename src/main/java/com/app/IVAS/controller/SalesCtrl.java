@@ -279,8 +279,8 @@ public class SalesCtrl {
     }
 
     @PostMapping("/save/sales/edit")
-    public ResponseEntity<Invoice> SaveSalesEdit(@RequestBody SalesDto sales){
-        return ResponseEntity.ok(service.SaveSalesEdit(sales));
+    public ResponseEntity<Invoice> SaveSalesEdit(@RequestBody SalesDto salesDto){
+        return ResponseEntity.ok(service.SaveSalesEdit(salesDto));
     }
 
 }
