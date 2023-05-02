@@ -103,7 +103,6 @@ public class VerificationServiceImpl implements VerificationService {
                         verificationDto.setPlate(vehicle.get().getPlateNumber().getPlateNumber().toUpperCase());
                     }
 
-
                 }
 
 
@@ -293,6 +292,7 @@ public class VerificationServiceImpl implements VerificationService {
 
 
             }
+
             return verificationDto;
 
         }
