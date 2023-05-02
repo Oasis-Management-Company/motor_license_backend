@@ -72,7 +72,6 @@ public class SalesCtrl {
         if (filter.getBefore() != null && !filter.getBefore().equals("")) {
             LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
             userJPAQuery.where(QSales.sales.createdAt.loe(endDate.atTime(LocalTime.MAX)));
-
         }
 
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
