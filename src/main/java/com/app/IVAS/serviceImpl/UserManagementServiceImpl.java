@@ -125,7 +125,8 @@ public class UserManagementServiceImpl implements UserManagementService {
            loginResponse.setPermissions(getPermission(user.getRole()));
            loginResponse.setId(user.getId());
 
-           cachingConfig.cacheManager().getCache("tokens").putIfAbsent(user.getId(), token);
+           cachingConfig.cacheManager().getCache("tokens").evictIfPresent(user.getId());
+           cachingConfig.cacheManager().getCache("tokens").put(user.getId(), token);
            activityLogService.createActivityLog((user.getDisplayName() + " logged in"), ActivityStatusConstant.LOGIN);
 
            return loginResponse;

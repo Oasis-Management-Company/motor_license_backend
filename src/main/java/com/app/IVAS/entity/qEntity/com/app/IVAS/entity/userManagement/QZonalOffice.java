@@ -32,7 +32,7 @@ public class QZonalOffice extends EntityPathBase<ZonalOffice> {
 
     public final StringPath name = createString("name");
 
-    public final QZone zone;
+    public final com.app.IVAS.entity.userManagement.QZone zone;
 
     public QZonalOffice(String variable) {
         this(ZonalOffice.class, forVariable(variable), INITS);
