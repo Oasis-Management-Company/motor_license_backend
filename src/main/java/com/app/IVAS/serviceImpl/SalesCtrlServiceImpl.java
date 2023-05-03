@@ -682,10 +682,13 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             return null;
         }
 
-        PlateNumberType types = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
+        PlateNumberType types = plateNumberTypeRepository.findById(invoiceEdited.getVehicle().getPlateNumber().getType().getId()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
+        System.out.println(category);
+        System.out.println(types);
+        System.out.println(serviceTypes);
         List<InvoiceServiceType> servicesToBeDeleted = invoiceServiceTypeRepository.findByInvoice(invoiceEdited);
 
         for (InvoiceServiceType invoiceServiceType : servicesToBeDeleted) {
@@ -721,6 +724,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
         } catch (Exception e) {
         }
+
+        Vehicle vehicle = vehicleRepository.findById(invoiceEdited.getVehicle().getId()).get();
+        vehicle.setVehicleCategory(category);
+
+        vehicleRepository.save(vehicle);
 
         return savedInvoice;
     }
