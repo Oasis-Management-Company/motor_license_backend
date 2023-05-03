@@ -82,9 +82,9 @@ public class JwtService {
                     .build();
             DecodedJWT jwt = verifier.verify(token);
             Claim userId = jwt.getClaim("userId");
-//            if (cachingConfig.cacheManager().getCache("tokens").get(userId.asLong(), (String::new)).equals("")){
-//                return false;
-//            }
+            if (cachingConfig.cacheManager().getCache("tokens").get(userId.asLong(), (String::new)).equals("")){
+                return false;
+            }
             log.info("USER ID: " + userId);
             return true;
         } catch (SignatureException e) {
