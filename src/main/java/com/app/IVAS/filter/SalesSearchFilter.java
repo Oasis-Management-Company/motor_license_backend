@@ -20,6 +20,7 @@ public class SalesSearchFilter extends BaseSearchDto implements QuerydslBinderCu
         bindings.bind(root.vehicle.plateNumber.plateNumber).as("plateNumber").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.vehicle.portalUser.asin).as("asin").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.invoice.paymentStatus).as("paymentStatus").first((path, value) -> path.eq(value));
+        bindings.bind(root.invoice.invoiceNumber).as("invoiceNo").first((path, value) -> path.containsIgnoreCase(value));
         bindings.including(root.vehicle);
     }
 }

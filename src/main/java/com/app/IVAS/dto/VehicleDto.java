@@ -34,5 +34,6 @@ public class VehicleDto {
     private String email;
     private Long categoryId;
     private String createdBy;
+    private String asin;
 
 }

@@ -26,7 +26,9 @@ public class VioServiceImpl implements VioService {
     private final SalesRepository salesRepository;
     private final RrrGenerationService rrrGenerationService;
     private final JwtService jwtService;
-
+    private final VehicleRepository vehicleRepository;
+    private final PlateNumberRepository plateNumberRepository;
+    private final PaymentServiceImpl paymentService;
 
 
     @Override
@@ -36,7 +38,9 @@ public class VioServiceImpl implements VioService {
 
     @Override
     public Invoice saveOffenseTypeByPhonenumber(String phoneNumber, List<Long> ids) {
-        PortalUser user = portalUserRepository.findFirstByPhoneNumber(phoneNumber);
+        PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(phoneNumber);
+        Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+
 
         Double totalAmount = 0.0;
         Sales sales1 = new Sales();
@@ -48,7 +52,7 @@ public class VioServiceImpl implements VioService {
         String invoiceNumber = rrrGenerationService.generateNewRrrNumber();
 
         Invoice invoice = new Invoice();
-        invoice.setPayer(user);
+        invoice.setPayer(vehicle.getPortalUser());
         invoice.setInvoiceNumber(invoiceNumber);
         invoice.setAmount(totalAmount);
         invoice.setPaymentStatus(PaymentStatus.NOT_PAID);
@@ -70,10 +74,15 @@ public class VioServiceImpl implements VioService {
             invoiceOffenceRepository.save(invoiceOffenseType);
         }
 
-
+        try {
+            paymentService.sendPaymentTax(savedInvoice.getInvoiceNumber());
+        } catch (Exception e) {
+        }
         sales1.setInvoice(savedInvoice);
         sales1.setCreatedBy(jwtService.user);
         sales1.setPlateType(RegType.OFFENCE);
+        sales1.setVehicle(vehicle);
+        sales1.setInvoice(savedInvoice);
         salesRepository.save(sales1);
         return savedInvoice;
     }
@@ -110,6 +119,12 @@ public class VioServiceImpl implements VioService {
             dto.setApprovalStatus(sales.getApprovalStatus());
             dto.setId(sales.getId());
             dto.setInvoice(sales.getInvoice().getId());
+            dto.setMake(sales.getVehicle().getVehicleModel().getVehicleMake().getName());
+            dto.setModel(sales.getVehicle().getVehicleModel().getName());
+            dto.setChasis(sales.getVehicle().getChasisNumber());
+            dto.setEngine(sales.getVehicle().getEngineNumber());
+            dto.setYear(sales.getVehicle().getYear());
+            dto.setStatus(sales.getInvoice().getPaymentStatus());
             return dto;
 
         }).collect(Collectors.toList());

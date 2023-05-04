@@ -73,7 +73,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
-        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
+//        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
         PortalUser portalUser = null;
 
@@ -109,7 +109,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
         vehicle.setYear(sales.getYear());
-        vehicle.setInsurance(insuranceCompany);
+//        vehicle.setInsurance(insuranceCompany);
         vehicle.setInsuranceNumber(sales.getInsuranceNumber());
         vehicle.setLoad(sales.getLoad());
         vehicle.setCapacity(sales.getCapacity());
@@ -538,7 +538,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         PlateNumberType type = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
-        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
+//        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
         portalUser = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
 
         if (portalUser == null) {
@@ -576,8 +576,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
         vehicle.setYear(sales.getYear());
-        vehicle.setInsurance(insuranceCompany);
-        vehicle.setInsuranceNumber(sales.getInsuranceNumber());
+//        vehicle.setInsurance(insuranceCompany);
+//        vehicle.setInsuranceNumber(sales.getInsuranceNumber());
         vehicle.setLoad(sales.getLoad());
         vehicle.setCapacity(sales.getCapacity());
         Vehicle savedVehicle = vehicleRepository.save(vehicle);

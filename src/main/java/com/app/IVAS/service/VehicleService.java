@@ -37,7 +37,7 @@ public interface VehicleService {
 
     List<SalesDto> searchTaxpayerAssessments(List<Sales> results);
 
-    List<PortalUserPojo> searchTaxpayerAssessment(List<PortalUser> results);
+    List<PortalUserPojo> searchTaxpayerAssessment(List<Sales> results);
 
     List<InvoiceDto> searchAllInvoice(List<Invoice> results);
 
