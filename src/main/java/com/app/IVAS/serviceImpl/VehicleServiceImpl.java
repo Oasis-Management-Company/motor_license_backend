@@ -44,6 +44,7 @@ public class VehicleServiceImpl implements VehicleService {
         List<Vehicle> vehicles = vehicleRepository.findByPortalUser(user);
         List<Invoice> invoices = invoiceRepository.findByPayer(user);
 
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
         dto.setInvoices(invoices);
         dto.setVehicleDtos(vehicles);
         dto.setAddress(user.getAddress());
@@ -52,6 +53,7 @@ public class VehicleServiceImpl implements VehicleService {
         dto.setFirstname(user.getDisplayName());
         dto.setPhonenumber(user.getPhoneNumber());
         dto.setPhoto(user.getImage());
+        dto.setDateString(user.getCreatedAt().format(df));
 
         return dto;
     }
@@ -70,6 +72,7 @@ public class VehicleServiceImpl implements VehicleService {
         dto.setAddress(user.getAddress());
         dto.setPhonenumber(user.getPhoneNumber());
         dto.setEmail(user.getEmail());
+        dto.setAsin(user.getAsin());
         return dto;
     }
 
@@ -328,14 +331,16 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
-    public List<PortalUserPojo> searchTaxpayerAssessment(List<PortalUser> results) {
+    public List<PortalUserPojo> searchTaxpayerAssessment(List<Sales> results) {
         return results.stream().map(user -> {
             PortalUserPojo dto = new PortalUserPojo();
 
-            dto.setName(user.getDisplayName());
-            dto.setPhoneNumber(user.getPhoneNumber());
-            dto.setEmail(user.getEmail());
-            dto.setId(user.getId());
+            dto.setName(user.getInvoice().getPayer().getDisplayName());
+            dto.setPhoneNumber(user.getInvoice().getPayer().getPhoneNumber());
+            dto.setEmail(user.getInvoice().getPayer().getEmail());
+            dto.setId(user.getInvoice().getPayer().getId());
+            dto.setInvoiceNo(user.getInvoice().getInvoiceNumber());
+            dto.setAmount(user.getInvoice().getAmount());
             LocalDateTime dateTime = LocalDateTime.parse(user.getCreatedAt().toString(), DateTimeFormatter.ISO_DATE_TIME);
             DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
             dto.setDateCreated(dateTime.format(outputFormatter));

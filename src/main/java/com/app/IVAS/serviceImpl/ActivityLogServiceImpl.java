@@ -43,7 +43,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
         log.setDescription(description);
         log.setAction(action);
         log.setStatus(GenericStatusConstant.ACTIVE);
-        if (action.equals(ActivityStatusConstant.LOGIN)){
+        if (!action.equals(ActivityStatusConstant.LOGIN)){
             log.setCreatedBy(jwtService.user);
         }
         activityLogRepository.save(log);

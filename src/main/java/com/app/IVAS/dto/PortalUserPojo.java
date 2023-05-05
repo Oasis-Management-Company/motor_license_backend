@@ -24,4 +24,6 @@ public class PortalUserPojo {
     private String firstName;
     private String lastName;
     private String otherNames;
+    private Double amount;
+    private String invoiceNo;
 }
