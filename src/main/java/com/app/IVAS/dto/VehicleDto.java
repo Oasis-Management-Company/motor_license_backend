@@ -14,7 +14,8 @@ public class VehicleDto {
     private String engine;
     private String category;
     private String weight;
-    private  String make;
+    private String make;
+    private Long makeId;
     private String model;
     private String year;
     private String color;

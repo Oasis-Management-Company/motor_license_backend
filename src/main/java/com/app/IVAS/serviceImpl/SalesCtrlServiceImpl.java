@@ -628,6 +628,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         dto.setColor(vehicle.getColor());
         dto.setModel(vehicle.getVehicleModel().getName());
         dto.setMake(vehicle.getVehicleModel().getVehicleMake().getName());
+        dto.setMakeId(vehicle.getVehicleModel().getVehicleMake().getId());
         dto.setCategory(vehicle.getVehicleCategory().getName());
         dto.setCategoryId(vehicle.getVehicleCategory().getId());
         dto.setPlate(vehicle.getPlateNumber().getPlateNumber());

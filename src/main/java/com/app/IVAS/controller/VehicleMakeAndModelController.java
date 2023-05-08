@@ -101,5 +101,18 @@ public class VehicleMakeAndModelController {
         return ResponseEntity.ok("");
     }
 
+    @GetMapping("/all-vehicle-make")
+    public List<VehicleMake> listVehicleMake(){
+
+        return vehicleMakeAndModelService.fetchVehicleMake();
+    }
+
+    @GetMapping("/all-vehicle-model")
+    public List<VehicleModel> listVehicleModel(@RequestParam Long id){
+
+        return vehicleMakeAndModelService.fetchVehicleModel(id);
+    }
+
+
 
 }
