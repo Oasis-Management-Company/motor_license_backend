@@ -6,6 +6,7 @@ import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.DashboardDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QInvoice;
+import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QSales;
@@ -61,7 +62,7 @@ public class DashboardServiceImpl implements DashboardCtrlService {
         JPAQuery<ZonalOffice> zonalOfficeJPAQuery = appRepository.startJPAQuery(QZonalOffice.zonalOffice);
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.like("PLATE NUMBER REGISTRATION"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.like("PLATE NUMBER VEHICLE"))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         JPAQuery<Invoice> invoices = appRepository.startJPAQuery(QInvoice.invoice)

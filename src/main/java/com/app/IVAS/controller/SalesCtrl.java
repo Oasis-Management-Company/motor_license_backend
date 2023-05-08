@@ -273,7 +273,6 @@ public class SalesCtrl {
     public SalesDto GetQRCode(@RequestParam String invoiceNo){
         SalesDto salesDto = new SalesDto();
         salesDto.setQrCode(qrCodeService.base64CertificateQrCode(invoiceNo));
-
         return salesDto;
     }
 

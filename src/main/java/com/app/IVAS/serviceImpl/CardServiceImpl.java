@@ -273,7 +273,7 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("barcode", qrCode);
             extraParameter.put("capacity", card.getVehicle().getPassengers());
             extraParameter.put("weight", card.getVehicle().getLoad());
-            extraParameter.put("policy", card.getVehicle().getInsurance().getName().substring(0, 20)+"...");
+//            extraParameter.put("policy", card.getVehicle().getInsurance().getName().substring(0, 20)+"...");
             if(card.getVehicle().getInsuranceNumber() != null){
                 extraParameter.put("insurance", card.getVehicle().getInsuranceNumber());
             }else{
@@ -323,7 +323,7 @@ public class CardServiceImpl implements CardService {
             throw new Exception("file not found");
         }
 
-        return pdfRenderToMultiplePages.loadFileAsResource(appConfigurationProperties.getPrintDirectory() +"/"+ fileName);
+        return pdfRenderToMultiplePages.loadFileAsResource(appConfigurationProperties.getPrintDirectory() + fileName);
     }
 
     private String getTemplate(CardTypeConstant type){
@@ -379,8 +379,8 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("barcode", qrCode);
             extraParameter.put("capacity", invoiceServiceType.getInvoice().getVehicle().getPassengers());
             extraParameter.put("weight", invoiceServiceType.getInvoice().getVehicle().getLoad());
-            extraParameter.put("policy", invoiceServiceType.getInvoice().getVehicle().getInsurance().getName());
-            extraParameter.put("insurance", invoiceServiceType.getInvoice().getVehicle().getInsuranceNumber());
+//            extraParameter.put("policy", invoiceServiceType.getInvoice().getVehicle().getInsurance().getName());
+//            extraParameter.put("insurance", invoiceServiceType.getInvoice().getVehicle().getInsuranceNumber());
             extraParameter.put("permit", invoiceServiceType.getInvoice().getVehicle().getPermit());
             extraParameter.put("invoice", invoiceServiceType.getInvoice().getInvoiceNumber());
 //            extraParameter.put("expiry", invoiceServiceType.getExpiryDate());

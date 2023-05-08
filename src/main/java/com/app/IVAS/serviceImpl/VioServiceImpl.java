@@ -10,6 +10,7 @@ import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -37,6 +38,7 @@ public class VioServiceImpl implements VioService {
     }
 
     @Override
+    @Transactional
     public Invoice saveOffenseTypeByPhonenumber(String phoneNumber, List<Long> ids) {
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(phoneNumber);
         Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
