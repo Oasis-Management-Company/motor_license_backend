@@ -17,6 +17,8 @@ public interface VehicleMakeAndModelService {
 
     List<VehicleModel> getVehicleModels(List<VehicleModel> vehicleModels);
 
+    List<VehicleMake> fetchVehicleMake();
 
+    List<VehicleModel> fetchVehicleModel(Long id);
 
 }

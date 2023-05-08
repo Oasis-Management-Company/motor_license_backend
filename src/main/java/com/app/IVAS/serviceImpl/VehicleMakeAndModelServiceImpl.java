@@ -86,5 +86,19 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
         return vehicleModels;
     }
 
+    @Override
+    public List<VehicleMake> fetchVehicleMake() {
+
+        return vehicleMakeRepository.findAll();
+    }
+
+    @Override
+    public List<VehicleModel> fetchVehicleModel(Long id) {
+
+        Optional<VehicleMake> vehicleMake = vehicleMakeRepository.findById(id);
+
+        return vehicleModelRepository.findAllByVehicleMake(vehicleMake.get());
+    }
+
 
 }
