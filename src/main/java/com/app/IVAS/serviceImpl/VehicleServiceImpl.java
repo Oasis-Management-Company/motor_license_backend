@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +37,8 @@ public class VehicleServiceImpl implements VehicleService {
     private final RrrGenerationService rrrGenerationService;
     private final PaymentServiceImpl paymentService;
     private final CardService cardService;
+    private final VehicleModelRepository vehicleModelRepository;
+    private final VehicleMakeRepository vehicleMakeRepository;
 
     @Override
     public InvoiceDto getUserVehicleDetails(Long id) {
@@ -80,7 +83,12 @@ public class VehicleServiceImpl implements VehicleService {
     public Vehicle saveEditedVehicle(VehicleDto vehicleDto) {
         Vehicle editVehicle = new Vehicle();
         Vehicle vehicle = vehicleRepository.findById(vehicleDto.getParent()).get();
+        Optional<VehicleMake> vehicleMake = vehicleMakeRepository.findById(vehicleDto.getMakeId());
+        Optional<VehicleModel> vehicleModel = vehicleModelRepository.findById(vehicleDto.getModelId());
 
+        System.out.println(vehicleDto.getModelId());
+
+        editVehicle.setVehicleModel(vehicleModel.get());
         editVehicle.setYear(vehicleDto.getYear());
         editVehicle.setColor(vehicleDto.getColor());
         editVehicle.setChasisNumber(vehicleDto.getChasis());
@@ -92,7 +100,7 @@ public class VehicleServiceImpl implements VehicleService {
         editVehicle.setCreatedBy(jwtService.user);
         editVehicle.setPortalUser(vehicle.getPortalUser());
         editVehicle.setPlateNumber(vehicle.getPlateNumber());
-        editVehicle.setVehicleModel(vehicle.getVehicleModel());
+//        editVehicle.setVehicleModel(vehicle.getVehicleModel());
 
         vehicleRepository.save(editVehicle);
 
@@ -450,6 +458,7 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle news = vehicleRepository.findFirstByParentId(id);
 
         if (type.equalsIgnoreCase("Approval")){
+            old.setVehicleModel(news.getVehicleModel() == old.getVehicleModel() ? old.getVehicleModel() : news.getVehicleModel());
             old.setVehicleCategory(news.getVehicleCategory() == old.getVehicleCategory() ? old.getVehicleCategory() : news.getVehicleCategory());
             old.setColor(news.getColor() == old.getColor() ? old.getColor() : news.getColor());
             old.setChasisNumber(news.getChasisNumber()== old.getChasisNumber() ? old.getChasisNumber() : news.getChasisNumber());
