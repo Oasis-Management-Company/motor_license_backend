@@ -58,16 +58,10 @@ public class VehicleMakeAndModelController {
 
         vehicleModelJPAQuery.where(QVehicleModel.vehicleModel.vehicleMake.name.equalsIgnoreCase(filter.getName()));
 
-       // vehicleModelJPAQuery.where(QVehicleModel.vehicleModel.vehicleMake.)
-
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("name"), QVehicleModel.vehicleModel);
         QueryResults<VehicleModel> vehicleModelQueryResults = vehicleModelJPAQuery.select(QVehicleModel.vehicleModel).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(vehicleMakeAndModelService.getVehicleModels(vehicleModelQueryResults.getResults()), vehicleModelQueryResults.getLimit(), vehicleModelQueryResults.getOffset(), vehicleModelQueryResults.getTotal());
     }
-
-
-
-
 
     @GetMapping("/search-vehicle-make")
     public QueryResults<VehicleMake> searchVehicleMake(VehicleMakeSearchFilter filter) {

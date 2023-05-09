@@ -17,6 +17,7 @@ public class VehicleDto {
     private String make;
     private Long makeId;
     private String model;
+    private Long modelId;
     private String year;
     private String color;
     private String plate;
