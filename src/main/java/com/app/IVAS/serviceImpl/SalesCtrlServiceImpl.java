@@ -75,6 +75,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
 //        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
+
+        if(sales.getSelectInsurance().equalsIgnoreCase("Yes")){
+            serviceTypes.addAll(serviceTypeRepository.findAllByRegType(RegType.INSURANCE));
+        }
         PortalUser portalUser = null;
 
         PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), sales.getEmail());
@@ -665,11 +669,16 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
     @Override
-    public List<ServiceType> getServiceByCatandPlate(Long cat, Long plate) {
+    public List<ServiceType> getServiceByCatandPlate(Long cat, Long plate, String selectInsurance) {
 
         VehicleCategory category = vehicleCategoryRepository.findById(cat).get();
         PlateNumberType plateNumber = plateNumberTypeRepository.findById(plate).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, plateNumber, RegType.REGISTRATION, RegType.COMPULSARY);
+
+        if(selectInsurance.equalsIgnoreCase("Yes")){
+            serviceTypes.addAll(serviceTypeRepository.findAllByRegType(RegType.INSURANCE));
+        }
+
         return serviceTypes;
     }
 

@@ -56,7 +56,7 @@ public interface SalesCtrlService {
 
     InvoiceDto getVehicleOwnerDetails(Long invoiceId);
 
-    List<ServiceType> getServiceByCatandPlate(Long cat, Long plate);
+    List<ServiceType> getServiceByCatandPlate(Long cat, Long plate, String selectInsurance);
 
     SalesDto viewSale(Long id);
 
