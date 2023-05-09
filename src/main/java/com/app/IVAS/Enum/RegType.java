@@ -7,5 +7,6 @@ public enum RegType {
     OTHERS,
     COMPULSARY,
     OFFENCE,
-    EDIT
+    EDIT,
+    INSURANCE
 }

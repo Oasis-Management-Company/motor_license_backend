@@ -52,4 +52,6 @@ public class SalesDto {
     private String invoiceNo;
     private String qrCode;
 
+    private String selectInsurance;
+
 }
