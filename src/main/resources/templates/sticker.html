@@ -45,7 +45,7 @@ position: absolute;
 font-size: 18px;
 font-family: arial;
 font-weight: bolder;">
-<span>ANAMBRA STATE <span>AWK - 458MT</span>
+<span>ANAMBRA STATE <span  th:text="${#strings.toUpperCase(plate)}">AWK - 458MT</span>
 </span>
 </span>
         <span style="    top: 70px;
@@ -141,7 +141,7 @@ font-weight: bold;
 line-height: normal;
 font-stretch: normal;
 text-decoration: none;">
-<span th:text="${#strings.toUpperCase(expiry)}">2023-04-10</span>
+<span th:text="${#strings.toUpperCase(rwexpiry)}">2023-04-10</span>
 </span>
         <span style="
 top: 140px;
@@ -157,7 +157,7 @@ font-family: arial;
 /*    font-weight: bold;*/
 line-height: normal;
 font-stretch: normal;
-text-decoration: none; "><span th:text="${#strings.toUpperCase(permit)}">Permits:</span></span>
+text-decoration: none; "><span>Permits:</span></span>
         <span style="
 top: 140px;
 left: 60px;
@@ -173,7 +173,7 @@ font-weight: bold;
 line-height: normal;
 font-stretch: normal;
 text-decoration: none;">
-<span>Heavy Duty</span>
+<span th:text="${#strings.toUpperCase(permit)}">Heavy Duty</span>
 </span>
         <span style="
 top: 160px;
@@ -190,14 +190,14 @@ font-weight: bold;
 line-height: normal;
 font-stretch: normal;
 text-decoration: none;">
-<span>Insured</span>
+<span th:text="${#strings.toUpperCase(insured)}"></span>
 </span>
     </div>
     </span>
-    <img src="frame(4).png" style="position: absolute;left: 340px;margin-top: -180px;" width="80px">
+    <img th:src="${barcode}" src="img/frame(4).png" style="position: absolute;left: 340px; top:380px" width="80px">
 </div>
 <span style="
-top: 470px;
+top: 455px;
 left: 160px;
 font-size: 6px;
 position: absolute;

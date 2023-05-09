@@ -34,6 +34,9 @@ public class Card extends StatusEntity {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime expiryDate;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime rwExpiryDate;
+
     @Enumerated(EnumType.STRING)
     private RegType regType = RegType.REGISTRATION;
 }

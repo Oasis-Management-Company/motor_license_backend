@@ -18,12 +18,16 @@ import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.DashboardCtrlService;
+import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -49,10 +53,19 @@ public class DashboardServiceImpl implements DashboardCtrlService {
     @Override
     public DashboardDto DashboardReport() {
 
+        LocalDate now = LocalDate.now();
         DashboardDto dto = new DashboardDto();
         Double totalAmount = 0.0;
         Double totalPlateAmount = 0.0;
         List<Double> amounts = new ArrayList<>();
+        Double mytoday = 0.0;
+        Double mythisWeek = 0.0;
+        Double mythisMonth = 0.0;
+        Double mythisYear = 0.0;
+        Double mypToday  = 0.0;
+        Double mypThisWeek = 0.0;
+        Double mypThisMonth = 0.0;
+        Double mypThisYear = 0.0;
 
         JPAQuery<Stock> stockJPAQuery = appRepository.startJPAQuery(QStock.stock);
         JPAQuery<Sales> salesJPAQuery = appRepository.startJPAQuery(QSales.sales);
@@ -62,10 +75,64 @@ public class DashboardServiceImpl implements DashboardCtrlService {
         JPAQuery<ZonalOffice> zonalOfficeJPAQuery = appRepository.startJPAQuery(QZonalOffice.zonalOffice);
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.like("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
+        JPAQuery<InvoiceServiceType> pToday = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(LocalDate.now().atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(LocalDate.now().atStartOfDay().plusHours(24)))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+
+        LocalDate date = now.with(DayOfWeek.SUNDAY);
+        JPAQuery<InvoiceServiceType> pThisWeek = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(date.minusDays(7).atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(date.atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+        LocalDate month = now.withDayOfMonth(1);
+        LocalDate end = now.withDayOfMonth(now.getMonth().length(now.isLeapYear()));
+        JPAQuery<InvoiceServiceType> pThisMonth = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(month.atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(end.plusDays(1).atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+        Date d=new Date();
+        int currentYear=d.getYear()+1900;
+        Year startyear = Year.parse(String.valueOf(currentYear));
+        LocalDate startdate = startyear.atDay(1);
+        LocalDate endYear = startyear.atDay(365);
+        JPAQuery<InvoiceServiceType> pThisYear = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(startdate.atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(endYear.atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+
         JPAQuery<Invoice> invoices = appRepository.startJPAQuery(QInvoice.invoice)
+                .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+        JPAQuery<Invoice> Today = appRepository.startJPAQuery(QInvoice.invoice)
+                .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID))
+                .where(QInvoice.invoice.paymentDate.goe(LocalDate.now().atStartOfDay()))
+                .where(QInvoice.invoice.paymentDate.loe(LocalDate.now().atStartOfDay().plusHours(24)));
+
+        JPAQuery<Invoice> ThisWeek = appRepository.startJPAQuery(QInvoice.invoice)
+                .where(QInvoice.invoice.paymentDate.goe(date.minusDays(7).atStartOfDay()))
+                .where(QInvoice.invoice.paymentDate.loe(date.atStartOfDay()))
+                .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+        JPAQuery<Invoice> ThisMonth = appRepository.startJPAQuery(QInvoice.invoice)
+                .where(QInvoice.invoice.paymentDate.goe(month.atStartOfDay()))
+                .where(QInvoice.invoice.paymentDate.loe(end.plusDays(1).atStartOfDay()))
+                .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+        JPAQuery<Invoice> ThisYear = appRepository.startJPAQuery(QInvoice.invoice)
+                .where(QInvoice.invoice.paymentDate.goe(startdate.atStartOfDay()))
+                .where(QInvoice.invoice.paymentDate.loe(endYear.atStartOfDay()))
                 .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
@@ -103,7 +170,30 @@ public class DashboardServiceImpl implements DashboardCtrlService {
             for (InvoiceServiceType fetch : invoiceServiceTypeJPAQuery.fetch()) {
                 totalPlateAmount += fetch.getServiceType().getPrice();
             }
-
+            for (InvoiceServiceType fetch : pToday.fetch()) {
+                mypToday += fetch.getAmount();
+            }
+            for (InvoiceServiceType fetch : pThisWeek.fetch()) {
+                mypThisWeek += fetch.getAmount();
+            }
+            for (InvoiceServiceType fetch : pThisMonth.fetch()) {
+                mypThisMonth += fetch.getAmount();
+            }
+            for (InvoiceServiceType fetch : pThisYear.fetch()) {
+                mypThisYear += fetch.getAmount();
+            }
+            for (Invoice fetch : Today.fetch()) {
+                mytoday += fetch.getAmount();
+            }
+            for (Invoice fetch : ThisWeek.fetch()) {
+                mythisWeek += fetch.getAmount();
+            }
+            for (Invoice fetch : ThisMonth.fetch()) {
+                mythisMonth += fetch.getAmount();
+            }
+            for (Invoice fetch : ThisYear.fetch()) {
+                mythisYear += fetch.getAmount();
+            }
             dto.setTotalStock(stockJPAQuery.fetch().size());
             dto.setTotalSales(salesJPAQuery.fetch().size());
             dto.setTotalRequest(plateNumberRequestJPAQuery1.fetch().size());
@@ -112,7 +202,14 @@ public class DashboardServiceImpl implements DashboardCtrlService {
             dto.setTotalPlateAmount(totalPlateAmount);
             dto.setTotalMla(portalUserJPAQuery.fetch().size());
             dto.setTotalStations(zonalOfficeJPAQuery.fetch().size());
-
+            dto.setPToday(mypToday);
+            dto.setPThisWeek(mypThisWeek);
+            dto.setPThisMonth(mypThisMonth);
+            dto.setPThisYear(mypThisYear);
+            dto.setToday(mytoday);
+            dto.setThisWeek(mythisWeek);
+            dto.setThisMonth(mythisMonth);
+            dto.setThisYear(mythisYear);
             return dto;
         }
         dto.setTotalMla(0);

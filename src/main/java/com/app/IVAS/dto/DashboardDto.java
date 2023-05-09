@@ -12,4 +12,13 @@ public class DashboardDto {
     private int totalRequest;
     private Double totalPlateAmount;
     private Double totalAmount;
+    private Double today;
+    private Double thisWeek;
+    private Double thisMonth;
+    private Double thisYear;
+    private Double pToday;
+    private Double pThisWeek;
+    private Double pThisMonth;
+    private Double pThisYear;
+
 }
