@@ -54,7 +54,9 @@ public class ReportServiceImpl implements ReportService {
         for (Sales salesList: sales){
 
             InvoiceServiceType invoiceService = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(salesList.getInvoice()).and(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER VEHICLE")))
+                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(salesList.getInvoice())
+                            .and(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER VEHICLE")
+                                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER MOTORCYCLE"))))
                     .fetchFirst();
 
            if (invoiceService != null){

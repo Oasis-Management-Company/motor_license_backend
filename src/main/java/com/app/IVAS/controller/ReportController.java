@@ -90,7 +90,9 @@ public class ReportController {
 
         for (Sales sales:salesListJPAQuery.fetch()){
             InvoiceServiceType invoiceService = appRepository.startJPAQuery(com.app.IVAS.entity.QInvoiceServiceType.invoiceServiceType)
-                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(sales.getInvoice()).and(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("PLATE NUMBER VEHICLE")))
+                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(sales.getInvoice())
+                            .and(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER VEHICLE")
+                                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER MOTORCYCLE"))))
                     .fetchFirst();
             if (invoiceService != null){
                 prices.add(invoiceService.getServiceType().getPrice());
@@ -169,14 +171,16 @@ public class ReportController {
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notLike("PLATE NUMBER VEHICLE%"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notLike("PLATE NUMBER MOTORCYCLE%"))
                 .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull())
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
         JPAQuery<InvoiceServiceType> typeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notLike("PLATE NUMBER VEHICLE%"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notLike("PLATE NUMBER MOTORCYCLE%"))
                 .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull());
 
         if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
@@ -216,20 +220,20 @@ public class ReportController {
 
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("PaymentDate"), QInvoiceServiceType.invoiceServiceType);
         QueryResults<InvoiceServiceType> invoiceServiceTypeQueryResults = invoiceServiceTypeJPAQuery.select(QInvoiceServiceType.invoiceServiceType).distinct().orderBy(sortedColumn).fetchResults();
-        return new QueryResultsPojo<>(reportService.getServiceSales(invoiceServiceTypeQueryResults.getResults()), invoiceServiceTypeQueryResults.getLimit(), invoiceServiceTypeQueryResults.getOffset(), invoiceServiceTypeQueryResults.getTotal(), invoiceServiceTypeQueryResults.isEmpty(), null, prices.stream().mapToDouble(Double::doubleValue).sum());
+        return new QueryResultsPojo<>(reportService.getServiceSales(invoiceServiceTypeQueryResults.getResults()), invoiceServiceTypeQueryResults.getLimit(), invoiceServiceTypeQueryResults.getOffset(), invoiceServiceTypeQueryResults.getTotal(), invoiceServiceTypeQueryResults.isEmpty(), null, prices.size() > 0 ? prices.stream().mapToDouble(Double::doubleValue).sum() : 0.00);
     }
 
     private void getVIOService(JPAQuery<InvoiceServiceType> typeJPAQuery) {
-        typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("LEARNER PERMIT")
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("STICKER"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("ROADWORTHINESS/COMPUTERIZED VEHICLE"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("VEHICLE TEST/ROADWORTHINESS"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("TEST-MOTORCYCLE/KEKE"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("TRICYCLE DRIVING TEST FEE"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("RENEWAL OF DRIVING TEST FEE"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("RENEWAL OF TRICYCLE DRIVING TEST FEE"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("DRIVING TEST"))
-                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("DRIVERS TEST")));
+        typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("LEARNER PERMIT")
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.equalsIgnoreCase("VEHICLE REG -VEHICLE TEST/ROAD WORTHINESS (PRIVATE)"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("ROADWORTHINESS/COMPUTERIZED VEHICLE"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("VEHICLE TEST/ROADWORTHINESS"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("Test-MotorCycle/KEKE"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("TRICYCLE DRIVING TEST FEE"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("RENEWAL OF DRIVING TEST FEE"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("RENEWAL OF TRICYCLE DRIVING TEST FEE"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("DRIVERS TEST"))
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("DRIVING TEST FEE")));
     }
 
     @GetMapping("/search/vio-report")
@@ -474,7 +478,8 @@ public class ReportController {
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notLike("PLATE NUMBER VEHICLE%"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notLike("PLATE NUMBER MOTORCYCLE%"))
                 .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull());
 
 
