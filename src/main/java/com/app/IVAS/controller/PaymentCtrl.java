@@ -2,6 +2,7 @@ package com.app.IVAS.controller;
 
 
 import com.app.IVAS.dto.*;
+import com.app.IVAS.entity.InsuranceResponse;
 import com.app.IVAS.entity.Invoice;
 import com.app.IVAS.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,12 @@ public class PaymentCtrl {
     public ResponseEntity<AssessmentResponse> PaymentReturn(@RequestBody PaymentResponse respondDto) {
         AssessmentResponse assessmentResponse = paymentService.PaymentReturn(respondDto);
         return new ResponseEntity<>(assessmentResponse, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/insurance/send")
+    public ResponseEntity<?> sendInsuranceToVendor(@RequestParam String plate,@RequestParam String invoiceNumber){
+        System.out.println(plate);
+        InsuranceResponse dto = paymentService.sendInsuranceToVendor(plate,invoiceNumber);
+        return ResponseEntity.ok(dto);
     }
 }

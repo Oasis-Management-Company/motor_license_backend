@@ -5,15 +5,10 @@ import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.OkHttp3Util;
+import com.app.IVAS.Utils.Utils;
 import com.app.IVAS.dto.*;
-import com.app.IVAS.entity.Card;
-import com.app.IVAS.entity.Invoice;
-import com.app.IVAS.entity.InvoiceServiceType;
-import com.app.IVAS.entity.PaymentHistory;
-import com.app.IVAS.repository.CardRepository;
-import com.app.IVAS.repository.InvoiceRepository;
-import com.app.IVAS.repository.InvoiceServiceTypeRepository;
-import com.app.IVAS.repository.PaymentHistoryRepository;
+import com.app.IVAS.entity.*;
+import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.CardService;
 import com.app.IVAS.service.PaymentService;
@@ -47,11 +42,20 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${payment-password}")
     private String password;
 
+    @Value("${insurance-username}")
+    private String insuranceusername;
+
+    @Value("${insurance-password}")
+    private String insurancepassword;
+
     private final InvoiceRepository invoiceRepository;
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final CardRepository cardRepository;
     private final CardService cardService;
+    private final VehicleRepository vehicleRepository;
+    private final PlateNumberRepository plateNumberRepository;
+    private final InsuranceResponserepo insuranceResponserepo;
 
     @Value("${payment.domain}")
     private String paymentDomain;
@@ -63,7 +67,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String sendPaymentTax(String invoice) {
-        System.out.println("Steepped into this");
         try{
 
             String baseUrl = "http://41.207.248.189:8084/api/external/authenticate";
@@ -169,6 +172,7 @@ public class PaymentServiceImpl implements PaymentService {
     public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
         AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
+        Boolean insurance = false;
 
         PaymentHistory history = paymentHistoryRepository.findFirstByPaymentReference(respondDto.getPaymentReference());
 
@@ -217,14 +221,19 @@ public class PaymentServiceImpl implements PaymentService {
         List<InvoiceServiceType> serviceType = invoiceServiceTypeRepository.findByInvoice(invoice);
 
         for (InvoiceServiceType invoiceServiceType : serviceType) {
+            if (invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
+                insurance = true;
+            }
             invoiceServiceType.setPaymentDate(dateTime);
             invoiceServiceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
-
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
         try{
             cardService.updateCardByPayment(respondDto.getCustReference(), Double.valueOf(respondDto.getAmount()));
+            if (insurance){
+                sendInsuranceToVendor(invoice.getVehicle().getPlateNumber().getPlateNumber(), invoice.getInvoiceNumber());
+            }
         }catch (Exception e){
             System.out.println(e);
         }
@@ -240,5 +249,96 @@ public class PaymentServiceImpl implements PaymentService {
         assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
 
         return assessmentResponse;
+    }
+
+    @Override
+    public InsuranceResponse sendInsuranceToVendor(String plate, String invoiceNumber) {
+        System.out.println(plate);
+        try{
+
+            String baseUrl = "https://ieiplcng.azurewebsites.net/api/Auth/Login";
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Accept", "application/json");
+            headers.add("Content-Type", "application/json");
+            PaymentLoginDto paymentLoginDto = new PaymentLoginDto();
+
+            paymentLoginDto.setUsername(insuranceusername);
+            paymentLoginDto.setPassword(insurancepassword);
+
+            String result = restTemplate.postForObject(baseUrl, paymentLoginDto, String.class);
+
+            Gson gson = new Gson();
+            PaymentRespondDto responseToken = gson.fromJson(result, PaymentRespondDto.class);
+
+
+            MultiValueMap<String, String> headersAuth = new LinkedMultiValueMap<String, String>();
+            Map map = new HashMap<String, String>();
+            map.put("Content-Type", "application/json");
+            map.put("Authorization", "Bearer "+responseToken.getToken());
+            headersAuth.setAll(map);
+
+            String url ="https://ieiplcng.azurewebsites.net/api/Insurance/BuyInsurance";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
+            Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+            Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoiceNumber);
+
+            String PhoneNumber = Utils.removeFirstChar(vehicle.getPortalUser().getPhoneNumber());
+            InsuranceDto dto = new InsuranceDto();
+            dto.setAdddress(vehicle.getPortalUser().getAddress());
+            dto.setChassisNumber(vehicle.getChasisNumber());
+            dto.setEngineNumber(vehicle.getEngineNumber());
+            dto.setEngine_capacity(vehicle.getCapacity());
+            dto.setEmailAddress(vehicle.getPortalUser().getEmail());
+            dto.setRegistration_center("AWKA");
+            dto.setRegistrationNumber(vehicle.getPlateNumber().getPlateNumber());
+            dto.setRegistration_date(vehicle.getCreatedAt().format(formatter));
+            dto.setInsuranceType("MCO");
+            dto.setCategory(vehicle.getLoad());
+            dto.setFullname(vehicle.getPortalUser().getDisplayName());
+            dto.setMobileNumber("234"+PhoneNumber);
+            dto.setGender("Male");
+            dto.setOccupation("NONE");
+            dto.setType(vehicle.getPlateNumber().getType().getName());
+            dto.setYearOfMake(vehicle.getYear());
+            dto.setVehicleMake(vehicle.getVehicleModel().getVehicleMake().getName());
+            dto.setVehicleModel(vehicle.getVehicleModel().getName());
+            dto.setVehicleColour(vehicle.getColor());
+            dto.setState("Anambra");
+            dto.setPlate(vehicle.getPlateNumber().getPlateNumber());
+
+
+            System.out.println(dto);
+
+            HttpEntity entity = new HttpEntity(new Gson().toJson(dto), headersAuth);
+            try {
+                InsuranceResponse personResultAsJsonStr = restTemplate.postForObject(url, entity, InsuranceResponse.class);
+                personResultAsJsonStr.setVehicle(vehicle);
+                personResultAsJsonStr.setInvoice(invoice);
+
+                insuranceResponserepo.save(personResultAsJsonStr);
+
+                restTemplate.setErrorHandler(new ResponseErrorHandler() {
+                    @Override
+                    public boolean hasError(ClientHttpResponse response) throws IOException {
+                        return false;
+                    }
+
+                    @Override
+                    public void handleError(ClientHttpResponse response) throws IOException {
+                        // do nothing, or something
+                    }
+                });
+
+                System.out.println("Here is the response:::" + personResultAsJsonStr);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }catch(Exception e){
+            return null;
+        }
     }
 }

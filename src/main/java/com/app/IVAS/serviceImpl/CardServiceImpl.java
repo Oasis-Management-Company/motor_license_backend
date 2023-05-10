@@ -5,10 +5,7 @@ import com.app.IVAS.Utils.HtmlToPdfCreator;
 import com.app.IVAS.Utils.PDFRenderToMultiplePages;
 import com.app.IVAS.configuration.AppConfigurationProperties;
 import com.app.IVAS.dto.*;
-import com.app.IVAS.entity.Card;
-import com.app.IVAS.entity.Invoice;
-import com.app.IVAS.entity.InvoiceServiceType;
-import com.app.IVAS.entity.Vehicle;
+import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
@@ -46,6 +43,7 @@ public class CardServiceImpl implements CardService {
     private final JwtService jwtService;
     private final CardRepository cardRepository;
     private final ActivityLogService activityLogService;
+    private final InsuranceResponserepo insuranceResponserepo;
 
     @Value("${asin_verify}")
     private String asin_verify;
@@ -197,10 +195,9 @@ public class CardServiceImpl implements CardService {
                 /*Update cards **/
                 if (cards.isPresent()) {
                     for (Card card: cards.get()) {
-
                         card.setStatus(GenericStatusConstant.ACTIVE);
                         card.setCardStatus(CardStatusConstant.NOT_PRINTED);
-                        if (card.getVehicle().getPlateNumber().getType().getName().contains("Commercial")){
+                        if (card.getVehicle().getPlateNumber().getType().getName().contains("COMMERCIAL")){
                             card.setRwExpiryDate(LocalDateTime.now().plusMonths(6).minusDays(1));
                         }else{
                             card.setRwExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
@@ -209,7 +206,6 @@ public class CardServiceImpl implements CardService {
                         cardRepository.save(card);
                         activityLogService.createActivityLog(("Card for " + card.getInvoice().getPayer()  + " was updated"), ActivityStatusConstant.UPDATE);
                     }
-
                     return cards.get();
                 }
 
@@ -245,10 +241,12 @@ public class CardServiceImpl implements CardService {
     public Resource printCard(List<PrintDto> dtos) throws Exception {
         List<PdfDto> pdfDtos = dtos.stream().map(printDto -> {
             Card card = cardRepository.findById(printDto.getId()).orElseThrow(RuntimeException::new);
+            InsuranceResponse response = insuranceResponserepo.findFirstByVehicle(card.getVehicle());
 
             Map<String, Object> extraParameter = new TreeMap<>();
             String templateName = getTemplate(printDto.getType());
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
+            Boolean insurance;
 
             String dataValue = asin_verify+"="+card.getInvoice().getInvoiceNumber();
             String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
@@ -269,13 +267,13 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("category", card.getVehicle().getVehicleCategory().getName());
             extraParameter.put("type", card.getVehicle().getPlateNumber().getType().getName());
             extraParameter.put("color", card.getVehicle().getColor());
-            extraParameter.put("created", card.getCreatedAt().format(df));
+            extraParameter.put("created", card.getInvoice().getPaymentDate().format(df));
             extraParameter.put("barcode", qrCode);
             extraParameter.put("capacity", card.getVehicle().getPassengers());
             extraParameter.put("weight", card.getVehicle().getLoad());
 //            extraParameter.put("policy", card.getVehicle().getInsurance().getName().substring(0, 20)+"...");
-            if(card.getVehicle().getInsuranceNumber() != null){
-                extraParameter.put("insurance", card.getVehicle().getInsuranceNumber());
+            if(response != null){
+                extraParameter.put("insurance", response.getPolicyNumber());
                 extraParameter.put("insured", "Insured");
             }else{
                 extraParameter.put("insurance", "N/A");

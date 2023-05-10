@@ -56,7 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/verification/invoice/view/**",
                         "/api/payment/send/**",
                         "/api/payment/send",
-                        "/api/payment/respondse/payment"
+                        "/api/payment/respondse/payment",
+                        "/api/payment/insurance/send"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()

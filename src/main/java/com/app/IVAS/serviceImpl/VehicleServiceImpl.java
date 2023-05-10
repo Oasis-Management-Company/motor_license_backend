@@ -163,6 +163,7 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setRevenuecode(serviceType.getCode());
             invoiceServiceType.setReference(invoiceNumber);
             invoiceServiceType.setRegType(RegType.RENEWAL);
+            invoiceServiceType.setAmount(serviceType.getPrice());
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
