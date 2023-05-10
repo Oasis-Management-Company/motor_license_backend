@@ -9,4 +9,6 @@ import java.util.List;
 public interface ZonalOfficeRepository extends JpaRepository<ZonalOffice, Long> {
 
     List<ZonalOffice> findByZone(Zone zone);
+
+    ZonalOffice findByName(String name);
 }

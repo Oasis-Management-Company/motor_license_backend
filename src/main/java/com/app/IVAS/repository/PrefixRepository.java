@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PrefixRepository extends JpaRepository<Prefix, Long> {
+    Prefix findByCode(String name);
 }
