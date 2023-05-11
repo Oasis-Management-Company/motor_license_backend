@@ -2,22 +2,19 @@ package com.app.IVAS.controller;
 
 import com.app.IVAS.Enum.ActivityStatusConstant;
 import com.app.IVAS.Enum.GenericStatusConstant;
+import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.Enum.RegType;
-import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.PlateNumberDto;
-import com.app.IVAS.dto.PortalUserPojo;
-import com.app.IVAS.dto.UserDto;
+import com.app.IVAS.dto.data_transfer.DataTransferAssign;
 import com.app.IVAS.dto.data_transfer.DataTransferStock;
 import com.app.IVAS.dto.data_transfer.DataTransferUser;
+import com.app.IVAS.entity.PlateNumber;
+import com.app.IVAS.entity.PlateNumberRequest;
 import com.app.IVAS.entity.userManagement.PortalUser;
-import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
-import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.security.PasswordService;
-import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.PlateNumberService;
-import com.app.IVAS.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 
 @Slf4j
@@ -47,6 +42,8 @@ public class DataExportController {
     private final PortalUserRepository portalUserRepository;
     private final ZonalOfficeRepository zonalOfficeRepository;
     private final PasswordService passwordService;
+    private final PlateNumberRepository plateNumberRepository;
+    private final JwtService jwtService;
 
 
     @PostMapping("/create")
@@ -62,6 +59,8 @@ public class DataExportController {
             portalUser.setUsername(dto.getEmail());
             portalUser.setStatus(GenericStatusConstant.ACTIVE);
             portalUser.setPhoneNumber(dto.getPhone());
+            portalUser.setUserVerified(false);
+            portalUser.setAddress("12 parakou street");
             portalUser.setGeneratedPassword(passwordService.hashPassword("password"));
             portalUser.setRegType(RegType.REGISTRATION);
 
@@ -111,6 +110,28 @@ public class DataExportController {
             }
         }
 
+        return ResponseEntity.ok("");
+    }
+
+    @PostMapping("/plate-assignment")
+    @Transactional
+    public ResponseEntity<?> transferAssigment(@RequestBody List<DataTransferAssign> dtos){
+        for (DataTransferAssign  dto:dtos){
+            PortalUser mla = portalUserRepository.findFirstByUsernameIgnoreCase(dto.getMla());
+            PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(dto.getPlatenumber());
+           if (mla != null && plateNumber != null){
+               plateNumber.setAgent(mla);
+               plateNumber.setPlateNumberStatus(PlateNumberStatus.ASSIGNED);
+               plateNumber.setLastUpdatedBy(jwtService.user);
+               plateNumberRepository.save(plateNumber);
+               log.info("============ plate number assigned ================" + dto.getPlatenumber());
+           } else if (mla == null){
+               log.info("============ invalid user ================" + dto.getMla());
+
+           } else {
+               log.info("============ invalid plate ================" + dto.getPlatenumber());
+           }
+        }
         return ResponseEntity.ok("");
     }
 }

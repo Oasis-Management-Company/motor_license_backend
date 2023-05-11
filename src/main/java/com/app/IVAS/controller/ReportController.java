@@ -86,6 +86,14 @@ public class ReportController {
             salesListJPAQuery.where(QSales.sales.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
         }
 
+        if (filter.getType() != null){
+            salesJPAQuery.leftJoin(QPlateNumber.plateNumber1).on(QPlateNumber.plateNumber1.eq(QSales.sales.vehicle.plateNumber))
+                    .where(QPlateNumber.plateNumber1.type.id.eq(filter.getType()));
+
+            salesListJPAQuery.leftJoin(QPlateNumber.plateNumber1).on(QPlateNumber.plateNumber1.eq(QSales.sales.vehicle.plateNumber))
+                    .where(QPlateNumber.plateNumber1.type.id.eq(filter.getType()));
+        }
+
         List<Double> prices = new ArrayList<>();
 
         for (Sales sales:salesListJPAQuery.fetch()){
