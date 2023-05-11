@@ -15,4 +15,5 @@ public class LoginResponse {
     private List<PermissionTypeConstant> permissions;
     private String username;
     private Long id;
+    private boolean userVerified;
 }

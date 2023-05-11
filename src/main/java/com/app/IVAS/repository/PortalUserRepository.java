@@ -30,4 +30,6 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
     List<PortalUser> findAllByRole(Optional<Role> role);
 
     PortalUser findFirstByPhoneNumberOrEmail(String phone_number, String email);
+
+    PortalUser findByEmail(String email);
 }

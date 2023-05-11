@@ -65,6 +65,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         portalUser.setGeneratedPassword(passwordService.hashPassword(user.getPassword()));
         portalUser.setImage(user.getPhoto());
         portalUser.setAddress(user.getAddress());
+        portalUser.setUserVerified(false);
         portalUser.setRegType(RegType.REGISTRATION);
         if (user.getLga() != null){
             portalUser.setLga(lgaRepository.findById(user.getLga()).orElseThrow(RuntimeException::new));
@@ -124,6 +125,7 @@ public class UserManagementServiceImpl implements UserManagementService {
            loginResponse.setRole(user.getRole().getName());
            loginResponse.setPermissions(getPermission(user.getRole()));
            loginResponse.setId(user.getId());
+           loginResponse.setUserVerified(user.getUserVerified() != null ? user.getUserVerified() : false);
 
            cachingConfig.cacheManager().getCache("tokens").evictIfPresent(user.getId());
            cachingConfig.cacheManager().getCache("tokens").put(user.getId(), token);
@@ -209,6 +211,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
         if (passwordService.comparePassword(user.getGeneratedPassword(), dto.getOldPassword())){
            user.setGeneratedPassword(passwordService.hashPassword(dto.getNewPassword()));
+           user.setUserVerified(true);
            user.setLastUpdatedAt(LocalDateTime.now());
            portalUserRepository.save(user);
         } else throw new Exception("Invalid Password");
@@ -249,6 +252,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         }
         if(user.getPassword() != null){
             portalUser.setGeneratedPassword(passwordService.hashPassword(user.getPassword()));
+            portalUser.setUserVerified(false);
         }
         if (user.getRole() != null){
             portalUser.setRole(roleRepository.findByNameIgnoreCase(user.getRole()).orElseThrow(RuntimeException::new));

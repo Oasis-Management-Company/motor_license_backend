@@ -62,7 +62,7 @@ public class QSales extends EntityPathBase<Sales> {
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
-    public final QVehicle vehicle;
+    public final com.app.IVAS.entity.QVehicle vehicle;
 
     public QSales(String variable) {
         this(Sales.class, forVariable(variable), INITS);
