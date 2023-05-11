@@ -133,6 +133,9 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public Invoice saveServiceTypeByPlate(String myplate, List<Long> ids) {
+
+        ids.add(479L);
+        ids.add(481L);
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(myplate);
         Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
         Double totalAmount = 0.0;
