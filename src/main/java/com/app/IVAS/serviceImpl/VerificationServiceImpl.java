@@ -1,5 +1,6 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.InvoiceServiceTypeDto;
 import com.app.IVAS.dto.VerificationDto;
 import com.app.IVAS.entity.Invoice;
@@ -165,7 +166,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         if (plate.isPresent()) {
 
-            Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findVehicleByPlateNumberId(plate.get().getId()));
+            Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findVehicleByPlateNumberIdAndRegType(plate.get().getId(), RegType.REGISTRATION));
 
             if (vehicle.isPresent()) {
 

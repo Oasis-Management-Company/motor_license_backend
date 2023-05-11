@@ -1,5 +1,6 @@
 package com.app.IVAS.repository;
 
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.entity.PlateNumber;
 import com.app.IVAS.entity.Vehicle;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -21,6 +22,8 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     Vehicle findFirstByPlateNumber(PlateNumber plateNumber);
 
     Vehicle findVehicleByPlateNumberId(Long id);
+
+    Vehicle findVehicleByPlateNumberIdAndRegType(Long id, RegType regType);
 
     Vehicle findFirstByParentId(Long id);
 }
