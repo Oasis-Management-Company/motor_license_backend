@@ -55,6 +55,8 @@ public class QCard extends EntityPathBase<Card> {
 
     public final EnumPath<com.app.IVAS.Enum.RegType> regType = createEnum("regType", com.app.IVAS.Enum.RegType.class);
 
+    public final DateTimePath<java.time.LocalDateTime> rwExpiryDate = createDateTime("rwExpiryDate", java.time.LocalDateTime.class);
+
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
