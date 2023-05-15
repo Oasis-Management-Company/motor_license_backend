@@ -65,7 +65,7 @@ public class QVehicle extends EntityPathBase<Vehicle> {
 
     public final StringPath permit = createString("permit");
 
-    public final com.app.IVAS.entity.QPlateNumber plateNumber;
+    public final QPlateNumber plateNumber;
 
     public final StringPath policySector = createString("policySector");
 

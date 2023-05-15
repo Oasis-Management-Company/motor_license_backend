@@ -39,7 +39,7 @@ public class OpenApiConfiguration {
                 .info(new Info().title("IVAS API").version("1.0")
                         .contact(contact())
                         .description(
-                                "The IVAS RESTful service using springdoc-openapi and OpenAPI 3."));
+                                "The IVAS RESTful service using springdoc-openapi and OpenAPI 3.0"));
     }
 
     private Contact contact() {
@@ -55,5 +55,6 @@ public class OpenApiConfiguration {
                 "/**"};
         return GroupedOpenApi.builder().group("ivasOpenApi").pathsToMatch(paths).build();
     }
+
 
 }
