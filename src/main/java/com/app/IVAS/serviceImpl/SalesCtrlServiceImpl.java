@@ -77,8 +77,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
         if(sales.getSelectInsurance().equalsIgnoreCase("Yes")){
-            serviceTypes.addAll(serviceTypeRepository.findAllByRegType(RegType.INSURANCE));
+            serviceTypes.add(serviceTypeRepository.findByCategoryAndPlateNumberTypeAndRegType(category, types, RegType.INSURANCE));
         }
+        System.out.println(serviceTypes);
         PortalUser portalUser = null;
 
         PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), sales.getEmail());
@@ -680,7 +681,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, plateNumber, RegType.REGISTRATION, RegType.COMPULSARY);
 
         if(selectInsurance.equalsIgnoreCase("Yes")){
-            serviceTypes.addAll(serviceTypeRepository.findAllByRegType(RegType.INSURANCE));
+            serviceTypes.add(serviceTypeRepository.findByCategoryAndPlateNumberTypeAndRegType(category, plateNumber, RegType.INSURANCE));
         }
 
         return serviceTypes;
