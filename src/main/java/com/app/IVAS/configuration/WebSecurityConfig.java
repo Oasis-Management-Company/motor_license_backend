@@ -34,9 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().
                 authorizeRequests()
-                .antMatchers("/api/auth/**","/v3/api-docs",
-                        "/configuration/**", 
-                        "/swagger*/**", 
+                .antMatchers("/api/auth/**","/v3/api-docs/**",
+                       "/ivas-docs",
+                        "/configuration/**",
                         "/webjars/**",
                         "/api/validate",
                         "/api/validate/**",
@@ -79,10 +79,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/images/**",
                 "/console/**",
                 "/v3/api-docs",
+                "/swagger-ui/index.html",
                 "/configuration/ui",
                 "**/swagger-resources/**",
                 "/configuration/security",
-                "/swagger-ui.html",
                 "/webjars/**",
                 "/templates/**",
                 "/api/document-manager/getImage/**"
