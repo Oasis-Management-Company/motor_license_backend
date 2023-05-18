@@ -123,5 +123,30 @@ public class VioCtrl {
         return ResponseEntity.ok("");
     }
 
+    @PostMapping("/get/vio/approved-sales")
+    public QueryResults<VioSalesDto> searchAllVioApprovedInvoice(InvoiceSearchFilter filter) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        JPAQuery<Invoice> invoiceJPAQuery = appRepository.startJPAQuery(QInvoice.invoice)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QInvoice.invoice.vioApproval.eq(true))
+                .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
+            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
+            invoiceJPAQuery.where(QInvoice.invoice.createdAt.goe(startDate.atStartOfDay()));
+        }
+        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
+            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
+            invoiceJPAQuery.where(QInvoice.invoice.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QInvoice.invoice);
+        QueryResults<Invoice> invoiceQueryResults = invoiceJPAQuery.select(QInvoice.invoice).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(vioService.get(invoiceQueryResults.getResults()), invoiceQueryResults.getLimit(), invoiceQueryResults.getOffset(), invoiceQueryResults.getTotal());
+    }
+
 
 }
