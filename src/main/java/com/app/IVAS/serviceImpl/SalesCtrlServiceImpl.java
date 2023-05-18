@@ -3,11 +3,14 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
+import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.*;
+import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -56,6 +59,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Value("${asin_verification}")
     private String asinVerification;
     private final ActivityLogService activityLogService;
+    private final AppRepository appRepository;
 
     @Override
     @Transactional
@@ -710,10 +714,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
-        System.out.println(category);
-        System.out.println(types);
-        System.out.println(serviceTypes);
-        List<InvoiceServiceType> servicesToBeDeleted = invoiceServiceTypeRepository.findByInvoice(invoiceEdited);
+//        List<InvoiceServiceType> servicesToBeDeleted = invoiceServiceTypeRepository.findByInvoice(invoiceEdited);
+        List<InvoiceServiceType> servicesToBeDeleted = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType).where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("INSURANCE")).fetch();
+
 
         for (InvoiceServiceType invoiceServiceType : servicesToBeDeleted) {
             invoiceServiceTypeRepository.delete(invoiceServiceType);
