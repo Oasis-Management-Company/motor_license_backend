@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -67,6 +67,8 @@ public class QInvoice extends EntityPathBase<Invoice> {
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
     public final QVehicle vehicle;
+
+    public final BooleanPath vioApproval = createBoolean("vioApproval");
 
     public QInvoice(String variable) {
         this(Invoice.class, forVariable(variable), INITS);

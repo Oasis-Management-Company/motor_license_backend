@@ -1,17 +1,13 @@
 package com.app.IVAS.controller;
 
-import com.app.IVAS.Enum.GenericStatusConstant;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
-import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.QVehicle;
 import com.app.IVAS.dto.filters.PortalUserSearchFilter;
-import com.app.IVAS.entity.userManagement.PortalUser;
-import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.filter.InvoiceSearchFilter;
 import com.app.IVAS.filter.VehicleSerachFilter;
 import com.app.IVAS.repository.VehicleCategoryRepository;
@@ -31,9 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 5600)
 @RequiredArgsConstructor

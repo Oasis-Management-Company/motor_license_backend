@@ -1,16 +1,17 @@
 package com.app.IVAS.controller;
 
 
+import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
-import com.app.IVAS.dto.PortalUserPojo;
+import com.app.IVAS.dto.PlateNumberRequestDto;
 import com.app.IVAS.dto.SalesDto;
-import com.app.IVAS.dto.VehicleDto;
-import com.app.IVAS.dto.filters.PortalUserSearchFilter;
+import com.app.IVAS.dto.VioSalesDto;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.userManagement.PortalUser;
-import com.app.IVAS.entity.userManagement.QPortalUser;
+import com.app.IVAS.filter.InvoiceSearchFilter;
 import com.app.IVAS.filter.SalesSearchFilter;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -88,5 +90,38 @@ public class VioCtrl {
         QueryResults<Sales> userQueryResults = userJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(vioService.searchAllForVIO(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
     }
+
+    @PostMapping("/get/vio/sales")
+    public QueryResults<VioSalesDto> searchAllVioInvoice(InvoiceSearchFilter filter) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        JPAQuery<Invoice> invoiceJPAQuery = appRepository.startJPAQuery(QInvoice.invoice)
+                .where(predicateExtractor.getPredicate(filter))
+                .where(QInvoice.invoice.vioApproval.eq(false))
+                .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
+            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
+            invoiceJPAQuery.where(QInvoice.invoice.createdAt.goe(startDate.atStartOfDay()));
+        }
+        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
+            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
+            invoiceJPAQuery.where(QInvoice.invoice.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QInvoice.invoice);
+        QueryResults<Invoice> invoiceQueryResults = invoiceJPAQuery.select(QInvoice.invoice).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(vioService.get(invoiceQueryResults.getResults()), invoiceQueryResults.getLimit(), invoiceQueryResults.getOffset(), invoiceQueryResults.getTotal());
+    }
+
+
+    @PostMapping("/approve-sale")
+    public ResponseEntity<?> approveSale(@RequestParam Long id){
+        vioService.approveInvoice(id);
+        return ResponseEntity.ok("");
+    }
+
 
 }

@@ -2,7 +2,6 @@ package com.app.IVAS.filter;
 
 import com.app.IVAS.dto.filters.BaseSearchDto;
 import com.app.IVAS.entity.QInvoice;
-import com.app.IVAS.entity.QSales;
 import lombok.Data;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -19,6 +18,8 @@ public class InvoiceSearchFilter extends BaseSearchDto implements QuerydslBinder
         bindings.bind(root.payer.lastName).as("lastName").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.invoiceNumber).as("invoiceNo").first((path, value) -> path.containsIgnoreCase(value));
         bindings.bind(root.createdBy.displayName).as("createdBy").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.payer.phoneNumber).as("phoneNumber").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.bind(root.payer.displayName).as("displayName").first((path, value) -> path.containsIgnoreCase(value));
 
         bindings.including(root.payer, root.invoiceNumber, root.createdBy);
     }
