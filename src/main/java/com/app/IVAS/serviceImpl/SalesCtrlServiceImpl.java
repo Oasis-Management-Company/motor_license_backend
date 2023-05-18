@@ -60,6 +60,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Override
     @Transactional
     public Invoice SaveSales(SalesDto sales) {
+        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
@@ -67,6 +68,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         SalesDto salesDto = new SalesDto();
         List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
         Double totalAmount = 0.0;
+        String email = "";
 
         PlateNumberType types = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
@@ -79,17 +81,23 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         if(sales.getSelectInsurance().equalsIgnoreCase("Yes")){
             serviceTypes.add(serviceTypeRepository.findByCategoryAndPlateNumberTypeAndRegType(category, types, RegType.INSURANCE));
         }
-        System.out.println(serviceTypes);
         PortalUser portalUser = null;
 
-        PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), sales.getEmail());
+        if (sales.getEmail() == "" || sales.getEmail().isEmpty()){
+            email = sales.getPhone_number() + "@gmail.com";
+        }else{
+            email = sales.getEmail();
+        }
+
+        PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), email);
+        System.out.println(user);
         if (foundVehicle != null) {
             return null;
         }
 
         if (user == null) {
             dto.setAddress(sales.getAddress());
-            dto.setEmail(sales.getEmail());
+            dto.setEmail(email);
             dto.setFirstName(sales.getFirstname());
             dto.setLastName(sales.getLastname());
             dto.setPhoneNumber(sales.getPhone_number());

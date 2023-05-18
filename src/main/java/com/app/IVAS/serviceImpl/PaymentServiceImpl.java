@@ -69,6 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
     public String sendPaymentTax(String invoice) {
         try{
 
+            System.out.println(invoice);
             String baseUrl = "http://41.207.248.189:8084/api/external/authenticate";
 
             RestTemplate restTemplate = new RestTemplate();
@@ -145,6 +146,8 @@ public class PaymentServiceImpl implements PaymentService {
                 invoice1.setSentToTax(true);
                 invoiceRepository.save(invoice1);
                 System.out.println("Here is the response:::" + personResultAsJsonStr);
+
+                return personResultAsJsonStr;
             } catch (Exception e) {
                 e.printStackTrace();
             }
