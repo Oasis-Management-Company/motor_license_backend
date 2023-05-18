@@ -6,7 +6,6 @@ import com.app.IVAS.Utils.PDFRenderToMultiplePages;
 import com.app.IVAS.configuration.AppConfigurationProperties;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
-import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.userManagement.PortalUser;

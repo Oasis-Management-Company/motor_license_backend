@@ -6,7 +6,6 @@ import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.dto.filters.*;
 import com.app.IVAS.entity.*;
-import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QInvoiceOffenseType;
 import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
