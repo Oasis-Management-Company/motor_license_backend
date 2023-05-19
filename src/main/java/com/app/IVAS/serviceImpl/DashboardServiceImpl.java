@@ -2,15 +2,17 @@ package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.PlateNumberStatus;
+import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.DashboardDto;
 import com.app.IVAS.entity.*;
-import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QInvoiceServiceType;
+import com.app.IVAS.entity.QOffense;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.QStock;
+import com.app.IVAS.entity.QVehicle;
 import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.entity.userManagement.QZonalOffice;
@@ -18,7 +20,6 @@ import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.DashboardCtrlService;
-import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -73,6 +73,9 @@ public class DashboardServiceImpl implements DashboardCtrlService {
         JPAQuery<PlateNumber> plateNumberJPAQuery = appRepository.startJPAQuery(QPlateNumber.plateNumber1);
         JPAQuery<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser).where(QPortalUser.portalUser.role.name.equalsIgnoreCase("MLA"));
         JPAQuery<ZonalOffice> zonalOfficeJPAQuery = appRepository.startJPAQuery(QZonalOffice.zonalOffice);
+        JPAQuery<Vehicle> vehicleJPAQuery = appRepository.startJPAQuery(QVehicle.vehicle);
+        JPAQuery<Offense> offenseJPAQuery = appRepository.startJPAQuery(QOffense.offense);
+        JPAQuery<PortalUser> portalUserJPAQuery1 = appRepository.startJPAQuery(QPortalUser.portalUser).where(QPortalUser.portalUser.role.name.equalsIgnoreCase("GENERAL_USER"));
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
@@ -153,7 +156,7 @@ public class DashboardServiceImpl implements DashboardCtrlService {
 
             dto.setTotalRequest(plateNumberRequestJPAQuery1.fetch().size());
             dto.setTotalplate(plateNumberJPAQuery.fetch().size());
-            dto.setTotalSales(salesJPAQuery.fetch().size());
+            dto.setTotalSales(salesJPAQuery.where(QSales.sales.plateType.eq(RegType.REGISTRATION)).fetch().size());
             dto.setTotalMla(portalUserJPAQuery.fetch().size());
             dto.setTotalStations(zonalOfficeJPAQuery.fetch().size());
             dto.setTotalAmount(totalAmount);
@@ -161,12 +164,9 @@ public class DashboardServiceImpl implements DashboardCtrlService {
             return dto;
         }
         if(!jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
-
-
             for (Invoice invoice : invoices.fetch()) {
                 totalAmount += invoice.getAmount();
             }
-
             for (InvoiceServiceType fetch : invoiceServiceTypeJPAQuery.fetch()) {
                 totalPlateAmount += fetch.getServiceType().getPrice();
             }
@@ -195,7 +195,7 @@ public class DashboardServiceImpl implements DashboardCtrlService {
                 mythisYear += fetch.getAmount();
             }
             dto.setTotalStock(stockJPAQuery.fetch().size());
-            dto.setTotalSales(salesJPAQuery.fetch().size());
+            dto.setTotalSales(salesJPAQuery.where(QSales.sales.plateType.eq(RegType.REGISTRATION)).fetch().size());
             dto.setTotalRequest(plateNumberRequestJPAQuery1.fetch().size());
             dto.setTotalplate(plateNumberJPAQuery.fetch().size());
             dto.setTotalAmount(totalAmount);
@@ -210,6 +210,9 @@ public class DashboardServiceImpl implements DashboardCtrlService {
             dto.setThisWeek(mythisWeek);
             dto.setThisMonth(mythisMonth);
             dto.setThisYear(mythisYear);
+            dto.setTaxPayer(portalUserJPAQuery1.fetch().size());
+            dto.setVehicles(vehicleJPAQuery.fetch().size());
+            dto.setOffenses(offenseJPAQuery.fetch().size());
             return dto;
         }
         dto.setTotalMla(0);

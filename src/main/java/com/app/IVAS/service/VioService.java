@@ -1,6 +1,7 @@
 package com.app.IVAS.service;
 
 import com.app.IVAS.dto.SalesDto;
+import com.app.IVAS.dto.VioSalesDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 
@@ -16,4 +17,8 @@ public interface VioService {
     PortalUser getOffensePayer(String phoneNumber);
 
     List<SalesDto> searchAllForVIO(List<Sales> results);
+
+    List<VioSalesDto> get(List<Invoice> invoices);
+
+    Invoice approveInvoice (Long id);
 }

@@ -20,5 +20,8 @@ public class DashboardDto {
     private Double pThisWeek;
     private Double pThisMonth;
     private Double pThisYear;
+    private int taxPayer;
+    private int vehicles;
+    private int offenses;
 
 }

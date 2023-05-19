@@ -3,6 +3,7 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.SalesDto;
+import com.app.IVAS.dto.VioSalesDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
@@ -14,10 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class VioServiceImpl implements VioService {
 
     private final OffenseRepository offenseRepository;
@@ -131,5 +134,44 @@ public class VioServiceImpl implements VioService {
 
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<VioSalesDto> get(List<Invoice> invoices) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+
+        return invoices.stream().map(invoice -> {
+            VioSalesDto dto = new VioSalesDto();
+            dto.setId(invoice.getId());
+            dto.setDisplayName(invoice.getPayer().getDisplayName());
+            dto.setPlate(invoice.getVehicle().getPlateNumber().getPlateNumber());
+            dto.setChasis(invoice.getVehicle().getChasisNumber());
+            dto.setEngine(invoice.getVehicle().getEngineNumber());
+            dto.setMake(invoice.getVehicle().getVehicleModel().getVehicleMake().getName());
+            dto.setModel(invoice.getVehicle().getVehicleModel().getName());
+            dto.setPhoneNumber(invoice.getPayer().getPhoneNumber());
+            dto.setDate(invoice.getCreatedAt().format(df));
+            dto.setInvoiceNumber(invoice.getInvoiceNumber());
+            dto.setAmount(invoice.getAmount());
+            dto.setPaymentStatus(invoice.getPaymentStatus().toString());
+            dto.setVioApproved(invoice.getVioApproval().toString());
+
+            return dto;
+
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Invoice approveInvoice(Long id) {
+
+       Optional<Invoice> invoice = invoiceRepository.findById(id);
+
+       invoice.get().setVioApproval(true);
+
+       invoiceRepository.save(invoice.get());
+
+       return invoice.get();
+
+    }
+
 
 }

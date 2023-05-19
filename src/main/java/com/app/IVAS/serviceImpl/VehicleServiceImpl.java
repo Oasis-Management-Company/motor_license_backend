@@ -186,6 +186,8 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public InvoiceDto getTypeByInvoiceIdEdit(Long invoiceId) {
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy/hh:mm:ss");
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         InvoiceDto dto = new InvoiceDto();
         dto.setPhonenumber(invoice.getPayer().getPhoneNumber());
@@ -198,9 +200,11 @@ public class VehicleServiceImpl implements VehicleService {
         dto.setFirstname(invoice.getPayer().getFirstName());
         dto.setAddress(invoice.getPayer().getAddress());
         dto.setEmail(invoice.getPayer().getEmail());
-        dto.setInvoiceNumber(invoice.getPaymentRef());
+        dto.setInvoiceNumber(invoice.getInvoiceNumber());
         dto.setDate(invoice.getCreatedAt());
         dto.setPlatenumber(invoice.getVehicle().getPlateNumber().getPlateNumber());
+        dto.setDateString(invoice.getPaymentDate().format(df));
+        dto.setExpiry(invoice.getPaymentDate().plusMonths(1).minusDays(1).format(df));
 
 
         return dto;

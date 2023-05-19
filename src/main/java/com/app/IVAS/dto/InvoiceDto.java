@@ -34,4 +34,5 @@ public class InvoiceDto {
     private PaymentStatus status;
     private Long id;
     private String dateString;
+    private String expiry;
 }

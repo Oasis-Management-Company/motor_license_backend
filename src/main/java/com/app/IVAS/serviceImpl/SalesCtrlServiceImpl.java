@@ -3,11 +3,14 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.entity.userManagement.Role;
 import com.app.IVAS.repository.*;
+import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.*;
+import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -56,10 +59,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Value("${asin_verification}")
     private String asinVerification;
     private final ActivityLogService activityLogService;
+    private final AppRepository appRepository;
 
     @Override
     @Transactional
     public Invoice SaveSales(SalesDto sales) {
+        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
@@ -67,6 +72,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         SalesDto salesDto = new SalesDto();
         List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
         Double totalAmount = 0.0;
+        String email = "";
 
         PlateNumberType types = plateNumberTypeRepository.findById(sales.getPlatetype()).get();
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
@@ -77,18 +83,25 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
         if(sales.getSelectInsurance().equalsIgnoreCase("Yes")){
-            serviceTypes.addAll(serviceTypeRepository.findAllByRegType(RegType.INSURANCE));
+            serviceTypes.add(serviceTypeRepository.findByCategoryAndPlateNumberTypeAndRegType(category, types, RegType.INSURANCE));
         }
         PortalUser portalUser = null;
 
-        PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), sales.getEmail());
+        if (sales.getEmail() == "" || sales.getEmail().isEmpty()){
+            email = sales.getPhone_number() + "@gmail.com";
+        }else{
+            email = sales.getEmail();
+        }
+
+        PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), email);
+        System.out.println(user);
         if (foundVehicle != null) {
             return null;
         }
 
         if (user == null) {
             dto.setAddress(sales.getAddress());
-            dto.setEmail(sales.getEmail());
+            dto.setEmail(email);
             dto.setFirstName(sales.getFirstname());
             dto.setLastName(sales.getLastname());
             dto.setPhoneNumber(sales.getPhone_number());
@@ -680,7 +693,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, plateNumber, RegType.REGISTRATION, RegType.COMPULSARY);
 
         if(selectInsurance.equalsIgnoreCase("Yes")){
-            serviceTypes.addAll(serviceTypeRepository.findAllByRegType(RegType.INSURANCE));
+            serviceTypes.add(serviceTypeRepository.findByCategoryAndPlateNumberTypeAndRegType(category, plateNumber, RegType.INSURANCE));
         }
 
         return serviceTypes;
@@ -701,10 +714,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
-        System.out.println(category);
-        System.out.println(types);
-        System.out.println(serviceTypes);
-        List<InvoiceServiceType> servicesToBeDeleted = invoiceServiceTypeRepository.findByInvoice(invoiceEdited);
+//        List<InvoiceServiceType> servicesToBeDeleted = invoiceServiceTypeRepository.findByInvoice(invoiceEdited);
+        List<InvoiceServiceType> servicesToBeDeleted = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType).where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("INSURANCE")).fetch();
+
 
         for (InvoiceServiceType invoiceServiceType : servicesToBeDeleted) {
             invoiceServiceTypeRepository.delete(invoiceServiceType);
