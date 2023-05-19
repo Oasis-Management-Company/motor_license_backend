@@ -93,13 +93,9 @@ public class VehicleMakeAndModelController {
 
     @PostMapping("/vehicle/edit/save")
     public ResponseEntity<?> saveVehicle(@RequestBody VehicleDto vehicleDto){
-       Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findFirstByParentId(vehicleDto.getParent()));
-
-       if(!vehicle.isPresent()) {
            vehicleService.saveEditedVehicle(vehicleDto);
            return ResponseEntity.ok("");
-       }
-        return null;
+
 
     }
 
