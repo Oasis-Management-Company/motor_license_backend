@@ -4,6 +4,7 @@ import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.dto.filters.PlateNumberRequestSearchFilter;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QOffense;
 import com.app.IVAS.entity.QPlateNumberRequest;
 import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.QWorkFlowStage;
@@ -44,7 +45,6 @@ public class RequestController {
     private final RequestService requestService;
     private final PrefixRepository prefixRepository;
     private final JwtService jwtService;
-    private final OffenseRepository offenseRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping("/search/plate-number-request")
@@ -166,36 +166,25 @@ public class RequestController {
 
     @GetMapping("/get-mla")
     public List<String> getMla(){
-        List<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
+        return appRepository.startJPAQuery(QPortalUser.portalUser)
+                .select(QPortalUser.portalUser.displayName)
                 .where(QPortalUser.portalUser.role.name.equalsIgnoreCase("MLA"))
                 .fetch();
-
-        List<String> mlas= new ArrayList<>();
-        for (PortalUser user : portalUserJPAQuery){ mlas.add(user.getDisplayName()); }
-
-        return mlas;
     }
 
     @GetMapping("/get-vio")
     public List<String> getVio(){
-        List<PortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QPortalUser.portalUser)
+        return appRepository.startJPAQuery(QPortalUser.portalUser)
+                .select(QPortalUser.portalUser.displayName)
                 .where(QPortalUser.portalUser.role.name.equalsIgnoreCase("VIO"))
                 .fetch();
-
-        List<String> vios= new ArrayList<>();
-        for (PortalUser user : portalUserJPAQuery){ vios.add(user.getDisplayName()); }
-
-        return vios;
     }
 
     @GetMapping("/get-offenses")
     public List<String> getOffense(){
-        List<Offense> offenses = offenseRepository.findAll();
-
-        List<String> offense= new ArrayList<>();
-        for (Offense offense1 :offenses){ offense.add(offense1.getName()); }
-
-        return offense;
+        return appRepository.startJPAQuery(QOffense.offense)
+                .select(QOffense.offense.name)
+                .fetch();
     }
 
     @GetMapping("/serviceType/view")

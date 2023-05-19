@@ -20,6 +20,7 @@ import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.UserManagementService;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -38,7 +39,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -188,8 +191,17 @@ public class UserController {
     }
 
     @GetMapping("/get-user")
-    public PortalUser getPortalUserByEmail(@RequestParam String email){
-        return portalUserRepository.findByUsernameIgnoreCaseAndStatus(email, GenericStatusConstant.ACTIVE).orElseThrow(RuntimeException::new);
+    public Map<String,Object> getPortalUserByEmail(@RequestParam String email){
+        Tuple tuple = appRepository.startJPAQuery(QPortalUser.portalUser)
+                .select(QPortalUser.portalUser.displayName, QPortalUser.portalUser.id)
+                .where(QPortalUser.portalUser.username.equalsIgnoreCase(email)
+                        .and(QPortalUser.portalUser.status.eq(GenericStatusConstant.ACTIVE))).fetchOne();
+
+        Map<String, Object> data = new HashMap<>();
+        assert tuple != null;
+        data.put("id", tuple.get(QPortalUser.portalUser.id));
+        data.put("displayName", tuple.get(QPortalUser.portalUser.displayName));
+        return data;
     }
 
     @PostMapping("/reset-password/mobile")
