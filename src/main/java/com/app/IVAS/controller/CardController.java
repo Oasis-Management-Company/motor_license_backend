@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -54,9 +55,9 @@ public class CardController {
     }
 
     @PostMapping("/update_cards_by_payment/{invoiceNumber}/{amount}")
-    public ResponseEntity<?> updateCardByPayment(@PathVariable String invoiceNumber, @PathVariable Double amount){
+    public ResponseEntity<?> updateCardByPayment(@PathVariable String invoiceNumber, @PathVariable Double amount, @RequestParam LocalDateTime paymentDate){
 
-        return ResponseEntity.ok(cardService.updateCardByPayment(invoiceNumber, amount));
+        return ResponseEntity.ok(cardService.updateCardByPayment(invoiceNumber, amount, paymentDate));
     }
 
     @GetMapping("/list/zones")

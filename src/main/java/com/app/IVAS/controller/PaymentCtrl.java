@@ -45,7 +45,6 @@ public class PaymentCtrl {
 
     @PostMapping(value = "/insurance/send")
     public ResponseEntity<?> sendInsuranceToVendor(@RequestParam String plate,@RequestParam String invoiceNumber){
-        System.out.println(plate);
         InsuranceResponse dto = paymentService.sendInsuranceToVendor(plate,invoiceNumber);
         return ResponseEntity.ok(dto);
     }

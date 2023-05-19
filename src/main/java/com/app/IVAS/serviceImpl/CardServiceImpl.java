@@ -185,7 +185,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount) {
+    public List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount,@NonNull LocalDateTime paymentDate) {
         Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberIgnoreCase(invoiceNumber);
 
 
@@ -198,13 +198,13 @@ public class CardServiceImpl implements CardService {
                         card.setStatus(GenericStatusConstant.ACTIVE);
                         card.setCardStatus(CardStatusConstant.NOT_PRINTED);
                         if (card.getVehicle().getPlateNumber().getType().getName().contains("COMMERCIAL")){
-                            card.setRwExpiryDate(LocalDateTime.now().plusMonths(6).minusDays(1));
+                            card.setRwExpiryDate(paymentDate.plusMonths(6).minusDays(1));
                         }else{
-                            card.setRwExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
+                            card.setRwExpiryDate(paymentDate.plusYears(1).minusDays(1));
                         }
-                        card.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
+                        card.setExpiryDate(paymentDate.plusYears(1).minusDays(1));
                         cardRepository.save(card);
-                        activityLogService.createActivityLog(("Card for " + card.getInvoice().getPayer()  + " was updated"), ActivityStatusConstant.UPDATE);
+                        activityLogService.createActivityLog(("Card for " + card.getInvoice().getPayer().getDisplayName()  + " was updated"), ActivityStatusConstant.UPDATE);
                     }
                     return cards.get();
                 }
