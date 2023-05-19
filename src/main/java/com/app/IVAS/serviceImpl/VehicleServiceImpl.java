@@ -82,6 +82,10 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public Vehicle saveEditedVehicle(VehicleDto vehicleDto) {
         Vehicle editVehicle = new Vehicle();
+        Optional<Vehicle> oldEdit = Optional.ofNullable(vehicleRepository.findFirstByParentId(vehicleDto.getParent()));
+        if(oldEdit.isPresent()){
+            vehicleRepository.delete(oldEdit.get());
+        }
         Vehicle vehicle = vehicleRepository.findById(vehicleDto.getParent()).get();
         Optional<VehicleMake> vehicleMake = vehicleMakeRepository.findById(vehicleDto.getMakeId());
         Optional<VehicleModel> vehicleModel = vehicleModelRepository.findById(vehicleDto.getModelId());
