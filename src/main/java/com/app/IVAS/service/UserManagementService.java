@@ -52,5 +52,7 @@ public interface UserManagementService {
 
     void resetPasswordMobile(PasswordDto dto) throws Exception;
 
+    PortalUserPojo portalUserByPhone(String phone);
+
     List<PortalUserPojo>  searchOtherUsers(List<PortalUser> results);
 }
