@@ -21,7 +21,7 @@ public class WorkFlowStage extends StatusEntity {
     private Long step;
 
     @JsonIgnore
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     private PortalUser ApprovingOfficer;
 
     @Enumerated(EnumType.STRING)
