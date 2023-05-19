@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -40,6 +41,7 @@ public class VehicleMakeAndModelController {
     private final SalesCtrlService salesCtrlService;
     private final VehicleCategoryRepository vehicleCategoryRepository;
     private final VehicleService vehicleService;
+    private final VehicleRepository vehicleRepository;
 
 
     @PostMapping("/create-edit")
@@ -91,8 +93,10 @@ public class VehicleMakeAndModelController {
 
     @PostMapping("/vehicle/edit/save")
     public ResponseEntity<?> saveVehicle(@RequestBody VehicleDto vehicleDto){
-        vehicleService.saveEditedVehicle(vehicleDto);
-        return ResponseEntity.ok("");
+           vehicleService.saveEditedVehicle(vehicleDto);
+           return ResponseEntity.ok("");
+
+
     }
 
     @GetMapping("/all-vehicle-make")
