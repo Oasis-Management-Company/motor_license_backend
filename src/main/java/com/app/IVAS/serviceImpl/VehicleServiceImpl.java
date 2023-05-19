@@ -100,7 +100,12 @@ public class VehicleServiceImpl implements VehicleService {
         editVehicle.setCreatedBy(jwtService.user);
         editVehicle.setPortalUser(vehicle.getPortalUser());
         editVehicle.setPlateNumber(vehicle.getPlateNumber());
-//        editVehicle.setVehicleModel(vehicle.getVehicleModel());
+
+        if( ! vehicleDto.getPlate().equalsIgnoreCase(vehicle.getPlateNumber().getPlateNumber())){
+            editVehicle.setPlateEdit(vehicleDto.getPlate());
+        }else {
+            editVehicle.setPlateEdit(vehicle.getPlateNumber().getPlateNumber());
+        }
 
         vehicleRepository.save(editVehicle);
 
@@ -438,6 +443,7 @@ public class VehicleServiceImpl implements VehicleService {
         oldDetails.setCategory(old.getVehicleCategory().getName());
         oldDetails.setYear(old.getYear());
 
+
         newDetails.setFirstname(news.getPortalUser().getDisplayName());
         newDetails.setPhonenumber(news.getPortalUser().getPhoneNumber());
         newDetails.setEmail(news.getPortalUser().getEmail());
@@ -446,7 +452,7 @@ public class VehicleServiceImpl implements VehicleService {
         newDetails.setChasis(news.getChasisNumber());
         newDetails.setParent(news.getParentId());
         newDetails.setPlateType(news.getPlateNumber().getType().getName());
-        newDetails.setPlate(news.getPlateNumber().getPlateNumber());
+        newDetails.setPlate(news.getPlateEdit());
         newDetails.setColor(news.getColor());
         newDetails.setEngine(news.getEngineNumber());
         newDetails.setMake(news.getVehicleModel().getVehicleMake().getName());
@@ -464,6 +470,7 @@ public class VehicleServiceImpl implements VehicleService {
     public HttpStatus approveEdittedVehicle(Long id, String type) {
         Vehicle old = vehicleRepository.findById(id).get();
         Vehicle news = vehicleRepository.findFirstByParentId(id);
+        PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(old.getPlateNumber().getPlateNumber());
 
         if (type.equalsIgnoreCase("Approval")){
             old.setVehicleModel(news.getVehicleModel() == old.getVehicleModel() ? old.getVehicleModel() : news.getVehicleModel());
@@ -472,6 +479,8 @@ public class VehicleServiceImpl implements VehicleService {
             old.setChasisNumber(news.getChasisNumber()== old.getChasisNumber() ? old.getChasisNumber() : news.getChasisNumber());
             old.setEngineNumber(news.getEngineNumber()==old.getEngineNumber() ? old.getEngineNumber() : news.getEngineNumber());
             old.setYear(news.getYear()==old.getYear() ? old.getYear() : news.getYear());
+            plateNumber.setPlateNumber(news.getPlateEdit());
+
 
             vehicleRepository.save(old);
             vehicleRepository.delete(news);

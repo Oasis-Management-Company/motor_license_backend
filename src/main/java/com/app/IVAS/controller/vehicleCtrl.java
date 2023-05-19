@@ -5,6 +5,7 @@ import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.QVehicle;
 import com.app.IVAS.dto.filters.PortalUserSearchFilter;
