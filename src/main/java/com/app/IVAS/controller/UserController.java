@@ -262,8 +262,8 @@ public class UserController {
     }
 
     @GetMapping("/get-user/phone")
-    public PortalUser getPortalUserByPhone(@RequestParam String phone){
-        return portalUserRepository.findByPhoneNumberIgnoreCase(phone);
+    public PortalUserPojo getPortalUserByPhone(@RequestParam String phone){
+        return userManagementService.portalUserByPhone(phone);
     }
 
     @GetMapping("/search/pending-edit/mla")
