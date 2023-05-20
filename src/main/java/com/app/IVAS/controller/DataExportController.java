@@ -6,6 +6,7 @@ import com.app.IVAS.Enum.PlateNumberStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.PlateNumberDto;
 import com.app.IVAS.dto.data_transfer.DataTransferAssign;
+import com.app.IVAS.dto.data_transfer.DataTransferSales;
 import com.app.IVAS.dto.data_transfer.DataTransferStock;
 import com.app.IVAS.dto.data_transfer.DataTransferUser;
 import com.app.IVAS.entity.PlateNumber;
@@ -132,6 +133,45 @@ public class DataExportController {
                log.info("============ invalid plate ================" + dto.getPlatenumber());
            }
         }
+        return ResponseEntity.ok("");
+    }
+
+    @PostMapping("/sales")
+    @Transactional
+    public ResponseEntity<?> transferSales(@RequestBody List<DataTransferSales> dtos){
+        for(DataTransferSales dto: dtos) {
+            PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(dto.getPlate_number());
+            if (plateNumber == null) {
+                log.info("============ invalid plate ================" + dto.getPlate_number());
+            } else {
+                PortalUser owner = portalUserRepository.findFirstByUsernameIgnoreCase(dto.getPhonenumber());
+                if (owner == null) {
+                    PortalUser portalUser = new PortalUser();
+                    portalUser.setCreatedAt(LocalDateTime.now());
+                    portalUser.setEmail(dto.getPhonenumber());
+                    portalUser.setFirstName(dto.getSoldto());
+                    portalUser.setLastName("");
+                    portalUser.setDisplayName(dto.getSoldto());
+                    portalUser.setUsername(dto.getPhonenumber());
+                    portalUser.setStatus(GenericStatusConstant.ACTIVE);
+                    portalUser.setPhoneNumber(dto.getPhonenumber());
+                    portalUser.setUserVerified(false);
+                    portalUser.setAddress("AIRS office obiokoli street, Anambra");
+                    portalUser.setGeneratedPassword(passwordService.hashPassword("password"));
+                    portalUser.setRegType(RegType.REGISTRATION);
+                    portalUser.setRole(roleRepository.findByNameIgnoreCase("GENERAL_USER").orElseThrow(RuntimeException::new));
+                    owner = portalUserRepository.save(portalUser);
+                    log.info("============ taxpayer created ================" + dto.getSoldto());
+                }
+                plateNumber.setOwner(owner);
+                plateNumber.setPlateNumberStatus(PlateNumberStatus.SOLD);
+                plateNumber.setLastUpdatedBy(jwtService.user);
+                plateNumberRepository.save(plateNumber);
+                log.info("============ plate number sold ================" + dto.getPlate_number());
+
+            }
+        }
+
         return ResponseEntity.ok("");
     }
 }
