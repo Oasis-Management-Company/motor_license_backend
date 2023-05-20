@@ -60,7 +60,7 @@ public class DataExportController {
             portalUser.setStatus(GenericStatusConstant.ACTIVE);
             portalUser.setPhoneNumber(dto.getPhone());
             portalUser.setUserVerified(false);
-            portalUser.setAddress("12 parakou street");
+            portalUser.setAddress("AIRS office obiokoli street, Anambra");
             portalUser.setGeneratedPassword(passwordService.hashPassword("password"));
             portalUser.setRegType(RegType.REGISTRATION);
 

@@ -10,6 +10,7 @@ import com.app.IVAS.entity.Vehicle;
 import org.springframework.core.io.Resource;
 import lombok.NonNull;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public interface CardService {
 
     Resource printCard(List<PrintDto> dtos) throws Exception;
     
-    List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount);
+    List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount, @NonNull LocalDateTime paymentDate);
 
     Resource printDocuments(List<PrintDto> dtos) throws Exception;
 }

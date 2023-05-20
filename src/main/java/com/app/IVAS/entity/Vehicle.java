@@ -49,6 +49,8 @@ public class Vehicle extends StatusEntity {
 
     private Long parentId;
 
+    private String plateEdit;
+
     @Enumerated(EnumType.STRING)
     private RegType regType = RegType.REGISTRATION;
 

@@ -56,15 +56,15 @@ public class PortalUser extends StatusEntity {
             name = "phone_number",
             table = "portal_user",
             nullable = false,
-            length = 1024
+            length = 1024,
+            unique = true
     )
     private String phoneNumber;
     @Basic
     @Column(
             name = "generated_password",
             table = "portal_user",
-            length = 1024,
-            unique = true
+            length = 1024
     )
     private String generatedPassword;
     private String asin;

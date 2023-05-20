@@ -310,6 +310,31 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     }
 
+    @Override
+    public PortalUserPojo portalUserByPhone(String phone){
+
+        PortalUser user = portalUserRepository.findByPhoneNumberIgnoreCase(phone);
+
+        PortalUserPojo pojo = new PortalUserPojo();
+
+        pojo.setName(user.getDisplayName());
+        pojo.setEmail(user.getEmail());
+        pojo.setDateCreated(user.getCreatedAt().format(df));
+        pojo.setRole(user.getRole());
+        pojo.setStatus(user.getStatus());
+        pojo.setId(user.getId());
+        pojo.setPhoneNumber(user.getPhoneNumber());
+        if(user.getParentEmail() != null) {
+            pojo.setParentEmail(user.getParentEmail());
+        }
+        if(user.getAsin() != null) {
+            pojo.setAsin(user.getAsin());
+        }
+
+        return pojo;
+
+    }
+
 
     @Override
     public List<PortalUserPojo> searchOtherUsers(List<PortalUser> users) {

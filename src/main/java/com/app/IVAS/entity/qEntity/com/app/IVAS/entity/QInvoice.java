@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -66,7 +66,7 @@ public class QInvoice extends EntityPathBase<Invoice> {
     //inherited
     public final EnumPath<com.app.IVAS.Enum.GenericStatusConstant> status;
 
-    public final QVehicle vehicle;
+    public final com.app.IVAS.entity.QVehicle vehicle;
 
     public final BooleanPath vioApproval = createBoolean("vioApproval");
 
@@ -98,7 +98,7 @@ public class QInvoice extends EntityPathBase<Invoice> {
         this.lastUpdatedBy = _super.lastUpdatedBy;
         this.payer = inits.isInitialized("payer") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("payer"), inits.get("payer")) : null;
         this.status = _super.status;
-        this.vehicle = inits.isInitialized("vehicle") ? new QVehicle(forProperty("vehicle"), inits.get("vehicle")) : null;
+        this.vehicle = inits.isInitialized("vehicle") ? new com.app.IVAS.entity.QVehicle(forProperty("vehicle"), inits.get("vehicle")) : null;
     }
 
 }

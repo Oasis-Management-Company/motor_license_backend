@@ -233,7 +233,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         try{
-            cardService.updateCardByPayment(respondDto.getCustReference(), Double.valueOf(respondDto.getAmount()));
+            cardService.updateCardByPayment(respondDto.getCustReference(), Double.valueOf(respondDto.getAmount()), dateTime);
             if (insurance){
                 sendInsuranceToVendor(invoice.getVehicle().getPlateNumber().getPlateNumber(), invoice.getInvoiceNumber());
             }

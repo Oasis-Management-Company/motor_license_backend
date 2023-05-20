@@ -116,7 +116,6 @@ public class VioCtrl {
         return new QueryResults<>(vioService.get(invoiceQueryResults.getResults()), invoiceQueryResults.getLimit(), invoiceQueryResults.getOffset(), invoiceQueryResults.getTotal());
     }
 
-
     @PostMapping("/approve-sale")
     public ResponseEntity<?> approveSale(@RequestParam Long id){
         vioService.approveInvoice(id);
