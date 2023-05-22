@@ -15,4 +15,5 @@ public interface InvoiceServiceTypeRepository extends JpaRepository<InvoiceServi
 
     List<InvoiceServiceType> findByInvoice(Invoice invoice);
 
+    InvoiceServiceType findFirstByReference(String custReference);
 }

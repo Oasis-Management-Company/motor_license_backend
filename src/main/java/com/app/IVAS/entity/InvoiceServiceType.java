@@ -1,5 +1,6 @@
 package com.app.IVAS.entity;
 
+import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,4 +39,7 @@ public class InvoiceServiceType {
     @Enumerated(EnumType.STRING)
     private RegType regType;
     private LocalDateTime expiryDate;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 }

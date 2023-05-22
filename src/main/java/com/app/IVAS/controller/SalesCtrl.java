@@ -50,7 +50,8 @@ public class SalesCtrl {
 
     @PostMapping("/save/sales")
     public ResponseEntity<Invoice> SaveSales(@RequestBody SalesDto sales){
-        return ResponseEntity.ok(service.SaveSales(sales));
+        Invoice invoice = service.SaveSales(sales);
+        return ResponseEntity.ok(invoice);
     }
 
 
@@ -215,8 +216,8 @@ public class SalesCtrl {
     }
 
     @PostMapping("/get/serviceType/invoice")
-    public ResponseEntity<List<InvoiceServiceType>> getServiceTypeByInvoiceId(@RequestParam Long invoiceId){
-        return ResponseEntity.ok(service.getServiceTypeByInvoiceId(invoiceId));
+    public TopParentRequest getServiceTypeByInvoiceId(@RequestParam Long invoiceId){
+        return service.getServiceTypeByInvoiceId(invoiceId);
     }
 
     @PostMapping("/get/serviceType/owner/details")

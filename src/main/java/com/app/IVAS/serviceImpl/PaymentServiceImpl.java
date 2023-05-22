@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -48,6 +49,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${insurance-password}")
     private String insurancepassword;
 
+
+    @Value("${payment_auth}")
+    private String paymentAuth;
+
+    @Value("${payment}")
+    private String paymentUrl;
+
     private final InvoiceRepository invoiceRepository;
     private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
@@ -66,13 +74,14 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
+    @Transactional
     public String sendPaymentTax(String invoice) {
         Double OTHERS_AMOUNT = 0.0;
 
         try{
 
             System.out.println(invoice);
-            String baseUrl = "http://41.207.248.189:8084/api/external/authenticate";
+            String baseUrl = paymentAuth;
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
@@ -94,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
             map.put("Authorization", "Bearer "+responseToken.getToken());
             headersAuth.setAll(map);
 
-            String url ="http://41.207.248.189:8084/api/notification/handle-assessment-ivas";
+            String url =paymentUrl;
 
             ResponseEntity<Object> responseRC = null;
             ParentRequest paymentDto = new ParentRequest();
@@ -115,7 +124,6 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
                     dto.setDescription("PLATE NUMBER");
-                    dto.setTotalAmount(invoiceServiceType.getAmount());
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
@@ -129,7 +137,6 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
                     dto.setDescription("INSURANCE");
-                    dto.setTotalAmount(invoiceServiceType.getAmount());
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
@@ -142,7 +149,6 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
                     dto.setDescription("SMS");
-                    dto.setTotalAmount(invoiceServiceType.getAmount());
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
@@ -155,7 +161,6 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
                     dto.setDescription("COMPUTERIZED TEST");
-                    dto.setTotalAmount(invoiceServiceType.getAmount());
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
@@ -186,11 +191,11 @@ public class PaymentServiceImpl implements PaymentService {
 
             childRequests.add(paymentDto);
 
-            System.out.println(childRequests);
-
+            TopParentRequest parentRequest = new TopParentRequest();
+            parentRequest.setData(childRequests);
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
 
-            HttpEntity entity = new HttpEntity(new Gson().toJson(childRequests), headersAuth);
+            HttpEntity entity = new HttpEntity(new Gson().toJson(parentRequest), headersAuth);
             try {
                 String personResultAsJsonStr = restTemplate.postForObject(url, entity, String.class);
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {
@@ -234,6 +239,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
         AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
@@ -248,21 +254,81 @@ public class PaymentServiceImpl implements PaymentService {
             return assessmentResponse;
         }
 
-
-
-        Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
-        if (invoice == null ){
-            assessmentResponse.setStatusCode("002");
-            assessmentResponse.setMessage("Not Sucessful");
-            assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
-            return assessmentResponse;
-        }
-
-        List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
-
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
+
+        Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
+        InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(respondDto.getCustReference());
+
+        if (invoiceServiceType == null ){
+            if (invoice == null){
+                assessmentResponse.setStatusCode("002");
+                assessmentResponse.setMessage("Not Sucessful");
+                assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
+                return assessmentResponse;
+            }else{
+                List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+                for (InvoiceServiceType serviceType : invoiceServiceTypes) {
+                    if (serviceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE") || serviceType.getServiceType().getName().contains("SMS") || serviceType.getServiceType().getName().contains("INSURANCE") || serviceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
+                    }else{
+                        serviceType.setPaymentDate(dateTime);
+                        serviceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
+                        serviceType.setPaymentStatus(PaymentStatus.PAID);
+                        invoiceServiceTypeRepository.save(serviceType);
+                    }
+                }
+                List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+                for (InvoiceServiceType serviceType : invoiceServiceTypeList) {
+                    if (serviceType.getPaymentStatus().equals(PaymentStatus.NOT_PAID)) {
+                        break;
+                    }else{
+                        Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
+                        invoice1.setPaymentDate(serviceType.getPaymentDate());
+                        invoice1.setPaymentStatus(PaymentStatus.PAID);
+
+                        try{
+                            cardService.updateCardByPayment(invoice.getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), dateTime);
+                        }catch (Exception e){
+                            System.out.println(e);
+                        }
+                        invoiceRepository.save(invoice1);
+                    }
+                }
+            }
+        }else{
+            if (invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
+                try{
+                    sendInsuranceToVendor(invoiceServiceType.getInvoice().getVehicle().getPlateNumber().getPlateNumber(), invoiceServiceType.getReference());
+                }catch (Exception e){
+                    System.out.println(e);
+                }
+            }
+
+            invoiceServiceType.setPaymentDate(dateTime);
+            invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
+            invoiceServiceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
+            invoiceServiceTypeRepository.save(invoiceServiceType);
+
+            List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoiceServiceType.getInvoice());
+
+            for (InvoiceServiceType serviceType : invoiceServiceTypeList) {
+                if (serviceType.getPaymentStatus().equals(PaymentStatus.NOT_PAID)) {
+                    break;
+                }else{
+                    Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
+                    invoice1.setPaymentDate(serviceType.getPaymentDate());
+                    invoice1.setPaymentStatus(PaymentStatus.PAID);
+                    try{
+                        cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), dateTime);
+                    }catch (Exception e){
+                        System.out.println(e);
+                    }
+                    invoiceRepository.save(invoice1);
+                }
+            }
+        }
 
         paymentHistory.setAmount(respondDto.getAmount());
         paymentHistory.setPaymentDate(dateTime.format(formatter));
@@ -278,37 +344,6 @@ public class PaymentServiceImpl implements PaymentService {
         paymentHistoryRepository.save(paymentHistory);
 
 
-        invoice.setPaymentStatus(PaymentStatus.PAID);
-        invoice.setPaymentDate(dateTime);
-        invoice.setPaymentRef(respondDto.getPaymentReference());
-        invoiceRepository.save(invoice);
-
-        List<InvoiceServiceType> serviceType = invoiceServiceTypeRepository.findByInvoice(invoice);
-
-        for (InvoiceServiceType invoiceServiceType : serviceType) {
-            if (invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
-                insurance = true;
-            }
-            invoiceServiceType.setPaymentDate(dateTime);
-            invoiceServiceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
-            invoiceServiceTypeRepository.save(invoiceServiceType);
-        }
-
-        try{
-            cardService.updateCardByPayment(respondDto.getCustReference(), Double.valueOf(respondDto.getAmount()), dateTime);
-            if (insurance){
-                sendInsuranceToVendor(invoice.getVehicle().getPlateNumber().getPlateNumber(), invoice.getInvoiceNumber());
-            }
-        }catch (Exception e){
-            System.out.println(e);
-        }
-
-        for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
-            invoiceServiceType.setPaymentDate(dateTime);
-
-            invoiceServiceTypeRepository.save(invoiceServiceType);
-        }
-
         assessmentResponse.setStatusCode("000");
         assessmentResponse.setMessage("Success");
         assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
@@ -318,7 +353,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public InsuranceResponse sendInsuranceToVendor(String plate, String invoiceNumber) {
-        System.out.println(plate);
+        System.out.println("Reached out");
         try{
 
             String baseUrl = "https://ieiplcng.azurewebsites.net/api/Auth/Login";
@@ -348,13 +383,17 @@ public class PaymentServiceImpl implements PaymentService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
             Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
-            Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoiceNumber);
+            InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(invoiceNumber);
 
             String PhoneNumber = Utils.removeFirstChar(vehicle.getPortalUser().getPhoneNumber());
             InsuranceDto dto = new InsuranceDto();
             dto.setAdddress(vehicle.getPortalUser().getAddress());
             dto.setChassisNumber(vehicle.getChasisNumber());
-            dto.setEngineNumber(vehicle.getEngineNumber());
+            if (vehicle.getEngineNumber() == null){
+                dto.setEngineNumber(vehicle.getChasisNumber() + "1");
+            }else{
+                dto.setEngineNumber(vehicle.getEngineNumber());
+            }
             dto.setEngine_capacity(vehicle.getCapacity());
             dto.setEmailAddress(vehicle.getPortalUser().getEmail());
             dto.setRegistration_center("AWKA");
@@ -374,14 +413,11 @@ public class PaymentServiceImpl implements PaymentService {
             dto.setState("Anambra");
             dto.setPlate(vehicle.getPlateNumber().getPlateNumber());
 
-
-            System.out.println(dto);
-
             HttpEntity entity = new HttpEntity(new Gson().toJson(dto), headersAuth);
             try {
                 InsuranceResponse personResultAsJsonStr = restTemplate.postForObject(url, entity, InsuranceResponse.class);
                 personResultAsJsonStr.setVehicle(vehicle);
-                personResultAsJsonStr.setInvoice(invoice);
+                personResultAsJsonStr.setInvoice(invoiceServiceType.getInvoice());
 
                 insuranceResponserepo.save(personResultAsJsonStr);
 
@@ -396,7 +432,6 @@ public class PaymentServiceImpl implements PaymentService {
                         // do nothing, or something
                     }
                 });
-
                 System.out.println("Here is the response:::" + personResultAsJsonStr);
             } catch (Exception e) {
                 e.printStackTrace();
