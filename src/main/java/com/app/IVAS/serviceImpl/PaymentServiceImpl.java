@@ -67,6 +67,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String sendPaymentTax(String invoice) {
+        Double OTHERS_AMOUNT = 0.0;
+
         try{
 
             System.out.println(invoice);
@@ -96,7 +98,8 @@ public class PaymentServiceImpl implements PaymentService {
 
             ResponseEntity<Object> responseRC = null;
             ParentRequest paymentDto = new ParentRequest();
-            List<ChildRequest> childRequests = new ArrayList<>();
+            List<ParentRequest> childRequests = new ArrayList<>();
+            List<ChildRequest> licence = new ArrayList<>();
 
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
             Invoice invoice1 = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoice);
@@ -104,31 +107,90 @@ public class PaymentServiceImpl implements PaymentService {
             List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice1);
 
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
-                ChildRequest dto = new ChildRequest();
-                dto.setAmount(invoiceServiceType.getServiceType().getPrice());
-                dto.setItemCode(invoiceServiceType.getRevenuecode());
-                dto.setName(invoiceServiceType.getServiceType().getName());
-                dto.setReferenceNumber(invoiceServiceType.getReference());
-                dto.setDateBooked(invoiceServiceType.getInvoice().getCreatedAt().format(df));
+                ParentRequest dto = new ParentRequest();
+                if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
+                    dto.setAmount(invoiceServiceType.getAmount());
+                    dto.setName("PLATE NUMBER");
+                    dto.setItemCode("AIVDS001");
+                    dto.setReferenceNumber(invoiceServiceType.getReference());
+                    dto.setCustReference("167371977051");
+                    dto.setDescription("PLATE NUMBER");
+                    dto.setTotalAmount(invoiceServiceType.getAmount());
+                    dto.setFirstName(invoice1.getPayer().getFirstName());
+                    dto.setLastName(invoice1.getPayer().getDisplayName());
+                    dto.setEmail(invoice1.getPayer().getEmail());
 
-                childRequests.add(dto);
+                    childRequests.add(dto);
+
+                }else if(invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
+                    dto.setAmount(invoiceServiceType.getAmount());
+                    dto.setName("INSURANCE");
+                    dto.setItemCode("AIVDS003");
+                    dto.setReferenceNumber(invoiceServiceType.getReference());
+                    dto.setCustReference("167371977051");
+                    dto.setDescription("INSURANCE");
+                    dto.setTotalAmount(invoiceServiceType.getAmount());
+                    dto.setFirstName(invoice1.getPayer().getFirstName());
+                    dto.setLastName(invoice1.getPayer().getDisplayName());
+                    dto.setEmail(invoice1.getPayer().getEmail());
+
+                    childRequests.add(dto);
+                }else if(invoiceServiceType.getServiceType().getName().contains("SMS")){
+                    dto.setAmount(invoiceServiceType.getAmount());
+                    dto.setName("SMS");
+                    dto.setItemCode("AIVDS004");
+                    dto.setReferenceNumber(invoiceServiceType.getReference());
+                    dto.setCustReference("167371977051");
+                    dto.setDescription("SMS");
+                    dto.setTotalAmount(invoiceServiceType.getAmount());
+                    dto.setFirstName(invoice1.getPayer().getFirstName());
+                    dto.setLastName(invoice1.getPayer().getDisplayName());
+                    dto.setEmail(invoice1.getPayer().getEmail());
+
+                    childRequests.add(dto);
+                }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
+                    dto.setAmount(invoiceServiceType.getAmount());
+                    dto.setName("COMPUTERIZED TEST");
+                    dto.setItemCode("AIVDS005");
+                    dto.setReferenceNumber(invoiceServiceType.getReference());
+                    dto.setCustReference("167371977051");
+                    dto.setDescription("COMPUTERIZED TEST");
+                    dto.setTotalAmount(invoiceServiceType.getAmount());
+                    dto.setFirstName(invoice1.getPayer().getFirstName());
+                    dto.setLastName(invoice1.getPayer().getDisplayName());
+                    dto.setEmail(invoice1.getPayer().getEmail());
+
+                    childRequests.add(dto);
+                }else{
+                    ChildRequest childRequest = new ChildRequest();
+                    childRequest.setAmount(invoiceServiceType.getAmount());
+                    childRequest.setName(invoiceServiceType.getServiceType().getName());
+                    childRequest.setItemCode(invoiceServiceType.getServiceType().getCode());
+                    childRequest.setDescription(invoiceServiceType.getServiceType().getName());
+                    licence.add(childRequest);
+
+                    OTHERS_AMOUNT += invoiceServiceType.getAmount();
+                }
             }
 
-            paymentDto.setTotalAmount(invoice1.getAmount());
+            paymentDto.setAmount(OTHERS_AMOUNT);
+            paymentDto.setName("LICENSES");
+            paymentDto.setItemCode("AIVDS001");
+            paymentDto.setReferenceNumber(invoice1.getInvoiceNumber());
+            paymentDto.setCustReference("167371977051");
+            paymentDto.setDescription("LICENSES");
             paymentDto.setFirstName(invoice1.getPayer().getFirstName());
             paymentDto.setLastName(invoice1.getPayer().getDisplayName());
             paymentDto.setEmail(invoice1.getPayer().getEmail());
-            paymentDto.setParentDescription("Vehicle Registration Licence and General Motor Registration");
-            paymentDto.setTransactionId(invoice1.getInvoiceNumber());
-            paymentDto.setCustReference("167371977051");
+            paymentDto.setExtendedData(licence);
 
-            TopParentRequest topParentRequest = new TopParentRequest();
-            topParentRequest.setParentRequest(paymentDto);
-            topParentRequest.setChildRequest(childRequests);
+            childRequests.add(paymentDto);
+
+            System.out.println(childRequests);
 
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
 
-            HttpEntity entity = new HttpEntity(new Gson().toJson(topParentRequest), headersAuth);
+            HttpEntity entity = new HttpEntity(new Gson().toJson(childRequests), headersAuth);
             try {
                 String personResultAsJsonStr = restTemplate.postForObject(url, entity, String.class);
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {

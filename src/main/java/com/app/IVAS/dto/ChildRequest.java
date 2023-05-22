@@ -11,4 +11,5 @@ public class ChildRequest {
     private Double amount;
     private String name;
     private String description;
+    private String custReference;
 }

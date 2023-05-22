@@ -12,4 +12,6 @@ public interface VehicleCategoryRepository extends JpaRepository<VehicleCategory
 
 
     List<VehicleCategory> findAllByOrderByNameAsc();
+
+    VehicleCategory findFirstByNameContains(String category);
 }

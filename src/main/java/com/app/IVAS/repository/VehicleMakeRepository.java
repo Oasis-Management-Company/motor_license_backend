@@ -12,4 +12,5 @@ public interface VehicleMakeRepository extends JpaRepository<VehicleMake, Long> 
     Optional<VehicleMake> findByNameIgnoreCase(String name);
 
 
+    VehicleMake findFirstByNameIgnoreCase(String make);
 }

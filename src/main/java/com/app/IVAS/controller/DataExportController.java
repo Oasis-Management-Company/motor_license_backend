@@ -1,16 +1,10 @@
 package com.app.IVAS.controller;
 
-import com.app.IVAS.Enum.ActivityStatusConstant;
-import com.app.IVAS.Enum.GenericStatusConstant;
-import com.app.IVAS.Enum.PlateNumberStatus;
-import com.app.IVAS.Enum.RegType;
+import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.PlateNumberDto;
-import com.app.IVAS.dto.data_transfer.DataTransferAssign;
-import com.app.IVAS.dto.data_transfer.DataTransferSales;
-import com.app.IVAS.dto.data_transfer.DataTransferStock;
-import com.app.IVAS.dto.data_transfer.DataTransferUser;
-import com.app.IVAS.entity.PlateNumber;
-import com.app.IVAS.entity.PlateNumberRequest;
+import com.app.IVAS.dto.VehicleDto;
+import com.app.IVAS.dto.data_transfer.*;
+import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
@@ -26,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -45,6 +40,12 @@ public class DataExportController {
     private final PasswordService passwordService;
     private final PlateNumberRepository plateNumberRepository;
     private final JwtService jwtService;
+    private final VehicleRepository vehicleRepository;
+    private final InvoiceRepository invoiceRepository;
+    private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
+    private final VehicleMakeRepository vehicleMakeRepository;
+    private final VehicleModelRepository vehicleModelRepository;
+    private final VehicleCategoryRepository vehicleCategoryRepository;
 
 
     @PostMapping("/create")
@@ -172,6 +173,112 @@ public class DataExportController {
             }
         }
 
+        return ResponseEntity.ok("");
+    }
+
+    @PostMapping("/vehicle")
+    @Transactional
+    public ResponseEntity<?> transferVehicleDetails(@RequestBody List<VehicleDetailsDto> dtos){
+        for(VehicleDetailsDto dto: dtos) {
+                PortalUser owner = portalUserRepository.findFirstByUsernameIgnoreCase(dto.getVehicle_owner_mobile_number());
+                if (owner == null) {
+                    PortalUser portalUser = new PortalUser();
+                    portalUser.setCreatedAt(LocalDateTime.now());
+                    portalUser.setEmail(dto.getVehicle_owner_mobile_number());
+                    portalUser.setFirstName(dto.getVehicle_owner_full_name());
+                    portalUser.setLastName("");
+                    portalUser.setDisplayName(dto.getVehicle_owner_full_name());
+                    portalUser.setUsername(dto.getVehicle_owner_mobile_number());
+                    portalUser.setStatus(GenericStatusConstant.ACTIVE);
+                    portalUser.setPhoneNumber(dto.getVehicle_owner_mobile_number());
+                    portalUser.setUserVerified(false);
+                    portalUser.setAddress("AIRS office obiokoli street, Anambra");
+                    portalUser.setGeneratedPassword(passwordService.hashPassword("password"));
+                    portalUser.setRegType(RegType.REGISTRATION);
+                    portalUser.setRole(roleRepository.findByNameIgnoreCase("GENERAL_USER").orElseThrow(RuntimeException::new));
+                    owner = portalUserRepository.save(portalUser);
+                    log.info("============ taxpayer created ================" + owner.getDisplayName());
+                }
+
+                Vehicle vehicle = vehicleRepository.findFirstByChasisNumber(dto.getChassis_no());
+                VehicleMake vehicleMake = vehicleMakeRepository.findFirstByNameIgnoreCase(dto.getMake());
+                VehicleModel vehicleModel = vehicleModelRepository.findFirstByVehicleMakeAndNameIgnoreCase(vehicleMake, dto.getModel());
+                PlateNumberType type = plateNumberTypeRepository.findByNameIgnoreCase(dto.getType());
+                VehicleCategory category = vehicleCategoryRepository.findFirstByNameContains(dto.getCategory());
+                PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(dto.getPlate());
+                PlateNumber number = new PlateNumber();
+
+                if (plateNumber == null){
+                    number.setPlateNumber(dto.getPlate());
+                    number.setType(type);
+                    number.setOwner(owner);
+                    number.setPlateNumberStatus(PlateNumberStatus.SOLD);
+                    number.setPlateState(PlateState.OUT_OF_HOUSE);
+                    number.setAgent(jwtService.user);
+                    plateNumber = plateNumberRepository.save(number);
+                    log.info("============ plate Number Created ================" + plateNumber.getPlateNumber());
+                }
+
+                if (vehicle == null){
+                    Vehicle vehicle1 = new Vehicle();
+                    vehicle1.setPortalUser(owner);
+                    vehicle1.setColor(dto.getColour());
+                    if (vehicleModel != null){
+                        vehicle1.setVehicleModel(vehicleModel);
+                    }
+
+                    vehicle1.setChasisNumber(dto.getChassis_no());
+                    vehicle1.setVehicleCategory(category);
+                    vehicle1.setPlateNumber(plateNumber);
+                    vehicle1.setCreatedBy(jwtService.user);
+                    vehicle1.setYear(dto.getYear());
+                    vehicle1.setCapacity(dto.getEngine_capacity());
+                    Vehicle savedVehicle = vehicleRepository.save(vehicle1);
+                    log.info("============ Vehicle Created ================" + savedVehicle.getChasisNumber());
+
+
+//                    Invoice invoice = new Invoice();
+//
+//                    invoice.setAmount(dto.getAmount());
+//                    invoice.setPaymentStatus(PaymentStatus.PAID);
+//                    invoice.setPayer(owner);
+//                    invoice.setVehicle(savedVehicle);
+//                    invoice.setPaymentDate(LocalDateTime.from(dto.getDate()));
+//                    invoice.setSentToTax(true);
+//
+//                    Invoice saved = invoiceRepository.save(invoice);
+//                    log.info("============ Invoice Created ================" + saved.getAmount());
+                }
+            }
+        return ResponseEntity.ok("");
+    }
+
+
+    @PostMapping("/invoice")
+    @Transactional
+    public ResponseEntity<?> transferInvoiceDetails(@RequestBody List<InvoiceDto> dtos){
+        Double amount;
+        for(InvoiceDto dto: dtos) {
+            PortalUser owner = portalUserRepository.findFirstByUsernameIgnoreCase(dto.getVehicle_owner_mobile_number());
+            Vehicle vehicle = vehicleRepository.findFirstByChasisNumber(dto.getChassis_no());
+            PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(dto.getPlate());
+            InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
+            Invoice invoice = new Invoice();
+
+            List<InvoiceDto> invoiceDtos = new ArrayList<>();
+
+
+            invoice.setAmount(dto.getAmount());
+            invoice.setPaymentStatus(PaymentStatus.PAID);
+            invoice.setPayer(owner);
+            invoice.setVehicle(vehicle);
+            invoice.setPaymentDate(dto.getTime_created());
+            invoice.setSentToTax(true);
+
+            Invoice saved = invoiceRepository.save(invoice);
+            log.info("============ Invoice Created ================" + saved.getAmount());
+
+        }
         return ResponseEntity.ok("");
     }
 }
