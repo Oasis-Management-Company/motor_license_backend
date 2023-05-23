@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -77,9 +78,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public String sendPaymentTax(String invoice) {
         Double OTHERS_AMOUNT = 0.0;
-
+        Date in = new Date();
+        LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+        Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
         try{
 
+            List<ChildRequest> emptychildRequest = new ArrayList<>();
             System.out.println(invoice);
             String baseUrl = paymentAuth;
 
@@ -110,7 +114,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<ParentRequest> childRequests = new ArrayList<>();
             List<ChildRequest> licence = new ArrayList<>();
 
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             Invoice invoice1 = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoice);
 
             List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice1);
@@ -119,7 +123,6 @@ public class PaymentServiceImpl implements PaymentService {
                 ParentRequest dto = new ParentRequest();
                 if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
                     dto.setAmount(invoiceServiceType.getAmount());
-                    dto.setName("PLATE NUMBER");
                     dto.setItemCode("AIVDS001");
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
@@ -127,12 +130,13 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
+                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
+                    dto.setExtendedData(emptychildRequest);
 
                     childRequests.add(dto);
 
                 }else if(invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
                     dto.setAmount(invoiceServiceType.getAmount());
-                    dto.setName("INSURANCE");
                     dto.setItemCode("AIVDS003");
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
@@ -140,11 +144,11 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
-
+                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
+                    dto.setExtendedData(emptychildRequest);
                     childRequests.add(dto);
                 }else if(invoiceServiceType.getServiceType().getName().contains("SMS")){
                     dto.setAmount(invoiceServiceType.getAmount());
-                    dto.setName("SMS");
                     dto.setItemCode("AIVDS004");
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
@@ -152,11 +156,11 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
-
+                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
+                    dto.setExtendedData(emptychildRequest);
                     childRequests.add(dto);
                 }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
                     dto.setAmount(invoiceServiceType.getAmount());
-                    dto.setName("COMPUTERIZED TEST");
                     dto.setItemCode("AIVDS005");
                     dto.setReferenceNumber(invoiceServiceType.getReference());
                     dto.setCustReference("167371977051");
@@ -164,7 +168,8 @@ public class PaymentServiceImpl implements PaymentService {
                     dto.setFirstName(invoice1.getPayer().getFirstName());
                     dto.setLastName(invoice1.getPayer().getDisplayName());
                     dto.setEmail(invoice1.getPayer().getEmail());
-
+                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
+                    dto.setExtendedData(emptychildRequest);
                     childRequests.add(dto);
                 }else{
                     ChildRequest childRequest = new ChildRequest();
@@ -179,8 +184,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             paymentDto.setAmount(OTHERS_AMOUNT);
-            paymentDto.setName("LICENSES");
-            paymentDto.setItemCode("AIVDS001");
+            paymentDto.setItemCode("AIVDS002");
             paymentDto.setReferenceNumber(invoice1.getInvoiceNumber());
             paymentDto.setCustReference("167371977051");
             paymentDto.setDescription("LICENSES");
@@ -188,6 +192,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentDto.setLastName(invoice1.getPayer().getDisplayName());
             paymentDto.setEmail(invoice1.getPayer().getEmail());
             paymentDto.setExtendedData(licence);
+            paymentDto.setDateBooked(invoice1.getCreatedAt().format(df));
 
             childRequests.add(paymentDto);
 
@@ -203,7 +208,6 @@ public class PaymentServiceImpl implements PaymentService {
                     public boolean hasError(ClientHttpResponse response) throws IOException {
                         return false;
                     }
-
                     @Override
                     public void handleError(ClientHttpResponse response) throws IOException {
                         // do nothing, or something
