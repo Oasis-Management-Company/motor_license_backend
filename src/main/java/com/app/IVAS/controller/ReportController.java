@@ -133,7 +133,7 @@ public class ReportController {
                 .fetch().size();
 
         int soldStock = appRepository.startJPAQuery(com.app.IVAS.entity.QPlateNumber.plateNumber1)
-                .where(QPlateNumber.plateNumber1.request.isNotNull())
+                .where(QPlateNumber.plateNumber1.stock.isNotNull())
                 .where(QPlateNumber.plateNumber1.plateNumberStatus.eq(PlateNumberStatus.SOLD))
                 .fetch().size();
 

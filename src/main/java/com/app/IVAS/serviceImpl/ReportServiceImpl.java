@@ -6,6 +6,7 @@ import com.app.IVAS.Utils.PDFRenderToMultiplePages;
 import com.app.IVAS.configuration.AppConfigurationProperties;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoice;
 import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QPlateNumber;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -77,12 +78,12 @@ public class ReportServiceImpl implements ReportService {
         return users.stream().map(portalUser -> {
 
             JPAQuery<PlateNumber> plateNumberJPAQuery = appRepository.startJPAQuery(QPlateNumber.plateNumber1)
-                    .where(QPlateNumber.plateNumber1.request.isNotNull())
+                    .where(QPlateNumber.plateNumber1.stock.isNotNull())
                     .where(QPlateNumber.plateNumber1.agent.eq(portalUser));
 
             StockReportPojo pojo =  new StockReportPojo();
             pojo.setMla(portalUser.getDisplayName());
-            pojo.setStation(portalUser.getOffice().getName());
+            pojo.setStation(portalUser.getOffice() != null ? portalUser.getOffice().getName() : "-");
             pojo.setAssigned(plateNumberJPAQuery.fetch().size());
             pojo.setSold(plateNumberJPAQuery.where(QPlateNumber.plateNumber1.plateNumberStatus.eq(PlateNumberStatus.SOLD)).fetch().size());
             pojo.setCurrentQuantity(pojo.getAssigned() - pojo.getSold());
