@@ -689,7 +689,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         paymentDto.setAmount(OTHERS_AMOUNT);
         paymentDto.setName("LICENSES");
-        paymentDto.setItemCode("AIVDS001");
+        paymentDto.setItemCode("AIVDS002");
         paymentDto.setReferenceNumber(invoice.getInvoiceNumber());
         paymentDto.setCustReference("167371977051");
         paymentDto.setDescription("LICENSES");
