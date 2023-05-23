@@ -190,7 +190,6 @@ public class CardServiceImpl implements CardService {
 
 
         if (invoice.isPresent()) {
-            if (amount >= invoice.get().getAmount()) {
                 Optional<List<Card>> cards = cardRepository.findAllByInvoiceInvoiceNumberIgnoreCase(invoice.get().getInvoiceNumber());
                 /*Update cards **/
                 if (cards.isPresent()) {
@@ -208,8 +207,6 @@ public class CardServiceImpl implements CardService {
                     }
                     return cards.get();
                 }
-
-            }
 
         }
 

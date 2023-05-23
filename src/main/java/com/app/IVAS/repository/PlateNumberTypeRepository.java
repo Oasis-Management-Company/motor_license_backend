@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface PlateNumberTypeRepository extends JpaRepository<PlateNumberType, Long> {
 
     PlateNumberType findByName(String name);
+
+    PlateNumberType findByNameIgnoreCase(String type);
 }

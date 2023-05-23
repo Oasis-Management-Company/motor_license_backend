@@ -152,8 +152,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             InvoiceServiceType serviceType = new InvoiceServiceType();
             serviceType.setServiceType(type);
             serviceType.setInvoice(savedInvoice);
+            serviceType.setPaymentStatus(PaymentStatus.NOT_PAID);
 
-            serviceType.setReference(invoiceNumber);
+            serviceType.setReference(rrrGenerationService.generateNewRrrNumber());
             if (type.getRevenueCode() != null){
                 serviceType.setRevenuecode(type.getRevenueCode());
             }
@@ -627,10 +628,78 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
     @Override
-    public List<InvoiceServiceType> getServiceTypeByInvoiceId(Long invoiceId) {
+    public TopParentRequest getServiceTypeByInvoiceId(Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
-        List<InvoiceServiceType> invoiceServiceType = invoiceServiceTypeRepository.findByInvoice(invoice);
-        return invoiceServiceType;
+
+        Double OTHERS_AMOUNT = 0.0;
+        ParentRequest paymentDto = new ParentRequest();
+        List<ParentRequest> childRequests = new ArrayList<>();
+        List<ChildRequest> licence = new ArrayList<>();
+        List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+        for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
+            ParentRequest dto = new ParentRequest();
+            if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
+                dto.setAmount(invoiceServiceType.getAmount());
+                dto.setName("PLATE NUMBER");
+                dto.setItemCode("AIVDS001");
+                dto.setReferenceNumber(invoiceServiceType.getReference());
+                dto.setCustReference("167371977051");
+                dto.setDescription("PLATE NUMBER");
+                childRequests.add(dto);
+
+            }else if(invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
+                dto.setAmount(invoiceServiceType.getAmount());
+                dto.setName("INSURANCE");
+                dto.setItemCode("AIVDS003");
+                dto.setReferenceNumber(invoiceServiceType.getReference());
+                dto.setCustReference("167371977051");
+                dto.setDescription("INSURANCE");
+
+                childRequests.add(dto);
+            }else if(invoiceServiceType.getServiceType().getName().contains("SMS")){
+                dto.setAmount(invoiceServiceType.getAmount());
+                dto.setName("SMS");
+                dto.setItemCode("AIVDS004");
+                dto.setReferenceNumber(invoiceServiceType.getReference());
+                dto.setCustReference("167371977051");
+                dto.setDescription("SMS");
+
+                childRequests.add(dto);
+            }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
+                dto.setAmount(invoiceServiceType.getAmount());
+                dto.setName("COMPUTERIZED TEST");
+                dto.setItemCode("AIVDS005");
+                dto.setReferenceNumber(invoiceServiceType.getReference());
+                dto.setCustReference("167371977051");
+                dto.setDescription("COMPUTERIZED TEST");
+
+                childRequests.add(dto);
+            }else{
+                ChildRequest childRequest = new ChildRequest();
+                childRequest.setAmount(invoiceServiceType.getAmount());
+                childRequest.setName(invoiceServiceType.getServiceType().getName());
+                childRequest.setItemCode(invoiceServiceType.getServiceType().getCode());
+                childRequest.setDescription(invoiceServiceType.getServiceType().getName());
+                licence.add(childRequest);
+
+                OTHERS_AMOUNT += invoiceServiceType.getAmount();
+            }
+        }
+
+        paymentDto.setAmount(OTHERS_AMOUNT);
+        paymentDto.setName("LICENSES");
+        paymentDto.setItemCode("AIVDS002");
+        paymentDto.setReferenceNumber(invoice.getInvoiceNumber());
+        paymentDto.setCustReference("167371977051");
+        paymentDto.setDescription("LICENSES");
+        paymentDto.setExtendedData(licence);
+
+        childRequests.add(paymentDto);
+
+        TopParentRequest parentRequest = new TopParentRequest();
+        parentRequest.setData(childRequests);
+        return parentRequest;
     }
 
     @Override

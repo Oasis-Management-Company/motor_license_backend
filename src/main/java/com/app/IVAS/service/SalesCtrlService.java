@@ -48,7 +48,7 @@ public interface SalesCtrlService {
 
     PortalUser createUser(UserDto dto);
 
-    List<InvoiceServiceType> getServiceTypeByInvoiceId(Long invoiceId);
+    TopParentRequest getServiceTypeByInvoiceId(Long invoiceId);
 
     List<InsuranceCompany> getInsurance();
 
