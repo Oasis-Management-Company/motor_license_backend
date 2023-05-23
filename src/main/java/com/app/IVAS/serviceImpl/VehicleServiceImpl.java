@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -289,6 +290,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public Invoice saveTaxPayerServiceType(Long id, List<Long> ids) {
         PortalUser portalUser = portalUserRepository.findById(id).get();
+        List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
 
         Double totalAmount = 0.0;
 
@@ -306,18 +308,22 @@ public class VehicleServiceImpl implements VehicleService {
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
-
-
         for (Long nid : ids) {
             InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
             ServiceType serviceType = serviceTypeRepository.findById(nid).get();
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
-            invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference(invoiceNumber);
-            invoiceServiceType.setRegType(RegType.NON_VEHICLE);
-            invoiceServiceTypeRepository.save(invoiceServiceType);
+            invoiceServiceType.setPaymentStatus(PaymentStatus.NOT_PAID);
+
+            invoiceServiceType.setReference(rrrGenerationService.generateNewRrrNumber());
+            if (serviceType.getRevenueCode() != null){
+                invoiceServiceType.setRevenuecode(serviceType.getRevenueCode());
+            }
+            invoiceServiceType.setRegType(RegType.REGISTRATION);
+            invoiceServiceType.setAmount(serviceType.getPrice());
+            invoiceServiceTypeArrayList.add(invoiceServiceType);
         }
+        invoiceServiceTypeRepository.saveAll(invoiceServiceTypeArrayList);
 
         Sales sales1 = new Sales();
         sales1.setInvoice(savedInvoice);

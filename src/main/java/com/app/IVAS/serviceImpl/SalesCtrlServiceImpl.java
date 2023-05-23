@@ -64,7 +64,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Override
     @Transactional
     public Invoice SaveSales(SalesDto sales) {
-        System.out.println(sales);
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
         UserDto dto = new UserDto();
@@ -668,11 +667,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 childRequests.add(dto);
             }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
                 dto.setAmount(invoiceServiceType.getAmount());
-                dto.setName("COMPUTERIZED TEST");
+                dto.setName("COMPUTERIZED TEST/ROADWORTHINESS");
                 dto.setItemCode("AIVDS005");
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("167371977051");
-                dto.setDescription("COMPUTERIZED TEST");
+                dto.setDescription("COMPUTERIZED TEST/ROADWORTHINESS");
 
                 childRequests.add(dto);
             }else{
