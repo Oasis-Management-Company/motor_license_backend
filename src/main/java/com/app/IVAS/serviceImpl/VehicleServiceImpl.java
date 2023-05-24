@@ -176,7 +176,7 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference(invoiceNumber);
+            invoiceServiceType.setReference(rrrGenerationService.generateNewRrrNumber());
             invoiceServiceType.setRegType(RegType.RENEWAL);
             invoiceServiceType.setAmount(serviceType.getPrice());
             invoiceServiceTypeRepository.save(invoiceServiceType);
@@ -254,7 +254,7 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setServiceType(serviceType);
             invoiceServiceType.setInvoice(savedInvoice);
             invoiceServiceType.setRevenuecode(serviceType.getCode());
-            invoiceServiceType.setReference(invoiceNumber);
+            invoiceServiceType.setReference(rrrGenerationService.generateNewRrrNumber());
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 

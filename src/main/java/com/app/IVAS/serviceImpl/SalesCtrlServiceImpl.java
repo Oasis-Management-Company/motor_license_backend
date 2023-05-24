@@ -78,7 +78,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
         Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
-//        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
         if(sales.getSelectInsurance().equalsIgnoreCase("Yes")){
@@ -93,7 +92,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         }
 
         PortalUser user = portalUserRepository.findFirstByPhoneNumberOrEmail(sales.getPhone_number(), email);
-        System.out.println(user);
         if (foundVehicle != null) {
             return null;
         }
@@ -125,7 +123,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         vehicle.setCreatedBy(jwtService.user);
         vehicle.setPolicySector(sales.getPolicy());
         vehicle.setYear(sales.getYear());
-//        vehicle.setInsurance(insuranceCompany);
         vehicle.setInsuranceNumber(sales.getInsuranceNumber());
         vehicle.setLoad(sales.getLoad());
         vehicle.setCapacity(sales.getCapacity());
@@ -163,7 +160,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         }
         invoiceServiceTypeRepository.saveAll(invoiceServiceTypeArrayList);
-
 
         sales1.setVehicle(savedVehicle);
         sales1.setInvoice(savedInvoice);
@@ -535,9 +531,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             dto.setChasis(sales.getChasisNumber());
             dto.setEngine(sales.getEngineNumber());
             dto.setColor(sales.getColor());
-            dto.setModel(sales.getVehicleModel().getName());
-            dto.setMake(sales.getVehicleModel().getVehicleMake().getName());
-            dto.setCategory(sales.getVehicleCategory().getName());
+            if(sales.getVehicleModel() != null){
+                dto.setModel(sales.getVehicleModel().getName());
+                dto.setMake(sales.getVehicleModel().getVehicleMake().getName());
+                dto.setCategory(sales.getVehicleCategory().getName());
+            }
             dto.setPlate(sales.getPlateNumber().getPlateNumber());
             dto.setDate(sales.getCreatedAt());
             dto.setYear(sales.getYear());
@@ -637,64 +635,72 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
 
         for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
-            ParentRequest dto = new ParentRequest();
-            if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
+                ParentRequest dto = new ParentRequest();
                 dto.setAmount(invoiceServiceType.getAmount());
-                dto.setName("PLATE NUMBER");
-                dto.setItemCode("AIVDS001");
+                dto.setName(invoiceServiceType.getServiceType().getName());
+                dto.setItemCode(invoiceServiceType.getServiceType().getCode());
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("167371977051");
-                dto.setDescription("PLATE NUMBER");
+                dto.setDescription(invoiceServiceType.getServiceType().getName());
                 childRequests.add(dto);
 
-            }else if(invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
-                dto.setAmount(invoiceServiceType.getAmount());
-                dto.setName("INSURANCE");
-                dto.setItemCode("AIVDS003");
-                dto.setReferenceNumber(invoiceServiceType.getReference());
-                dto.setCustReference("167371977051");
-                dto.setDescription("INSURANCE");
-
-                childRequests.add(dto);
-            }else if(invoiceServiceType.getServiceType().getName().contains("SMS")){
-                dto.setAmount(invoiceServiceType.getAmount());
-                dto.setName("SMS");
-                dto.setItemCode("AIVDS004");
-                dto.setReferenceNumber(invoiceServiceType.getReference());
-                dto.setCustReference("167371977051");
-                dto.setDescription("SMS");
-
-                childRequests.add(dto);
-            }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
-                dto.setAmount(invoiceServiceType.getAmount());
-                dto.setName("COMPUTERIZED TEST/ROADWORTHINESS");
-                dto.setItemCode("AIVDS005");
-                dto.setReferenceNumber(invoiceServiceType.getReference());
-                dto.setCustReference("167371977051");
-                dto.setDescription("COMPUTERIZED TEST/ROADWORTHINESS");
-
-                childRequests.add(dto);
-            }else{
-                ChildRequest childRequest = new ChildRequest();
-                childRequest.setAmount(invoiceServiceType.getAmount());
-                childRequest.setName(invoiceServiceType.getServiceType().getName());
-                childRequest.setItemCode(invoiceServiceType.getServiceType().getCode());
-                childRequest.setDescription(invoiceServiceType.getServiceType().getName());
-                licence.add(childRequest);
-
-                OTHERS_AMOUNT += invoiceServiceType.getAmount();
-            }
+//            if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
+//                dto.setAmount(invoiceServiceType.getAmount());
+//                dto.setName("PLATE NUMBER");
+//                dto.setItemCode("AIVDS001");
+//                dto.setReferenceNumber(invoiceServiceType.getReference());
+//                dto.setCustReference("167371977051");
+//                dto.setDescription("PLATE NUMBER");
+//                childRequests.add(dto);
+//
+//            }else if(invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
+//                dto.setAmount(invoiceServiceType.getAmount());
+//                dto.setName("INSURANCE");
+//                dto.setItemCode("AIVDS003");
+//                dto.setReferenceNumber(invoiceServiceType.getReference());
+//                dto.setCustReference("167371977051");
+//                dto.setDescription("INSURANCE");
+//
+//                childRequests.add(dto);
+//            }else if(invoiceServiceType.getServiceType().getName().contains("SMS")){
+//                dto.setAmount(invoiceServiceType.getAmount());
+//                dto.setName("SMS");
+//                dto.setItemCode("AIVDS004");
+//                dto.setReferenceNumber(invoiceServiceType.getReference());
+//                dto.setCustReference("167371977051");
+//                dto.setDescription("SMS");
+//
+//                childRequests.add(dto);
+//            }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
+//                dto.setAmount(invoiceServiceType.getAmount());
+//                dto.setName("COMPUTERIZED TEST/ROADWORTHINESS");
+//                dto.setItemCode("AIVDS005");
+//                dto.setReferenceNumber(invoiceServiceType.getReference());
+//                dto.setCustReference("167371977051");
+//                dto.setDescription("COMPUTERIZED TEST/ROADWORTHINESS");
+//
+//                childRequests.add(dto);
+//            }else{
+//                ChildRequest childRequest = new ChildRequest();
+//                childRequest.setAmount(invoiceServiceType.getAmount());
+//                childRequest.setName(invoiceServiceType.getServiceType().getName());
+//                childRequest.setItemCode(invoiceServiceType.getServiceType().getCode());
+//                childRequest.setDescription(invoiceServiceType.getServiceType().getName());
+//                licence.add(childRequest);
+//
+//                OTHERS_AMOUNT += invoiceServiceType.getAmount();
+//            }
         }
-
-        paymentDto.setAmount(OTHERS_AMOUNT);
-        paymentDto.setName("LICENSES");
-        paymentDto.setItemCode("AIVDS002");
-        paymentDto.setReferenceNumber(invoice.getInvoiceNumber());
-        paymentDto.setCustReference("167371977051");
-        paymentDto.setDescription("LICENSES");
-        paymentDto.setExtendedData(licence);
-
-        childRequests.add(paymentDto);
+//
+//        paymentDto.setAmount(OTHERS_AMOUNT);
+//        paymentDto.setName("LICENSES");
+//        paymentDto.setItemCode("AIVDS002");
+//        paymentDto.setReferenceNumber(invoice.getInvoiceNumber());
+//        paymentDto.setCustReference("167371977051");
+//        paymentDto.setDescription("LICENSES");
+//        paymentDto.setExtendedData(licence);
+//
+//        childRequests.add(paymentDto);
 
         TopParentRequest parentRequest = new TopParentRequest();
         parentRequest.setData(childRequests);
