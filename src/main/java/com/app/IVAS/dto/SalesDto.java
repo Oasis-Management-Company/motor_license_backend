@@ -54,4 +54,6 @@ public class SalesDto {
 
     private String selectInsurance;
 
+    private String plateState;
+
 }
