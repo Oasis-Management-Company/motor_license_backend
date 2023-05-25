@@ -7,4 +7,6 @@ public interface VerificationService {
 VerificationDto getScannedInvoice(String invoiceNumber);
 
     VerificationDto getInvoiceByPlateNumber(String plateNumber);
+
+    VerificationDto getInvoiceByReferenceNumber(String referenceNumber);
 }
