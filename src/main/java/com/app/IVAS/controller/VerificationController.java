@@ -30,4 +30,9 @@ public class VerificationController {
         return ResponseEntity.ok(verificationService.getInvoiceByPlateNumber(plateNumber));
     }
 
+    @GetMapping("/invoice/view/referenceDetails{referenceNumber}")
+    public ResponseEntity<?> getReferenceDetails(@PathVariable String referenceNumber){
+        return ResponseEntity.ok(verificationService.getInvoiceByReferenceNumber(referenceNumber));
+    }
+
 }

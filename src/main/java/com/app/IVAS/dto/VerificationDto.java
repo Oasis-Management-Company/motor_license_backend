@@ -1,6 +1,7 @@
 package com.app.IVAS.dto;
 
 import com.app.IVAS.Enum.PaymentStatus;
+import com.app.IVAS.entity.ServiceType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,8 @@ public class VerificationDto {
 
     private List<InvoiceServiceTypeDto> invoiceServices;
 
+    private List<ServiceType> serviceTypes;
+
     private LocalDateTime expiryDate;
 
     private String chasis;
@@ -33,6 +36,8 @@ public class VerificationDto {
     private String year;
     private String color;
     private String plate;
+
+    private String referenceNumber;
 
 
 }
