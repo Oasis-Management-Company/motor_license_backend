@@ -110,13 +110,10 @@ public class PaymentServiceImpl implements PaymentService {
             String url =paymentUrl;
 
             ResponseEntity<Object> responseRC = null;
-            ParentRequest paymentDto = new ParentRequest();
             List<ParentRequest> childRequests = new ArrayList<>();
-            List<ChildRequest> licence = new ArrayList<>();
 
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             Invoice invoice1 = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(invoice);
-
             List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice1);
 
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
@@ -124,7 +121,7 @@ public class PaymentServiceImpl implements PaymentService {
                 dto.setAmount(invoiceServiceType.getAmount());
                 dto.setItemCode(invoiceServiceType.getRevenuecode());
                 dto.setReferenceNumber(invoiceServiceType.getReference());
-                dto.setCustReference("167371977051");
+                dto.setCustReference("2036644664");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
                 dto.setFirstName(invoice1.getPayer().getFirstName());
                 dto.setLastName(invoice1.getPayer().getDisplayName());
@@ -132,83 +129,7 @@ public class PaymentServiceImpl implements PaymentService {
                 dto.setDateBooked(invoice1.getCreatedAt().format(df));
                 dto.setExtendedData(emptychildRequest);
                 childRequests.add(dto);
-
-//                if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
-//                    dto.setAmount(invoiceServiceType.getAmount());
-//                    dto.setItemCode("AIVDS001");
-//                    dto.setItemCode(invoiceServiceType.getRevenuecode());
-//                    dto.setReferenceNumber(invoiceServiceType.getReference());
-//                    dto.setCustReference("167371977051");
-//                    dto.setDescription(invoiceServiceType.getServiceType().getName());
-//                    dto.setDescription("PLATE NUMBER");
-//                    dto.setFirstName(invoice1.getPayer().getFirstName());
-//                    dto.setLastName(invoice1.getPayer().getDisplayName());
-//                    dto.setEmail(invoice1.getPayer().getEmail());
-//                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
-//                    dto.setExtendedData(emptychildRequest);
-//
-//                    childRequests.add(dto);
-//
-//                }else if(invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
-//                    dto.setAmount(invoiceServiceType.getAmount());
-//                    dto.setItemCode("AIVDS003");
-//                    dto.setReferenceNumber(invoiceServiceType.getReference());
-//                    dto.setCustReference("167371977051");
-//                    dto.setDescription("INSURANCE");
-//                    dto.setFirstName(invoice1.getPayer().getFirstName());
-//                    dto.setLastName(invoice1.getPayer().getDisplayName());
-//                    dto.setEmail(invoice1.getPayer().getEmail());
-//                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
-//                    dto.setExtendedData(emptychildRequest);
-//                    childRequests.add(dto);
-//                }else if(invoiceServiceType.getServiceType().getName().contains("SMS")){
-//                    dto.setAmount(invoiceServiceType.getAmount());
-//                    dto.setItemCode("AIVDS004");
-//                    dto.setReferenceNumber(invoiceServiceType.getReference());
-//                    dto.setCustReference("167371977051");
-//                    dto.setDescription("SMS");
-//                    dto.setFirstName(invoice1.getPayer().getFirstName());
-//                    dto.setLastName(invoice1.getPayer().getDisplayName());
-//                    dto.setEmail(invoice1.getPayer().getEmail());
-//                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
-//                    dto.setExtendedData(emptychildRequest);
-//                    childRequests.add(dto);
-//                }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
-//                    dto.setAmount(invoiceServiceType.getAmount());
-//                    dto.setItemCode("AIVDS005");
-//                    dto.setReferenceNumber(invoiceServiceType.getReference());
-//                    dto.setCustReference("167371977051");
-//                    dto.setDescription("COMPUTERIZED TEST");
-//                    dto.setFirstName(invoice1.getPayer().getFirstName());
-//                    dto.setLastName(invoice1.getPayer().getDisplayName());
-//                    dto.setEmail(invoice1.getPayer().getEmail());
-//                    dto.setDateBooked(invoice1.getCreatedAt().format(df));
-//                    dto.setExtendedData(emptychildRequest);
-//                    childRequests.add(dto);
-//                }else{
-//                    ChildRequest childRequest = new ChildRequest();
-//                    childRequest.setAmount(invoiceServiceType.getAmount());
-//                    childRequest.setName(invoiceServiceType.getServiceType().getName());
-//                    childRequest.setItemCode(invoiceServiceType.getServiceType().getCode());
-//                    childRequest.setDescription(invoiceServiceType.getServiceType().getName());
-//                    licence.add(childRequest);
-//
-//                    OTHERS_AMOUNT += invoiceServiceType.getAmount();
-//                }
             }
-//
-//            paymentDto.setAmount(OTHERS_AMOUNT);
-//            paymentDto.setItemCode("AIVDS002");
-//            paymentDto.setReferenceNumber(invoice1.getInvoiceNumber());
-//            paymentDto.setCustReference("167371977051");
-//            paymentDto.setDescription("LICENSES");
-//            paymentDto.setFirstName(invoice1.getPayer().getFirstName());
-//            paymentDto.setLastName(invoice1.getPayer().getDisplayName());
-//            paymentDto.setEmail(invoice1.getPayer().getEmail());
-//            paymentDto.setExtendedData(licence);
-//            paymentDto.setDateBooked(invoice1.getCreatedAt().format(df));
-//
-//            childRequests.add(paymentDto);
 
             TopParentRequest parentRequest = new TopParentRequest();
             parentRequest.setData(childRequests);
