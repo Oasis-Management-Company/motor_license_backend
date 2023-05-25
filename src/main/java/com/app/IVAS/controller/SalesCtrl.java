@@ -62,10 +62,12 @@ public class SalesCtrl {
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
                 .where(QSales.sales.plateType.eq(RegType.REGISTRATION))
-                .where(QSales.sales.createdBy.id.eq(jwtService.user.getId()))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
+        if (jwtService.user.getRole().getName().equals("MLA")){
+            userJPAQuery.where(QSales.sales.createdBy.id.eq(jwtService.user.getId()));
+        }
         if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
             LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
             userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
@@ -87,11 +89,13 @@ public class SalesCtrl {
         JPAQuery<Sales> userJPAQuery = appRepository.startJPAQuery(QSales.sales)
                 .where(predicateExtractor.getPredicate(filter))
                 .where(QSales.sales.plateType.eq(RegType.RENEWAL))
-                .where(QSales.sales.createdBy.id.eq(jwtService.user.getId()))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
 
+        if (jwtService.user.getRole().getName().equals("MLA")){
+            userJPAQuery.where(QSales.sales.createdBy.id.eq(jwtService.user.getId()));
+        }
         if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
             LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
             userJPAQuery.where(QSales.sales.createdAt.goe(startDate.atStartOfDay()));
