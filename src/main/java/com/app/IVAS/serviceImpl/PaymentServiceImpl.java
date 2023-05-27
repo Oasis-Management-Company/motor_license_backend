@@ -28,6 +28,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -192,11 +193,11 @@ public class PaymentServiceImpl implements PaymentService {
             return assessmentResponse;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
         LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
 
-        Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
         InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(respondDto.getCustReference());
+        Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
 
         if (invoiceServiceType == null ){
             if (invoice == null){
@@ -252,7 +253,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoiceServiceType.getInvoice());
 
             for (InvoiceServiceType serviceType : invoiceServiceTypeList) {
-                if (serviceType.getPaymentStatus().equals(PaymentStatus.NOT_PAID)) {
+                if (serviceType.getPaymentStatus() == null || serviceType.getPaymentStatus().equals(PaymentStatus.NOT_PAID)) {
                     break;
                 }else{
                     Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
