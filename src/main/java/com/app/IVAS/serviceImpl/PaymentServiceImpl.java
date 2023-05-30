@@ -125,7 +125,9 @@ public class PaymentServiceImpl implements PaymentService {
                 dto.setCustReference("2036644664");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
                 dto.setFirstName(invoice1.getPayer().getFirstName());
-                dto.setLastName(invoice1.getPayer().getDisplayName());
+                if (invoice1.getPayer().getLastName() != null){
+                    dto.setLastName(invoice1.getPayer().getLastName());
+                }
                 dto.setEmail(invoice1.getPayer().getEmail());
                 dto.setDateBooked(invoice1.getCreatedAt().format(df));
                 dto.setExtendedData(emptychildRequest);
