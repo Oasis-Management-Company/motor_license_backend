@@ -640,7 +640,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("167371977051");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
-                dto.setDateExpired(invoiceServiceType.getExpiryDate().format(df));
+                if(invoiceServiceType.getExpiryDate() != null){
+                    dto.setDateExpired(invoiceServiceType.getExpiryDate().format(df));
+                }
                 childRequests.add(dto);
                 dto.setInvoiceNumber(invoiceServiceType.getInvoice().getInvoiceNumber());
 
