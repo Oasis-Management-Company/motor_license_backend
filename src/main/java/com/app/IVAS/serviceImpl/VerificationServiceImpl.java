@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,8 @@ public class VerificationServiceImpl implements VerificationService {
     public VerificationDto getScannedInvoice(String invoiceNumber) {
 
         VerificationDto verificationDto = new VerificationDto();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM, yyyy");
+
 
         Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberIgnoreCase(invoiceNumber);
         if (invoice.isPresent()) {
@@ -137,13 +140,18 @@ public class VerificationServiceImpl implements VerificationService {
                         if (invoiceServiceType.getPaymentDate() != null) {
                             invoiceServiceTypeDto.setPaymentDate(invoiceServiceType.getPaymentDate());
                         }
+//                        if (invoiceServiceType.getExpiryDate() != null && invoiceServiceType.getPaymentDate() != null) {
+//                            invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getExpiryDate());
+//                        }
 
-                        if (invoiceServiceType.getServiceType().getDurationInMonth() != null && invoiceServiceType.getPaymentDate() != null) {
-                            invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getPaymentDate().plusMonths(invoiceServiceType.getServiceType().getDurationInMonth()));
+                        if (invoiceServiceType.getExpiryDate() != null) {
+                            invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getExpiryDate());
+                            invoiceServiceTypeDto.setExpiry(invoiceServiceType.getExpiryDate().format(formatter));
                         }
 
                         invoiceServiceTypeDtos.add(invoiceServiceTypeDto);
                     }
+                    System.out.println(invoiceServiceTypeDtos);
 
                     verificationDto.setInvoiceServices(invoiceServiceTypeDtos);
                 }
@@ -157,6 +165,8 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public VerificationDto getInvoiceByPlateNumber(String plateNumber) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM, yyyy");
 
         VerificationDto verificationDto = new VerificationDto();
 
@@ -271,12 +281,18 @@ public class VerificationServiceImpl implements VerificationService {
                                     invoiceServiceTypeDto.setPaymentDate(invoiceServiceType.getPaymentDate());
                                 }
 
-                                if (invoiceServiceType.getServiceType().getDurationInMonth() != null && invoiceServiceType.getPaymentDate() != null) {
-                                    invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getPaymentDate().plusMonths(invoiceServiceType.getServiceType().getDurationInMonth()));
+                                if (invoiceServiceType.getExpiryDate() != null) {
+//                                    invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getPaymentDate().plusMonths(invoiceServiceType.getServiceType().getDurationInMonth()));
+
+                                    invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getExpiryDate());
+                                    invoiceServiceTypeDto.setExpiry(invoiceServiceType.getExpiryDate().format(formatter));
+
                                 }
 
                                 invoiceServiceTypeDtos.add(invoiceServiceTypeDto);
                             }
+
+                            System.out.println(invoiceServiceTypeDtos);
 
 
                             verificationDto.setInvoiceServices(invoiceServiceTypeDtos);

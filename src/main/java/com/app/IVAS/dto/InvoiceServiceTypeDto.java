@@ -11,5 +11,6 @@ public class InvoiceServiceTypeDto extends ServiceTypeDto {
     String reference;
     LocalDateTime paymentDate;
     LocalDateTime expiryDate;
+    String expiry;
 
 }

@@ -628,11 +628,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     @Override
     public TopParentRequest getServiceTypeByInvoiceId(Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
-
-        Double OTHERS_AMOUNT = 0.0;
-        ParentRequest paymentDto = new ParentRequest();
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
         List<ParentRequest> childRequests = new ArrayList<>();
-        List<ChildRequest> licence = new ArrayList<>();
         List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
 
         for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
@@ -643,7 +640,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("167371977051");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
+                dto.setDateExpired(invoiceServiceType.getExpiryDate().format(df));
                 childRequests.add(dto);
+                dto.setInvoiceNumber(invoiceServiceType.getInvoice().getInvoiceNumber());
 
 //            if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
 //                dto.setAmount(invoiceServiceType.getAmount());

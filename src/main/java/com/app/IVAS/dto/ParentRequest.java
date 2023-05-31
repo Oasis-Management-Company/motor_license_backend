@@ -18,4 +18,5 @@ public class ParentRequest {
     private String itemCode;
     List<ChildRequest> extendedData;
     private String name;
+    private String invoiceNumber;
 }
