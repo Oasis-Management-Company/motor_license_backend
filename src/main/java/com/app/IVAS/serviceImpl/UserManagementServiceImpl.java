@@ -278,7 +278,7 @@ public class UserManagementServiceImpl implements UserManagementService {
             permission.setPermissionTypeConstant(permissionTypeConstant);
             permission.setRole(role);
             permissionRepository.save(permission);
-            activityLogService.createActivityLog(("Permission: " + permissionTypeConstant.name() + "has been added to role : " + role.getName()), ActivityStatusConstant.UPDATE);
+            activityLogService.createActivityLog(("Permission: " + permissionTypeConstant.name() + " has been added to role : " + role.getName()), ActivityStatusConstant.UPDATE);
         });
     }
 
