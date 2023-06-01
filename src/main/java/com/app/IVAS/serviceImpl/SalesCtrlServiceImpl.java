@@ -777,7 +777,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public Invoice SaveSalesEdit(SalesDto sales) {
-        System.out.println(sales);
         List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
         Double totalAmount = 0.0;
 
