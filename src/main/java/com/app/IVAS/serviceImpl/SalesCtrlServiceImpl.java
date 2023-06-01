@@ -640,7 +640,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("167371977051");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
-                dto.setDateExpired(invoiceServiceType.getExpiryDate().format(df));
+                if(invoiceServiceType.getExpiryDate() != null){
+                    dto.setDateExpired(invoiceServiceType.getExpiryDate().format(df));
+                }
                 childRequests.add(dto);
                 dto.setInvoiceNumber(invoiceServiceType.getInvoice().getInvoiceNumber());
 
@@ -786,11 +788,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         PlateNumberType types = plateNumberTypeRepository.findById(invoiceEdited.getVehicle().getPlateNumber().getType().getId()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
+
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
-//        List<InvoiceServiceType> servicesToBeDeleted = invoiceServiceTypeRepository.findByInvoice(invoiceEdited);
-        List<InvoiceServiceType> servicesToBeDeleted = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType).where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("INSURANCE")).fetch();
-
+        List<InvoiceServiceType> servicesToBeDeleted = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.invoiceNumber.equalsIgnoreCase(invoiceEdited.getInvoiceNumber()))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.notEqualsIgnoreCase("INSURANCE")).fetch();
 
         for (InvoiceServiceType invoiceServiceType : servicesToBeDeleted) {
             invoiceServiceTypeRepository.delete(invoiceServiceType);
