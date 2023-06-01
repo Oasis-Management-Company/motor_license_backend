@@ -291,4 +291,8 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.SaveSalesEdit(salesDto));
     }
 
+    @PostMapping("/phone/validate")
+    public ResponseEntity<PortalUserPojo> ValidatPhoneNumber(@RequestParam String phone){
+        return ResponseEntity.ok(service.ValidatPhoneNumber(phone));
+    }
 }

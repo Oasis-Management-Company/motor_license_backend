@@ -249,6 +249,20 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
     @Override
+    public PortalUserPojo ValidatPhoneNumber(String phone) {
+        PortalUser portalUser = portalUserRepository.findFirstByPhoneNumber(phone);
+        if (portalUser == null){
+            return null;
+        }
+        PortalUserPojo portalUserPojo = new PortalUserPojo();
+        portalUserPojo.setPhoneNumber(portalUser.getPhoneNumber());
+        portalUserPojo.setName(portalUser.getDisplayName());
+        portalUserPojo.setAddress(portalUser.getAddress());
+
+        return portalUserPojo;
+    }
+
+    @Override
     public PortalUser viewPortalUser(Long id) {
         Optional<PortalUser> taxPayer = portalUserRepository.findById(id);
 
