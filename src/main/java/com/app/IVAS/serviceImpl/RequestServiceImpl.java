@@ -55,7 +55,7 @@ public class RequestServiceImpl implements RequestService {
             pojo.setTrackingId(request.getTrackingId());
             pojo.setCreatedAt(request.getCreatedAt().format(df));
             pojo.setCreatedBy(request.getCreatedBy().getDisplayName());
-            pojo.setMlaZone(request.getCreatedBy().getOffice().getName());
+            pojo.setMlaZone(request.getCreatedBy().getOffice() != null ? request.getCreatedBy().getOffice().getName(): "");
             pojo.setPlateNumberType(request.getPlateNumberType().getName());
             pojo.setTypeId(request.getPlateNumberType().getId());
             pojo.setPlateNumberSubType(request.getSubType() != null ? request.getSubType().getName() : null);
