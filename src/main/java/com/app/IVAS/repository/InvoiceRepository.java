@@ -26,4 +26,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     @Query(value = "SELECT * FROM invoice WHERE vehicle_id = ?1 ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Invoice findLastByVehicle(Vehicle vehicle);
+
+    Invoice findFirstByVehicle(Vehicle vehicle);
 }

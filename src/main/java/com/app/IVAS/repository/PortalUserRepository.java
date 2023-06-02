@@ -32,4 +32,6 @@ public interface PortalUserRepository extends JpaRepository<PortalUser, Long> {
     PortalUser findFirstByPhoneNumberOrEmail(String phone_number, String email);
 
     PortalUser findByEmail(String email);
+
+    PortalUser findFirstByFirstNameIgnoreCase(String first_name);
 }

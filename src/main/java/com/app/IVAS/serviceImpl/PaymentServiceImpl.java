@@ -195,7 +195,7 @@ public class PaymentServiceImpl implements PaymentService {
             return assessmentResponse;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
 
         InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(respondDto.getCustReference());

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,6 +50,7 @@ public class SalesCtrl {
     private final PredicateExtractor predicateExtractor;
 
     @PostMapping("/save/sales")
+    @Transactional
     public ResponseEntity<Invoice> SaveSales(@RequestBody SalesDto sales){
         Invoice invoice = service.SaveSales(sales);
         return ResponseEntity.ok(invoice);
@@ -210,6 +212,7 @@ public class SalesCtrl {
 
 
     @PostMapping("/add/vehicle")
+    @Transactional
     public ResponseEntity<SalesDto> AddVehicle(@RequestBody SalesDto sales){
         return ResponseEntity.ok(service.AddVehicle(sales));
     }
@@ -291,4 +294,8 @@ public class SalesCtrl {
         return ResponseEntity.ok(service.SaveSalesEdit(salesDto));
     }
 
+    @PostMapping("/phone/validate")
+    public ResponseEntity<PortalUserPojo> ValidatPhoneNumber(@RequestParam String phone){
+        return ResponseEntity.ok(service.ValidatPhoneNumber(phone));
+    }
 }

@@ -62,7 +62,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private final AppRepository appRepository;
 
     @Override
-    @Transactional
     public Invoice SaveSales(SalesDto sales) {
         Vehicle vehicle = new Vehicle();
         Sales sales1 = new Sales();
@@ -246,6 +245,20 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         return dto;
 
+    }
+
+    @Override
+    public PortalUserPojo ValidatPhoneNumber(String phone) {
+        PortalUser portalUser = portalUserRepository.findFirstByPhoneNumber(phone);
+        if (portalUser == null){
+            return null;
+        }
+        PortalUserPojo portalUserPojo = new PortalUserPojo();
+        portalUserPojo.setPhoneNumber(portalUser.getPhoneNumber());
+        portalUserPojo.setName(portalUser.getDisplayName());
+        portalUserPojo.setAddress(portalUser.getAddress());
+
+        return portalUserPojo;
     }
 
     @Override
@@ -561,6 +574,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 //        InsuranceCompany insuranceCompany = insuranceRepository.findById(sales.getInsurance()).get();
         portalUser = portalUserRepository.findFirstByPhoneNumber(sales.getPhone_number());
 
+        PlateNumber plate = plateNumberRepository.findFirstByPlateNumberIgnoreCase(sales.getPlate());
+        if(plate != null){
+            return null;
+        }
+
         if (portalUser == null) {
             dto.setAddress(sales.getAddress());
             dto.setEmail(sales.getEmail());
@@ -777,7 +795,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public Invoice SaveSalesEdit(SalesDto sales) {
-        System.out.println(sales);
         List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
         Double totalAmount = 0.0;
 

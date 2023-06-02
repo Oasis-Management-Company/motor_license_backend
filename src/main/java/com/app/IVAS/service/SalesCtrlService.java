@@ -60,5 +60,7 @@ public interface SalesCtrlService {
 
     SalesDto viewSale(Long id);
 
+    PortalUserPojo ValidatPhoneNumber(String phone);
+
 //    Void editSalesInvoice(SalesDto dto);
 }

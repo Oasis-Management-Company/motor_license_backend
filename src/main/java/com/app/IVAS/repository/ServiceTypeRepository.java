@@ -36,4 +36,7 @@ public interface ServiceTypeRepository extends JpaRepository<ServiceType, Long> 
 
     ServiceType findByCategoryAndPlateNumberTypeAndRegType(VehicleCategory category, PlateNumberType plateNumberType, RegType insurance);
 
+    ServiceType findFirstByNameIgnoreCase(String description);
+
+    ServiceType findFirstByNameContains(String description);
 }

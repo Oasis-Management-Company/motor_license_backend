@@ -2,6 +2,7 @@ package com.app.IVAS.controller;
 
 import com.app.IVAS.Enum.*;
 import com.app.IVAS.dto.PlateNumberDto;
+import com.app.IVAS.dto.UploadDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.dto.data_transfer.*;
 import com.app.IVAS.entity.*;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class DataExportController {
     private final VehicleMakeRepository vehicleMakeRepository;
     private final VehicleModelRepository vehicleModelRepository;
     private final VehicleCategoryRepository vehicleCategoryRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
 
 
     @PostMapping("/create")
@@ -278,6 +281,35 @@ public class DataExportController {
             Invoice saved = invoiceRepository.save(invoice);
             log.info("============ Invoice Created ================" + saved.getAmount());
 
+        }
+        return ResponseEntity.ok("");
+    }
+
+    @PostMapping(value = "/upload", consumes = "application/json", produces = "application/json")
+    @Transactional
+    public ResponseEntity<?> uplaodFromTax(@RequestBody List<UploadDto> dtos){
+
+        System.out.println(dtos);
+        for (UploadDto dto : dtos) {
+            PortalUser payer = portalUserRepository.findFirstByFirstNameIgnoreCase(dto.getFirst_name());
+            Vehicle vehicle = vehicleRepository.findFirstByPortalUser(payer);
+            Invoice invoice = invoiceRepository.findFirstByVehicle(vehicle);
+            ServiceType serviceType = serviceTypeRepository.findFirstByNameContains(dto.getDescription());
+
+            InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
+            invoiceServiceType.setInvoice(invoice);
+            invoiceServiceType.setAmount(dto.getAmount());
+            invoiceServiceType.setRegType(RegType.REGISTRATION);
+            invoiceServiceType.setReference(dto.getReference_number());
+            invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
+            invoiceServiceType.setRevenuecode(dto.getItem_code());
+//            invoiceServiceType.setPaymentDate(dto.getTime_created());
+//            invoiceServiceType.setExpiryDate(dto.getTime_created().plusYears(1).minusDays(1));
+            invoiceServiceType.setServiceType(serviceType);
+
+            invoiceServiceTypeRepository.save(invoiceServiceType);
+
+            System.out.println("Created Invoice");
         }
         return ResponseEntity.ok("");
     }
