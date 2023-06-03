@@ -265,7 +265,7 @@ public class PaymentServiceImpl implements PaymentService {
                         try{
                             cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), dateTime);
                         }catch (Exception e){
-                            System.out.println(e);
+                            System.out.println(e.getMessage());
                         }
                         invoiceRepository.save(invoice1);
                     }
