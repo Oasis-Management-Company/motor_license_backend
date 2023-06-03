@@ -182,6 +182,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
+        System.out.println(respondDto);
         AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
         Boolean insurance = false;
@@ -195,8 +196,8 @@ public class PaymentServiceImpl implements PaymentService {
             return assessmentResponse;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+//        LocalDateTime dateTime = LocalDateTime.parse(respondDto.getPaymentDate(), formatter);
 
         InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(respondDto.getCustReference());
         Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
@@ -213,8 +214,8 @@ public class PaymentServiceImpl implements PaymentService {
                 for (InvoiceServiceType serviceType : invoiceServiceTypes) {
                     if (serviceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE") || serviceType.getServiceType().getName().contains("SMS") || serviceType.getServiceType().getName().contains("INSURANCE") || serviceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
                     }else{
-                        serviceType.setPaymentDate(dateTime);
-                        serviceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
+                        serviceType.setPaymentDate(LocalDateTime.now());
+                        serviceType.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
                         serviceType.setPaymentStatus(PaymentStatus.PAID);
                         invoiceServiceTypeRepository.save(serviceType);
                     }
@@ -230,7 +231,7 @@ public class PaymentServiceImpl implements PaymentService {
                         invoice1.setPaymentStatus(PaymentStatus.PAID);
 
                         try{
-                            cardService.updateCardByPayment(invoice.getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), dateTime);
+                            cardService.updateCardByPayment(invoice.getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), LocalDateTime.now());
                         }catch (Exception e){
                             System.out.println(e);
                         }
@@ -239,17 +240,20 @@ public class PaymentServiceImpl implements PaymentService {
                 }
             }
         }else{
-            if (invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
-                try{
-                    sendInsuranceToVendor(invoiceServiceType.getInvoice().getVehicle().getPlateNumber().getPlateNumber(), invoiceServiceType.getReference());
-                }catch (Exception e){
-                    System.out.println(e);
+            if(invoiceServiceType.getServiceType() != null){
+                if (invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
+                    try{
+                        sendInsuranceToVendor(invoiceServiceType.getInvoice().getVehicle().getPlateNumber().getPlateNumber(), invoiceServiceType.getReference());
+                    }catch (Exception e){
+                        System.out.println(e);
+                    }
                 }
             }
 
-            invoiceServiceType.setPaymentDate(dateTime);
+
+            invoiceServiceType.setPaymentDate(LocalDateTime.now());
             invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
-            invoiceServiceType.setExpiryDate(dateTime.plusYears(1).minusDays(1));
+            invoiceServiceType.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
             invoiceServiceTypeRepository.save(invoiceServiceType);
 
             List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoiceServiceType.getInvoice());
@@ -259,20 +263,22 @@ public class PaymentServiceImpl implements PaymentService {
                     break;
                 }else{
                     Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
-                    invoice1.setPaymentDate(serviceType.getPaymentDate());
-                    invoice1.setPaymentStatus(PaymentStatus.PAID);
-                    try{
-                        cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), dateTime);
-                    }catch (Exception e){
-                        System.out.println(e);
+                    if (invoice1 != null){
+                        invoice1.setPaymentDate(serviceType.getPaymentDate());
+                        invoice1.setPaymentStatus(PaymentStatus.PAID);
+                        try{
+                            cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), LocalDateTime.now());
+                        }catch (Exception e){
+                            System.out.println(e);
+                        }
+                        invoiceRepository.save(invoice1);
                     }
-                    invoiceRepository.save(invoice1);
                 }
             }
         }
 
         paymentHistory.setAmount(respondDto.getAmount());
-        paymentHistory.setPaymentDate(dateTime.format(formatter));
+//        paymentHistory.setPaymentDate(respondDto.getPaymentDate());
         paymentHistory.setPaymentReference(respondDto.getPaymentReference());
         paymentHistory.setCustomerName(respondDto.getCustomerName());
         paymentHistory.setReceiptNo(respondDto.getReceiptNo());
@@ -294,7 +300,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public InsuranceResponse sendInsuranceToVendor(String plate, String invoiceNumber) {
-        System.out.println("Reached out");
         try{
 
             String baseUrl = "https://ieiplcng.azurewebsites.net/api/Auth/Login";
