@@ -182,10 +182,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
-        System.out.println(respondDto);
         AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
-        Boolean insurance = false;
 
         PaymentHistory history = paymentHistoryRepository.findFirstByPaymentReference(respondDto.getPaymentReference());
 
@@ -203,42 +201,10 @@ public class PaymentServiceImpl implements PaymentService {
         Invoice invoice = invoiceRepository.findFirstByInvoiceNumberIgnoreCase(respondDto.getCustReference());
 
         if (invoiceServiceType == null ){
-            if (invoice == null){
                 assessmentResponse.setStatusCode("002");
                 assessmentResponse.setMessage("Not Sucessful");
                 assessmentResponse.setPaymentReference(respondDto.getPaymentReference());
                 return assessmentResponse;
-            }else{
-                List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
-
-                for (InvoiceServiceType serviceType : invoiceServiceTypes) {
-                    if (serviceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE") || serviceType.getServiceType().getName().contains("SMS") || serviceType.getServiceType().getName().contains("INSURANCE") || serviceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
-                    }else{
-                        serviceType.setPaymentDate(LocalDateTime.now());
-                        serviceType.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
-                        serviceType.setPaymentStatus(PaymentStatus.PAID);
-                        invoiceServiceTypeRepository.save(serviceType);
-                    }
-                }
-                List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoice);
-
-                for (InvoiceServiceType serviceType : invoiceServiceTypeList) {
-                    if (serviceType.getPaymentStatus().equals(PaymentStatus.NOT_PAID)) {
-                        break;
-                    }else{
-                        Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
-                        invoice1.setPaymentDate(serviceType.getPaymentDate());
-                        invoice1.setPaymentStatus(PaymentStatus.PAID);
-
-                        try{
-                            cardService.updateCardByPayment(invoice.getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), LocalDateTime.now());
-                        }catch (Exception e){
-                            System.out.println(e);
-                        }
-                        invoiceRepository.save(invoice1);
-                    }
-                }
-            }
         }else{
             if(invoiceServiceType.getServiceType() != null){
                 if (invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
@@ -249,7 +215,6 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                 }
             }
-
 
             invoiceServiceType.setPaymentDate(LocalDateTime.now());
             invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
@@ -262,19 +227,24 @@ public class PaymentServiceImpl implements PaymentService {
                 if (serviceType.getPaymentStatus() == null || serviceType.getPaymentStatus().equals(PaymentStatus.NOT_PAID)) {
                     break;
                 }else{
-                    Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
-                    if (invoice1 != null){
-                        invoice1.setPaymentDate(serviceType.getPaymentDate());
-                        invoice1.setPaymentStatus(PaymentStatus.PAID);
-                        try{
-                            cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), LocalDateTime.now());
-                        }catch (Exception e){
-                            System.out.println(e);
+                    try {
+                        if (serviceType.getInvoice() != null) {
+                            Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
+                            invoice1.setPaymentDate(serviceType.getPaymentDate());
+                            invoice1.setPaymentStatus(PaymentStatus.PAID);
+                            try {
+                                cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), LocalDateTime.now());
+                            } catch (Exception e) {
+                                System.out.println(e);
+                            }
+                            invoiceRepository.save(invoice1);
                         }
-                        invoiceRepository.save(invoice1);
+                    }catch (Exception ex){
+                        System.out.println(ex);
                     }
                 }
             }
+
         }
 
         paymentHistory.setAmount(respondDto.getAmount());
