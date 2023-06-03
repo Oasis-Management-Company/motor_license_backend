@@ -258,15 +258,18 @@ public class PaymentServiceImpl implements PaymentService {
                 if (serviceType.getPaymentStatus() == null || serviceType.getPaymentStatus().equals(PaymentStatus.NOT_PAID)) {
                     break;
                 }else{
-                    Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
-                    invoice1.setPaymentDate(serviceType.getPaymentDate());
-                    invoice1.setPaymentStatus(PaymentStatus.PAID);
-                    try{
-                        cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), dateTime);
-                    }catch (Exception e){
-                        System.out.println(e);
+                    if(serviceType.getInvoice() != null){
+                        Invoice invoice1 = invoiceRepository.findByInvoiceNumberIgnoreCase(serviceType.getInvoice().getInvoiceNumber()).get();
+                        invoice1.setPaymentDate(serviceType.getPaymentDate());
+                        invoice1.setPaymentStatus(PaymentStatus.PAID);
+                        try{
+                            cardService.updateCardByPayment(serviceType.getInvoice().getInvoiceNumber(), Double.valueOf(respondDto.getAmount()), dateTime);
+                        }catch (Exception e){
+                            System.out.println(e);
+                        }
+                        invoiceRepository.save(invoice1);
                     }
-                    invoiceRepository.save(invoice1);
+
                 }
             }
         }
