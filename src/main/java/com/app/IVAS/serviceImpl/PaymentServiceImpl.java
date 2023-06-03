@@ -184,7 +184,6 @@ public class PaymentServiceImpl implements PaymentService {
     public AssessmentResponse PaymentReturn(PaymentResponse respondDto) {
         AssessmentResponse assessmentResponse = new AssessmentResponse();
         PaymentHistory paymentHistory = new PaymentHistory();
-        Boolean insurance = false;
 
         PaymentHistory history = paymentHistoryRepository.findFirstByPaymentReference(respondDto.getPaymentReference());
 
@@ -243,8 +242,6 @@ public class PaymentServiceImpl implements PaymentService {
             }catch(Exception ex){
                 System.out.println(ex.getMessage());
             }
-
-
         }
 
         paymentHistory.setAmount(respondDto.getAmount());
@@ -270,7 +267,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public InsuranceResponse sendInsuranceToVendor(String plate, String invoiceNumber) {
-        System.out.println("Reached out");
         try{
 
             String baseUrl = "https://ieiplcng.azurewebsites.net/api/Auth/Login";
