@@ -39,4 +39,6 @@ public interface ServiceTypeRepository extends JpaRepository<ServiceType, Long> 
     ServiceType findFirstByNameIgnoreCase(String description);
 
     ServiceType findFirstByNameContains(String description);
+
+    List<ServiceType> findAllByRegTypeAndPlateNumberTypeAndCategory(RegType regType, PlateNumberType type, VehicleCategory category);
 }

@@ -42,6 +42,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final CardService cardService;
     private final VehicleModelRepository vehicleModelRepository;
     private final VehicleMakeRepository vehicleMakeRepository;
+    private final CardRepository cardRepository;
 
     @Override
     public InvoiceDto getUserVehicleDetails(Long id) {
@@ -339,6 +340,53 @@ public class VehicleServiceImpl implements VehicleService {
 
         return savedInvoice;
     }
+
+    @Override
+    public Invoice saveRenewalEdit(Long oldInvoiceId, Long customerId, List<Long> ids) {
+
+        PortalUser portalUser = portalUserRepository.findById(customerId).get();
+        List<InvoiceServiceType> invoiceServiceTypeArrayList = new ArrayList<>();
+
+        Double totalAmount = 0.0;
+
+        for (Long id : ids) {
+            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            totalAmount += serviceType.getPrice();
+        }
+
+        Optional<Invoice> invoice = invoiceRepository.findById(oldInvoiceId);
+        invoice.get().setAmount(totalAmount);
+        invoice.get().setLastUpdatedBy(jwtService.user);
+        invoice.get().setLastUpdatedAt(LocalDateTime.now());
+
+        invoiceRepository.save(invoice.get());
+
+        Optional<Invoice> deleteInvoice = invoiceRepository.findById(oldInvoiceId);
+
+        Optional<List<InvoiceServiceType>> deleteInvoiceServiceTypes = invoiceServiceTypeRepository.findAllByInvoice(deleteInvoice.get());
+        invoiceServiceTypeRepository.deleteAll(deleteInvoiceServiceTypes.get());
+
+
+        for (Long id : ids) {
+            InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
+            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            invoiceServiceType.setServiceType(serviceType);
+            invoiceServiceType.setInvoice(invoice.get());
+            invoiceServiceType.setPaymentStatus(PaymentStatus.NOT_PAID);
+
+            invoiceServiceType.setReference(rrrGenerationService.generateNewRrrNumber());
+            if (serviceType.getRevenueCode() != null){
+                invoiceServiceType.setRevenuecode(serviceType.getRevenueCode());
+            }
+            invoiceServiceType.setRegType(RegType.RENEWAL);
+            invoiceServiceType.setAmount(serviceType.getPrice());
+            invoiceServiceTypeArrayList.add(invoiceServiceType);
+        }
+        invoiceServiceTypeRepository.saveAll(invoiceServiceTypeArrayList);
+
+        return invoice.get();
+    }
+
 
     @Override
     public List<SalesDto> searchTaxpayerAssessments(List<Sales> results) {

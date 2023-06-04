@@ -56,4 +56,6 @@ public class SalesDto {
 
     private String plateState;
 
+    private Long payerId;
+
 }

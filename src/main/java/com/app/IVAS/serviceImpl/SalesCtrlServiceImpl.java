@@ -241,6 +241,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         dto.setPlatecat(sale.get().getVehicle().getPlateNumber().getType().getName());
         dto.setInvoiceNo(sale.get().getInvoice().getInvoiceNumber());
         dto.setPlateState(sale.get().getVehicle().getPlateNumber().getPlateState().name());
+        dto.setPayerId(sale.get().getVehicle().getPortalUser().getId());
 
 
         return dto;

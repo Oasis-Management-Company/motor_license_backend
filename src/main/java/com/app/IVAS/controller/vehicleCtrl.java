@@ -11,7 +11,7 @@ import com.app.IVAS.entity.QVehicle;
 import com.app.IVAS.dto.filters.PortalUserSearchFilter;
 import com.app.IVAS.filter.InvoiceSearchFilter;
 import com.app.IVAS.filter.VehicleSerachFilter;
-import com.app.IVAS.repository.VehicleCategoryRepository;
+import com.app.IVAS.repository.*;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VehicleService;
@@ -28,7 +28,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 5600)
 @RequiredArgsConstructor
@@ -40,6 +43,10 @@ public class vehicleCtrl {
     private final PredicateExtractor predicateExtractor;
     private final JwtService jwtService;
     private final VehicleCategoryRepository vehicleCategoryRepository;
+    private final ServiceTypeRepository serviceTypeRepository;
+    private final PlateNumberTypeRepository plateNumberTypeRepository;
+    private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
+    private final InvoiceRepository invoiceRepository;
 
     @GetMapping("/home")
     public String all(){
@@ -104,6 +111,38 @@ public class vehicleCtrl {
     public ResponseEntity<List<ServiceType>> getTaxpayerByDetailsServices(){
         List<ServiceType> dto = vehicleService.getTaxpayerByDetailsServices();
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/get/services/by-plate-type-and-category")
+    public ResponseEntity<List<ServiceType>> getServicesByPlateTypeAndCategory(@RequestParam Long typeId, @RequestParam Long categoryId){
+
+        Optional<VehicleCategory> vehicleCategory = vehicleCategoryRepository.findById(categoryId);
+        Optional<PlateNumberType> plateNumberType = plateNumberTypeRepository.findById(typeId);
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByRegTypeAndPlateNumberTypeAndCategory(RegType.RENEWAL, plateNumberType.get(), vehicleCategory.get());
+        List<ServiceType> otherServiceTypes = serviceTypeRepository.findAllByRegTypeOrRegType(RegType.NON_VEHICLE, RegType.COMPULSARY);
+
+        serviceTypes.addAll(otherServiceTypes);
+        serviceTypes.sort(Comparator.comparing(ServiceType::getName));
+
+        return ResponseEntity.ok(serviceTypes);
+    }
+
+    @GetMapping("/get/selected-renewal")
+    public ResponseEntity<List<Long>> getRenewalInvoiceId(@RequestParam Long invoiceId){
+        List<Long> invoiceServiceTypeIds = new ArrayList<>();
+        Optional<Invoice> invoice= invoiceRepository.findById(invoiceId);
+
+        List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice.get());
+        for (InvoiceServiceType invoiceServiceType: invoiceServiceTypes) {
+            invoiceServiceTypeIds.add(invoiceServiceType.getServiceType().getId());
+        }
+        return ResponseEntity.ok(invoiceServiceTypeIds);
+    }
+
+    @PostMapping("/save/edit/renewal")
+    public ResponseEntity<?> saveRenewalEdit(@RequestParam Long oldInvoiceId, @RequestParam Long id, @RequestParam List<Long> ids){
+        Invoice invoice = vehicleService.saveRenewalEdit(oldInvoiceId, id, ids);
+        return ResponseEntity.ok(invoice);
     }
 
     @PostMapping("/save/all/service-type/taxpayer/id")

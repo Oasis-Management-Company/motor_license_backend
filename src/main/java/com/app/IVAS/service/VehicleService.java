@@ -35,6 +35,8 @@ public interface VehicleService {
 
     Invoice saveTaxPayerServiceType(Long id, List<Long> ids);
 
+    Invoice saveRenewalEdit(Long oldInvoiceId, Long customerId, List<Long> ids);
+
     List<SalesDto> searchTaxpayerAssessments(List<Sales> results);
 
     List<PortalUserPojo> searchTaxpayerAssessment(List<Sales> results);
