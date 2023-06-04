@@ -39,6 +39,7 @@ public class PaymentCtrl {
 
     @PostMapping(value = "/respondse/payment", consumes = "application/json", produces = "application/json")
     public ResponseEntity<AssessmentResponse> PaymentReturn(@RequestBody PaymentResponse respondDto) {
+        System.out.println("Entry into IVAS FROM PAYMENT");
         AssessmentResponse assessmentResponse = paymentService.PaymentReturn(respondDto);
         return new ResponseEntity<>(assessmentResponse, HttpStatus.OK);
     }
