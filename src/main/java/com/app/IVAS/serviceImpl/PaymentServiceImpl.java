@@ -214,9 +214,17 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                 }
 
-                invoiceServiceType.setPaymentDate(LocalDateTime.now());
-                invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
-                invoiceServiceType.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
+                if (invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS")) {
+                    invoiceServiceType.setPaymentDate(LocalDateTime.now());
+                    invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
+                    invoiceServiceType.setExpiryDate(LocalDateTime.now().plusMonths(6).minusDays(1));
+                }else{
+                    invoiceServiceType.setPaymentDate(LocalDateTime.now());
+                    invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
+                    invoiceServiceType.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
+                }
+
+
                 invoiceServiceTypeRepository.save(invoiceServiceType);
 
                 List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoiceServiceType.getInvoice());
