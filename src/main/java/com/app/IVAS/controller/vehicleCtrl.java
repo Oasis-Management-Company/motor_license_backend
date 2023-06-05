@@ -119,9 +119,6 @@ public class vehicleCtrl {
         Optional<VehicleCategory> vehicleCategory = vehicleCategoryRepository.findById(categoryId);
         Optional<PlateNumberType> plateNumberType = plateNumberTypeRepository.findById(typeId);
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByRegTypeAndPlateNumberTypeAndCategory(RegType.RENEWAL, plateNumberType.get(), vehicleCategory.get());
-        List<ServiceType> otherServiceTypes = serviceTypeRepository.findAllByRegTypeOrRegType(RegType.NON_VEHICLE, RegType.COMPULSARY);
-
-        serviceTypes.addAll(otherServiceTypes);
         serviceTypes.sort(Comparator.comparing(ServiceType::getName));
 
         return ResponseEntity.ok(serviceTypes);
