@@ -226,7 +226,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 
                 invoiceServiceTypeRepository.save(invoiceServiceType);
-
                 List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoiceServiceType.getInvoice());
 
                 for (InvoiceServiceType serviceType : invoiceServiceTypeList) {
