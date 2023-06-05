@@ -154,6 +154,8 @@ public class VioServiceImpl implements VioService {
             dto.setAmount(invoice.getAmount());
             dto.setPaymentStatus(invoice.getPaymentStatus().toString());
             dto.setVioApproved(invoice.getVioApproval().toString());
+            dto.setMla(invoice.getCreatedBy().getDisplayName());
+            dto.setCategory(invoice.getVehicle().getVehicleCategory().getName());
 
             return dto;
 
