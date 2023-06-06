@@ -155,11 +155,14 @@ public class PaymentServiceImpl implements PaymentService {
                 invoiceRepository.save(invoice1);
                 System.out.println("Here is the response:::" + personResultAsJsonStr);
 
-                return personResultAsJsonStr;
+//                return personResultAsJsonStr;
+
+                return "Successful";
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return result;
+//            return result;
+            return "Not successful";
         }catch(Exception e){
             return null;
         }
