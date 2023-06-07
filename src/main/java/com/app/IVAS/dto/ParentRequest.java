@@ -1,5 +1,6 @@
 package com.app.IVAS.dto;
 
+import com.app.IVAS.Enum.PaymentStatus;
 import lombok.Data;
 
 import java.util.List;
@@ -19,4 +20,5 @@ public class ParentRequest {
     List<ChildRequest> extendedData;
     private String name;
     private String invoiceNumber;
+    private PaymentStatus status;
 }
