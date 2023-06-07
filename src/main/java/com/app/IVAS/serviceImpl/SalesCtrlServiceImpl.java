@@ -299,7 +299,13 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         edit.setParentId(existing.getId());
         edit.setAddress(pojo.getAddress() != null ? pojo.getAddress() : existing.getAddress());
 
-        edit.setPhoneNumber(pojo.getPhoneNumber() != null ? pojo.getPhoneNumber() : existing.getPhoneNumber());
+//        edit.setPhoneNumber(pojo.getPhoneNumber() != null ? pojo.getPhoneNumber() : existing.getPhoneNumber());
+        if(!pojo.getPhoneNumber().equals(existing.getPhoneNumber())){
+            edit.setPhoneNumber(pojo.getPhoneNumber());
+        }else{
+            edit.setPhoneNumber(pojo.getPhoneNumber() + "00000");
+        }
+
         edit.setAsin(pojo.getAsin() != null ? pojo.getAsin() : existing.getAsin());
         edit.setRegType(RegType.EDIT);
         edit.setCreatedBy(jwtService.user);
@@ -360,8 +366,17 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             if (edit.getAsin() != null) {
                 user.setAsin(edit.getAsin());
             }
-            if (edit.getPhoneNumber() != null) {
-                user.setPhoneNumber(edit.getPhoneNumber());
+//            if (edit.getPhoneNumber() != null) {
+//                user.setPhoneNumber(edit.getPhoneNumber());
+//            }
+
+            if(edit.getPhoneNumber().length() > user.getPhoneNumber().length()){
+                String editedPhoneNumber = edit.getPhoneNumber().substring(0, user.getPhoneNumber().length());
+
+                if(!editedPhoneNumber.equals(user.getPhoneNumber())) {
+                    user.setPhoneNumber(editedPhoneNumber);
+                }
+
             }
 
             if (edit.getParentEmail() != null) {
@@ -392,36 +407,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     }
 
 
-    /**
-     * Incomplete Edit function
-     **/
-//    @Override
-//    public Void editSalesInvoice(SalesDto dto) {
-//
-//        Optional<Sales> initialSale = salesRepository.findById(dto.getId());
-//        Invoice initialInvoice = initialSale.get().getInvoice();
-//        Invoice duplicateInvoice = new Invoice();
-//
-//        duplicateInvoice.setEditCopy(true);
-//        duplicateInvoice.setCreatedBy(jwtService.user);
-//        duplicateInvoice.setStatus(GenericStatusConstant.INACTIVE);
-//        duplicateInvoice.setParentInvoiceNumber(initialInvoice.getInvoiceNumber());
-//        duplicateInvoice.setAmount(initialInvoice.getAmount());
-//        duplicateInvoice.setPayer(initialInvoice.getPayer());
-//        duplicateInvoice.setVehicle(initialInvoice.getVehicle());
-//        duplicateInvoice.setPaymentDate(initialInvoice.getPaymentDate());
-//        duplicateInvoice.setCreatedAt(LocalDateTime.now());
-//        duplicateInvoice.setLastUpdatedAt(LocalDateTime.now());
-//        duplicateInvoice.setLastUpdatedBy(jwtService.user);
-//        duplicateInvoice.setPaymentRef(initialInvoice.getPaymentRef());
-//
-//        if(dto.getPlatetype() != null){
-//            PlateNumberType type = plateNumberTypeRepository.findById(dto.getPlatetype()).get();
-//        }
-//
-//
-//
-//    }
     @Override
     public AsinDto ValidateAsin(String asin) {
 
