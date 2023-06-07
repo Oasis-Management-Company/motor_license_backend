@@ -19,6 +19,8 @@ public class VioSalesDto {
     private String paymentStatus;
     private String vioApproved;
     private String date;
+    private String mla;
+    private String category;
 
 
 }
