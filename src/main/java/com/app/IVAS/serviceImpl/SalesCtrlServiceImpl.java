@@ -624,6 +624,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public PortalUser createUser(UserDto dto) {
+        System.out.println(dto);
         Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
         PortalUser user = userManagementService.createUser(dto, jwtService.user, role);
         return user;
@@ -647,66 +648,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 if(invoiceServiceType.getExpiryDate() != null){
                     dto.setDateExpired(invoiceServiceType.getExpiryDate().format(df));
                 }
+                dto.setStatus(invoiceServiceType.getPaymentStatus());
                 childRequests.add(dto);
                 dto.setInvoiceNumber(invoiceServiceType.getInvoice().getInvoiceNumber());
-
-//            if (invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER VEHICLE")){
-//                dto.setAmount(invoiceServiceType.getAmount());
-//                dto.setName("PLATE NUMBER");
-//                dto.setItemCode("AIVDS001");
-//                dto.setReferenceNumber(invoiceServiceType.getReference());
-//                dto.setCustReference("167371977051");
-//                dto.setDescription("PLATE NUMBER");
-//                childRequests.add(dto);
-//
-//            }else if(invoiceServiceType.getServiceType().getName().contains("INSURANCE")){
-//                dto.setAmount(invoiceServiceType.getAmount());
-//                dto.setName("INSURANCE");
-//                dto.setItemCode("AIVDS003");
-//                dto.setReferenceNumber(invoiceServiceType.getReference());
-//                dto.setCustReference("167371977051");
-//                dto.setDescription("INSURANCE");
-//
-//                childRequests.add(dto);
-//            }else if(invoiceServiceType.getServiceType().getName().contains("SMS")){
-//                dto.setAmount(invoiceServiceType.getAmount());
-//                dto.setName("SMS");
-//                dto.setItemCode("AIVDS004");
-//                dto.setReferenceNumber(invoiceServiceType.getReference());
-//                dto.setCustReference("167371977051");
-//                dto.setDescription("SMS");
-//
-//                childRequests.add(dto);
-//            }else if(invoiceServiceType.getServiceType().getName().contains("ROADWORTHINESS/COMPUTERIZED VEHICLE")){
-//                dto.setAmount(invoiceServiceType.getAmount());
-//                dto.setName("COMPUTERIZED TEST/ROADWORTHINESS");
-//                dto.setItemCode("AIVDS005");
-//                dto.setReferenceNumber(invoiceServiceType.getReference());
-//                dto.setCustReference("167371977051");
-//                dto.setDescription("COMPUTERIZED TEST/ROADWORTHINESS");
-//
-//                childRequests.add(dto);
-//            }else{
-//                ChildRequest childRequest = new ChildRequest();
-//                childRequest.setAmount(invoiceServiceType.getAmount());
-//                childRequest.setName(invoiceServiceType.getServiceType().getName());
-//                childRequest.setItemCode(invoiceServiceType.getServiceType().getCode());
-//                childRequest.setDescription(invoiceServiceType.getServiceType().getName());
-//                licence.add(childRequest);
-//
-//                OTHERS_AMOUNT += invoiceServiceType.getAmount();
-//            }
         }
-//
-//        paymentDto.setAmount(OTHERS_AMOUNT);
-//        paymentDto.setName("LICENSES");
-//        paymentDto.setItemCode("AIVDS002");
-//        paymentDto.setReferenceNumber(invoice.getInvoiceNumber());
-//        paymentDto.setCustReference("167371977051");
-//        paymentDto.setDescription("LICENSES");
-//        paymentDto.setExtendedData(licence);
-//
-//        childRequests.add(paymentDto);
 
         TopParentRequest parentRequest = new TopParentRequest();
         parentRequest.setData(childRequests);
@@ -744,6 +689,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     public InvoiceDto getVehicleOwnerDetails(Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         InvoiceDto invoiceDto = new InvoiceDto();
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
 
         invoiceDto.setFirstname(invoice.getPayer().getFirstName());
         invoice.setVehicle(invoice.getVehicle());
@@ -762,6 +708,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             invoiceDto.setPlateType(invoice.getVehicle().getPlateNumber().getType().getName());
         }
         invoiceDto.setDate(invoice.getCreatedAt());
+        if(invoice.getPaymentDate() != null){
+            invoiceDto.setExpiry(invoice.getPaymentDate().plusMonths(1).format(df));
+        }
         return invoiceDto;
     }
 
@@ -817,7 +766,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             serviceType.setServiceType(type);
             serviceType.setInvoice(savedInvoice);
 
-            serviceType.setReference(invoiceEdited.getInvoiceNumber());
+            serviceType.setReference(rrrGenerationService.generateNewRrrNumber());
             if (type.getRevenueCode() != null){
                 serviceType.setRevenuecode(type.getRevenueCode());
             }
