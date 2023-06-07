@@ -532,6 +532,40 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle news = vehicleRepository.findFirstByParentId(id);
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(old.getPlateNumber().getPlateNumber());
 
+        Optional<List<Card>> cards = Optional.ofNullable(cardRepository.findAllByVehicleId(news.getId()));
+
+        if(cards.isPresent()){
+            for (Card card: cards.get()) {
+                card.setVehicle(old);
+
+                cardRepository.save(card);
+            }
+        }
+
+        Optional<List<Invoice>> invoices = Optional.ofNullable(invoiceRepository.findAllByVehicleId(news.getId()));
+
+        if (invoices.isPresent()){
+
+            for (Invoice inv: invoices.get()) {
+
+                inv.setVehicle(old);
+
+                invoiceRepository.save(inv);
+
+                Optional <List<InvoiceServiceType> >invoiceServiceTypes = invoiceServiceTypeRepository.findAllByInvoiceId(inv.getId());
+
+                for (InvoiceServiceType insType: invoiceServiceTypes.get()) {
+                    insType.setInvoice(inv);
+
+                    invoiceServiceTypeRepository.save(insType);
+
+                }
+            }
+
+
+        }
+
+
         if (type.equalsIgnoreCase("Approval")){
             old.setVehicleModel(news.getVehicleModel() == old.getVehicleModel() ? old.getVehicleModel() : news.getVehicleModel());
             old.setVehicleCategory(news.getVehicleCategory() == old.getVehicleCategory() ? old.getVehicleCategory() : news.getVehicleCategory());
@@ -541,11 +575,11 @@ public class VehicleServiceImpl implements VehicleService {
             old.setYear(news.getYear()==old.getYear() ? old.getYear() : news.getYear());
             plateNumber.setPlateNumber(news.getPlateEdit());
 
-
             vehicleRepository.save(old);
             vehicleRepository.delete(news);
             return HttpStatus.OK;
         }else{
+
             vehicleRepository.delete(news);
             return HttpStatus.OK;
         }
