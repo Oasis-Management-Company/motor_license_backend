@@ -313,7 +313,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     @Override
     public PortalUserPojo portalUserByPhone(String phone){
 
-        PortalUser user = portalUserRepository.findByPhoneNumberIgnoreCase(phone);
+        PortalUser user = portalUserRepository.findFirstByPhoneNumber(phone);
 
         PortalUserPojo pojo = new PortalUserPojo();
 
@@ -323,6 +323,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         pojo.setRole(user.getRole());
         pojo.setStatus(user.getStatus());
         pojo.setId(user.getId());
+        pojo.setAddress(user.getAddress());
         pojo.setPhoneNumber(user.getPhoneNumber());
         if(user.getParentEmail() != null) {
             pojo.setParentEmail(user.getParentEmail());

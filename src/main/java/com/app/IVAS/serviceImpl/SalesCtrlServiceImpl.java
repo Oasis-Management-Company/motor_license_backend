@@ -639,6 +639,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
     @Override
     public PortalUser createUser(UserDto dto) {
+        System.out.println(dto);
         Role role = roleRepository.findByNameIgnoreCase(dto.getRole()).orElseThrow(RuntimeException::new);
         PortalUser user = userManagementService.createUser(dto, jwtService.user, role);
         return user;
@@ -832,7 +833,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             serviceType.setServiceType(type);
             serviceType.setInvoice(savedInvoice);
 
-            serviceType.setReference(invoiceEdited.getInvoiceNumber());
+            serviceType.setReference(rrrGenerationService.generateNewRrrNumber());
             if (type.getRevenueCode() != null){
                 serviceType.setRevenuecode(type.getRevenueCode());
             }
