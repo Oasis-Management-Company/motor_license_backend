@@ -28,4 +28,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Invoice findLastByVehicle(Vehicle vehicle);
 
     Invoice findFirstByVehicle(Vehicle vehicle);
+
+    List<Invoice> findAllByVehicle(Vehicle vehicle);
+
+
+    List<Invoice> findAllByVehicleId(Long id);
 }

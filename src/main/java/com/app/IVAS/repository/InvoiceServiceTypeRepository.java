@@ -18,4 +18,7 @@ public interface InvoiceServiceTypeRepository extends JpaRepository<InvoiceServi
     InvoiceServiceType findFirstByReference(String custReference);
 
     InvoiceServiceType findFirstByReferenceIgnoreCase(String reference);
+
+
+    Optional<List<InvoiceServiceType>> findAllByInvoiceId(Long inv);
 }
