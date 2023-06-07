@@ -283,12 +283,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         edit.setUsername(existing.getFirstName());
         edit.setParentUserName(existing.getUsername());
-//        if (pojo.getEmail().equalsIgnoreCase(existing.getEmail())) {
-//            edit.setParentEmail(existing.getEmail());
-//            edit.setEmail(pojo.getFirstName());
-//        } else {
-//            edit.setEmail(pojo.getEmail());
-//        }
 
         edit.setParentEmail(pojo.getEmail());
         edit.setEmail(pojo.getFirstName());
