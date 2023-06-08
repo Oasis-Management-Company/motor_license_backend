@@ -60,6 +60,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
     private String asinVerification;
     private final ActivityLogService activityLogService;
     private final AppRepository appRepository;
+    private final EditPortalUserDao editPortalUserDao;
 
     @Override
     public Invoice SaveSales(SalesDto sales) {
@@ -279,12 +280,12 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         PortalUser existing = existingUser.get();
 
-        PortalUser edit = new PortalUser();
+        Optional<List<EditPortalUser>> unapprovedEdits = Optional.ofNullable(editPortalUserDao.findAllByParentId(pojo.getId()));
 
-        edit.setUsername(existing.getFirstName());
-        edit.setParentUserName(existing.getUsername());
+        editPortalUserDao.deleteAll(unapprovedEdits.get());
 
-        edit.setParentEmail(pojo.getEmail());
+        EditPortalUser edit = new EditPortalUser();
+
         edit.setEmail(pojo.getFirstName());
 
         edit.setFirstName(pojo.getFirstName() != null ? pojo.getFirstName() : existing.getFirstName());
@@ -293,15 +294,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         edit.setParentId(existing.getId());
         edit.setAddress(pojo.getAddress() != null ? pojo.getAddress() : existing.getAddress());
 
-//        edit.setPhoneNumber(pojo.getPhoneNumber() != null ? pojo.getPhoneNumber() : existing.getPhoneNumber());
-        if(!pojo.getPhoneNumber().equals(existing.getPhoneNumber())){
-            edit.setPhoneNumber(pojo.getPhoneNumber());
-        }else{
-            edit.setPhoneNumber(pojo.getPhoneNumber() + "00000");
-        }
+        edit.setPhoneNumber(pojo.getPhoneNumber() != null ? pojo.getPhoneNumber() : existing.getPhoneNumber());
 
-        edit.setAsin(pojo.getAsin() != null ? pojo.getAsin() : existing.getAsin());
-        edit.setRegType(RegType.EDIT);
         edit.setCreatedBy(jwtService.user);
         edit.setCreatedAt(LocalDateTime.now());
 
@@ -313,18 +307,17 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             edit.setDisplayName(edit.getLastName());
         }
 
-        portalUserRepository.save(edit);
+        editPortalUserDao.save(edit);
 
         activityLogService.createActivityLog((edit.getDisplayName() + " detail was edited and sent for approval"), ActivityStatusConstant.UPDATE);
 
-        return edit;
+        return existing;
     }
 
     @Override
-    public void approveTaxPayerEdit(Long id, String approval) {
+    public void approveTaxPayerEdit(Long parentId, String approval) {
 
-        Optional<PortalUser> editedUser = portalUserRepository.findById(id);
-
+        Optional<EditPortalUser> editedUser = editPortalUserDao.findByParentId(parentId);
 
         if (!editedUser.isPresent()) {
             throw new IllegalArgumentException("Edited User not found");
@@ -335,11 +328,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         if (!initialUser.isPresent()) {
             throw new IllegalArgumentException("Initial User not found");
         }
-        PortalUser edit = editedUser.get();
+        EditPortalUser edit = editedUser.get();
         PortalUser user = initialUser.get();
 
         if (approval.equalsIgnoreCase("Reject")) {
-            portalUserRepository.delete(editedUser.get());
+            editPortalUserDao.delete(editedUser.get());
             activityLogService.createActivityLog((user.getDisplayName() + " edit request was disapproved"), ActivityStatusConstant.DISAPPROVAL);
 
         } else if (approval.equalsIgnoreCase("Approve")) {
@@ -357,24 +350,8 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 user.setAddress(edit.getAddress());
             }
 
-            if (edit.getAsin() != null) {
-                user.setAsin(edit.getAsin());
-            }
-//            if (edit.getPhoneNumber() != null) {
-//                user.setPhoneNumber(edit.getPhoneNumber());
-//            }
-
-            if(edit.getPhoneNumber().length() > user.getPhoneNumber().length()){
-                String editedPhoneNumber = edit.getPhoneNumber().substring(0, user.getPhoneNumber().length());
-
-                if(!editedPhoneNumber.equals(user.getPhoneNumber())) {
-                    user.setPhoneNumber(editedPhoneNumber);
-                }
-
-            }
-
-            if (edit.getParentEmail() != null) {
-                user.setEmail(edit.getParentEmail());
+            if (edit.getEmail() != null) {
+                user.setEmail(edit.getEmail());
             }
 
             if (edit.getOtherNames() != null) {
@@ -389,14 +366,16 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 user.setDisplayName(edit.getLastName());
             }
 
-            portalUserRepository.save(user);
+           if (edit.getPhoneNumber() != null){
+               user.setPhoneNumber(edit.getPhoneNumber());
+           }
 
-            portalUserRepository.delete(editedUser.get());
+            editPortalUserDao.delete(edit);
+            portalUserRepository.save(user);
 
             activityLogService.createActivityLog((user.getDisplayName() + " edit request was approved and saved"), ActivityStatusConstant.APPROVAL);
 
         }
-
 
     }
 

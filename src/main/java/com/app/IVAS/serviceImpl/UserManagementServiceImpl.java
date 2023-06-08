@@ -10,6 +10,7 @@ import com.app.IVAS.dto.LoginRequestDto;
 import com.app.IVAS.dto.PasswordDto;
 import com.app.IVAS.dto.PortalUserPojo;
 import com.app.IVAS.dto.UserDto;
+import com.app.IVAS.entity.EditPortalUser;
 import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.repository.*;
 import com.app.IVAS.security.JwtService;
@@ -361,6 +362,28 @@ public class UserManagementServiceImpl implements UserManagementService {
             return pojo;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<EditPortalUser> searchEditPortalUsers(List<EditPortalUser> users) {
+        return users.stream().map(user -> {
+
+            EditPortalUser pojo = new EditPortalUser();
+            pojo.setDisplayName(user.getDisplayName());
+            pojo.setEmail(user.getEmail());
+            pojo.setDateCreated(user.getCreatedAt().format(df));
+            pojo.setStatus(user.getStatus());
+            pojo.setId(user.getId());
+            pojo.setPhoneNumber(user.getPhoneNumber());
+
+            if(user.getParentId() != null) {
+                pojo.setParentId(user.getParentId());
+            }
+
+
+            return pojo;
+        }).collect(Collectors.toList());
+    }
+
 
 //    public static void main(String[] args) {
 //        int otp = new Random().nextInt(999999);
