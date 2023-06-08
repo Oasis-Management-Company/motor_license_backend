@@ -63,6 +63,7 @@ public class UserController {
     private final ZonalOfficeRepository zonalOfficeRepository;
     private final PermissionRepository permissionRepository;
     private final ActivityLogService activityLogService;
+    private final EditPortalUserDao editPortalUserDao;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
@@ -297,6 +298,12 @@ public class UserController {
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QEditPortalUser.editPortalUser);
         QueryResults<EditPortalUser> portalUserQueryResults = portalUserJPAQuery.select(QEditPortalUser.editPortalUser).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(userManagementService.searchEditPortalUsers(portalUserQueryResults.getResults()), portalUserQueryResults.getLimit(), portalUserQueryResults.getOffset(), portalUserQueryResults.getTotal());
+    }
+
+    @GetMapping("/get-edited_user/{id}")
+    public EditPortalUser getEditedPortalUser(@PathVariable Long id){
+
+        return editPortalUserDao.findByParentId(id).orElseThrow(RuntimeException::new);
     }
 
 

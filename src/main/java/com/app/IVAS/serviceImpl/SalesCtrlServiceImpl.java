@@ -280,6 +280,10 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         PortalUser existing = existingUser.get();
 
+        Optional<List<EditPortalUser>> unapprovedEdits = Optional.ofNullable(editPortalUserDao.findAllByParentId(pojo.getId()));
+
+        editPortalUserDao.deleteAll(unapprovedEdits.get());
+
         EditPortalUser edit = new EditPortalUser();
 
         edit.setEmail(pojo.getFirstName());
@@ -367,9 +371,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
            }
 
             editPortalUserDao.delete(edit);
-            System.out.println("deleted the edit");
             portalUserRepository.save(user);
-            System.out.println("saved the initial");
 
             activityLogService.createActivityLog((user.getDisplayName() + " edit request was approved and saved"), ActivityStatusConstant.APPROVAL);
 
