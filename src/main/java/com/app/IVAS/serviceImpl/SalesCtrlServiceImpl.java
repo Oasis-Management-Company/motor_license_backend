@@ -360,15 +360,18 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             if (edit.getAsin() != null) {
                 user.setAsin(edit.getAsin());
             }
-//            if (edit.getPhoneNumber() != null) {
-//                user.setPhoneNumber(edit.getPhoneNumber());
-//            }
 
-            if(edit.getPhoneNumber().length() > user.getPhoneNumber().length()){
-                String editedPhoneNumber = edit.getPhoneNumber().substring(0, user.getPhoneNumber().length());
+            if(!edit.getPhoneNumber().equals(user.getPhoneNumber())){
 
-                if(!editedPhoneNumber.equals(user.getPhoneNumber())) {
-                    user.setPhoneNumber(editedPhoneNumber);
+                if(edit.getPhoneNumber().length() > user.getPhoneNumber().length()){
+                    String editedPhoneNumber = edit.getPhoneNumber().substring(0, user.getPhoneNumber().length());
+
+                    if(!editedPhoneNumber.equals(user.getPhoneNumber())) {
+                        user.setPhoneNumber(editedPhoneNumber);
+                    }
+
+                }else {
+                    user.setPhoneNumber(edit.getPhoneNumber());
                 }
 
             }
@@ -396,7 +399,6 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
             activityLogService.createActivityLog((user.getDisplayName() + " edit request was approved and saved"), ActivityStatusConstant.APPROVAL);
 
         }
-
 
     }
 
