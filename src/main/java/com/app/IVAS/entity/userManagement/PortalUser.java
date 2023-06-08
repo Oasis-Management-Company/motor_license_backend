@@ -145,5 +145,6 @@ public class PortalUser extends StatusEntity {
     private Long parentId;
     private String parentEmail;
     private String parentUserName;
+    private String parentPhoneNumber;
 
 }

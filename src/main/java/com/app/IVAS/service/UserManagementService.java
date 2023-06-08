@@ -3,6 +3,7 @@ package com.app.IVAS.service;
 import com.app.IVAS.Enum.PermissionTypeConstant;
 import com.app.IVAS.api_response.LoginResponse;
 import com.app.IVAS.dto.*;
+import com.app.IVAS.entity.EditPortalUser;
 import com.app.IVAS.entity.userManagement.Area;
 import com.app.IVAS.entity.userManagement.Lga;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -55,4 +56,6 @@ public interface UserManagementService {
     PortalUserPojo portalUserByPhone(String phone);
 
     List<PortalUserPojo>  searchOtherUsers(List<PortalUser> results);
+
+    List<EditPortalUser> searchEditPortalUsers(List<EditPortalUser> users);
 }

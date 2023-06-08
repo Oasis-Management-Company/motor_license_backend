@@ -11,7 +11,10 @@ import com.app.IVAS.dto.LoginRequestDto;
 import com.app.IVAS.dto.PasswordDto;
 import com.app.IVAS.dto.PortalUserPojo;
 import com.app.IVAS.dto.UserDto;
+import com.app.IVAS.dto.filters.EditPortalUserSearchFilter;
 import com.app.IVAS.dto.filters.PortalUserSearchFilter;
+import com.app.IVAS.entity.EditPortalUser;
+import com.app.IVAS.entity.QEditPortalUser;
 import com.app.IVAS.entity.userManagement.*;
 import com.app.IVAS.entity.userManagement.QPortalUser;
 import com.app.IVAS.repository.*;
@@ -272,6 +275,30 @@ public class UserController {
         QueryResults<PortalUser> portalUserQueryResults = portalUserJPAQuery.select(QPortalUser.portalUser).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(userManagementService.searchOtherUsers(portalUserQueryResults.getResults()), portalUserQueryResults.getLimit(), portalUserQueryResults.getOffset(), portalUserQueryResults.getTotal());
     }
+
+    @GetMapping("/search/pending/edit-portalUser")
+    @Transactional
+    public QueryResults<EditPortalUser> searchPendingPortalEdit(EditPortalUserSearchFilter filter){
+
+        JPAQuery<EditPortalUser> portalUserJPAQuery = appRepository.startJPAQuery(QEditPortalUser.editPortalUser)
+                .where(predicateExtractor.getPredicate(filter))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+
+        if (filter.getCreatedAfter() != null){
+            portalUserJPAQuery.where(QEditPortalUser.editPortalUser.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+        }
+
+        if (filter.getCreatedBefore() != null){
+            portalUserJPAQuery.where(QEditPortalUser.editPortalUser.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QEditPortalUser.editPortalUser);
+        QueryResults<EditPortalUser> portalUserQueryResults = portalUserJPAQuery.select(QEditPortalUser.editPortalUser).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(userManagementService.searchEditPortalUsers(portalUserQueryResults.getResults()), portalUserQueryResults.getLimit(), portalUserQueryResults.getOffset(), portalUserQueryResults.getTotal());
+    }
+
 
     @GetMapping("/get-user/phone")
     public PortalUserPojo getPortalUserByPhone(@RequestParam String phone){
