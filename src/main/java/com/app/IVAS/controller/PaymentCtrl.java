@@ -4,6 +4,8 @@ package com.app.IVAS.controller;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.InsuranceResponse;
 import com.app.IVAS.entity.Invoice;
+import com.app.IVAS.entity.InvoiceServiceType;
+import com.app.IVAS.repository.InvoiceServiceTypeRepository;
 import com.app.IVAS.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpResponse;
@@ -25,6 +27,8 @@ public class PaymentCtrl {
 
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private InvoiceServiceTypeRepository invoiceServiceTypeRepository;
 
     @PostMapping("/payment/send")
     public ResponseEntity<?> sendPaymentToCBS(@RequestParam String invoice){
@@ -37,10 +41,15 @@ public class PaymentCtrl {
     @PostMapping("/payment/send/tax")
     public String sendPaymentToTaxCBS(@RequestParam String invoice){
         String dto = paymentService.sendPaymentTax(invoice);
-
-        System.out.println(dto);
         return dto;
     }
+    @PostMapping("/payment/resend/tax")
+    public String resendPaymentToTaxCBS(@RequestParam String reference){
+        InvoiceServiceType invoice = invoiceServiceTypeRepository.findFirstByReference(reference);
+        String dto = paymentService.sendPaymentTax(invoice.getInvoice().getInvoiceNumber());
+        return dto;
+    }
+
 
     @PostMapping(value = "/verify/payment")
     public List<PaymentHistoryDto> verifyPayment(@RequestParam String invoice) throws IOException {
