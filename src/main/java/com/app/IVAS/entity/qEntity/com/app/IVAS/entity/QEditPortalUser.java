@@ -32,6 +32,8 @@ public class QEditPortalUser extends EntityPathBase<EditPortalUser> {
     // inherited
     public final com.app.IVAS.entity.userManagement.QPortalUser createdBy;
 
+    public final StringPath dateCreated = createString("dateCreated");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> dateDeactivated;
 

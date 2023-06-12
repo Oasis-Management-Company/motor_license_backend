@@ -79,6 +79,8 @@ public class QPortalUser extends EntityPathBase<PortalUser> {
 
     public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
 
+    public final StringPath parentPhoneNumber = createString("parentPhoneNumber");
+
     public final StringPath parentUserName = createString("parentUserName");
 
     public final StringPath phoneNumber = createString("phoneNumber");

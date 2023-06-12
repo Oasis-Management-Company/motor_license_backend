@@ -85,7 +85,6 @@ public class PaymentServiceImpl implements PaymentService {
         try{
 
             List<ChildRequest> emptychildRequest = new ArrayList<>();
-            System.out.println(invoice);
             String baseUrl = paymentAuth;
 
             RestTemplate restTemplate = new RestTemplate();
