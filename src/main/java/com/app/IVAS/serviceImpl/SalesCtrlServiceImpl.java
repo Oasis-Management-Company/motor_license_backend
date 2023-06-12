@@ -664,7 +664,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         InvoiceDto invoiceDto = new InvoiceDto();
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
 
-        invoiceDto.setFirstname(invoice.getPayer().getFirstName());
+        invoiceDto.setFirstname(invoice.getPayer().getDisplayName());
         invoice.setVehicle(invoice.getVehicle());
         invoiceDto.setPhonenumber(invoice.getPayer().getPhoneNumber());
         invoiceDto.setAddress(invoice.getPayer().getAddress());
