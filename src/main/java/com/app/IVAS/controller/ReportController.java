@@ -58,57 +58,67 @@ public class ReportController {
     @Transactional
     public QueryResultsPojo<SalesReportDto> searchPlateNumberSales(SalesReportSearchFilter filter){
 
-        JPAQuery<Sales> salesJPAQuery = appRepository.startJPAQuery(QSales.sales)
+        JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QSales.sales.invoice.paymentDate.isNotNull())
-                .where(QSales.sales.vehicle.isNotNull())
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER VEHICLE")
+                        .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER MOTORCYCLE")))
+                .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull())
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
-        JPAQuery<Sales> salesListJPAQuery = appRepository.startJPAQuery(QSales.sales)
+        JPAQuery<InvoiceServiceType> typeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QSales.sales.vehicle.isNotNull())
-                .where(QSales.sales.invoice.paymentDate.isNotNull());
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER VEHICLE")
+                        .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER MOTORCYCLE")))
+                .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull());
 
         if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
-            salesJPAQuery.where(QSales.sales.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
-            salesListJPAQuery.where(QSales.sales.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.invoice.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
+            typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.invoice.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
         }
 
         if (filter.getCreatedAfter() != null){
-            salesJPAQuery.where(QSales.sales.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
-            salesListJPAQuery.where(QSales.sales.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+            typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
         }
 
         if (filter.getCreatedBefore() != null){
-            salesJPAQuery.where(QSales.sales.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
-            salesListJPAQuery.where(QSales.sales.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+            typeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
         }
 
-        if (filter.getType() != null){
-            salesJPAQuery.leftJoin(QPlateNumber.plateNumber1).on(QPlateNumber.plateNumber1.eq(QSales.sales.vehicle.plateNumber))
-                    .where(QPlateNumber.plateNumber1.type.id.eq(filter.getType()));
+        if (filter.getPlateNumber() !=  null){
+            invoiceServiceTypeJPAQuery.leftJoin(QVehicle.vehicle).on(QVehicle.vehicle.eq(QInvoiceServiceType.invoiceServiceType.invoice.vehicle))
+                    .where(QVehicle.vehicle.plateNumber.plateNumber.eq(filter.getPlateNumber()));
 
-            salesListJPAQuery.leftJoin(QPlateNumber.plateNumber1).on(QPlateNumber.plateNumber1.eq(QSales.sales.vehicle.plateNumber))
-                    .where(QPlateNumber.plateNumber1.type.id.eq(filter.getType()));
+            typeJPAQuery.leftJoin(QVehicle.vehicle).on(QVehicle.vehicle.eq(QInvoiceServiceType.invoiceServiceType.invoice.vehicle))
+                    .where(QVehicle.vehicle.plateNumber.plateNumber.eq(filter.getPlateNumber()));
+        }
+
+        if (filter.getType() !=  null){
+            invoiceServiceTypeJPAQuery.leftJoin(QVehicle.vehicle).on(QVehicle.vehicle.eq(QInvoiceServiceType.invoiceServiceType.invoice.vehicle))
+                    .where(QVehicle.vehicle.plateNumber.type.id.eq(filter.getType()));
+
+            typeJPAQuery.leftJoin(QVehicle.vehicle).on(QVehicle.vehicle.eq(QInvoiceServiceType.invoiceServiceType.invoice.vehicle))
+                    .where(QVehicle.vehicle.plateNumber.type.id.eq(filter.getType()));
+        }
+
+        if (filter.getZone() !=  null){
+            invoiceServiceTypeJPAQuery.leftJoin(QPortalUser.portalUser).on(QPortalUser.portalUser.eq(QInvoiceServiceType.invoiceServiceType.invoice.createdBy))
+                    .where(QPortalUser.portalUser.office.id.eq(filter.getZone()));
+
+            typeJPAQuery.leftJoin(QPortalUser.portalUser).on(QPortalUser.portalUser.eq(QInvoiceServiceType.invoiceServiceType.invoice.createdBy))
+                    .where(QPortalUser.portalUser.office.id.eq(filter.getZone()));
         }
 
         List<Double> prices = new ArrayList<>();
-
-        for (Sales sales:salesListJPAQuery.fetch()){
-            InvoiceServiceType invoiceService = appRepository.startJPAQuery(com.app.IVAS.entity.QInvoiceServiceType.invoiceServiceType)
-                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(sales.getInvoice())
-                            .and(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER VEHICLE")
-                                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER MOTORCYCLE"))))
-                    .fetchFirst();
-            if (invoiceService != null){
-                prices.add(invoiceService.getServiceType().getPrice());
-            }
+        for(InvoiceServiceType serviceType:typeJPAQuery.fetch()){
+            prices.add(serviceType.getAmount());
         }
 
-        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
-        QueryResults<Sales> salesQueryResults = salesJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
-        return new QueryResultsPojo<>(reportService.getSales(salesQueryResults.getResults()), salesQueryResults.getLimit(), salesQueryResults.getOffset(), (long) prices.size(), salesQueryResults.isEmpty(), null, prices.stream().mapToDouble(Double::doubleValue).sum());
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("PaymentDate"), QInvoiceServiceType.invoiceServiceType);
+        QueryResults<InvoiceServiceType> invoiceServiceTypeQueryResults = invoiceServiceTypeJPAQuery.select(QInvoiceServiceType.invoiceServiceType).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResultsPojo<>(reportService.getSales(invoiceServiceTypeQueryResults.getResults()), invoiceServiceTypeQueryResults.getLimit(), invoiceServiceTypeQueryResults.getOffset(), invoiceServiceTypeQueryResults.getTotal(), invoiceServiceTypeQueryResults.isEmpty(), null, prices.size() > 0 ? prices.stream().mapToDouble(Double::doubleValue).sum() : 0.00);
     }
 
     @GetMapping("/search/stock-level-report")
@@ -519,31 +529,42 @@ public class ReportController {
 
     private List<SalesReportDto> getSalesReportDto(SalesReportSearchFilter filter){
 
-        JPAQuery<Sales> salesJPAQuery = appRepository.startJPAQuery(QSales.sales)
+        JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QSales.sales.invoice.paymentDate.isNotNull())
-                .where(QSales.sales.vehicle.isNotNull());
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER VEHICLE")
+                        .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER MOTORCYCLE")))
+                .where(QInvoiceServiceType.invoiceServiceType.PaymentDate.isNotNull());
 
         if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){
-            salesJPAQuery.where(QSales.sales.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.invoice.createdBy.displayName.equalsIgnoreCase(jwtService.user.getDisplayName()));
         }
 
         if (filter.getCreatedAfter() != null){
-            salesJPAQuery.where(QSales.sales.createdAt.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.goe(LocalDate.parse(filter.getCreatedAfter(), formatter).atStartOfDay()));
         }
 
         if (filter.getCreatedBefore() != null){
-            salesJPAQuery.where(QSales.sales.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
+            invoiceServiceTypeJPAQuery.where(QInvoiceServiceType.invoiceServiceType.PaymentDate.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
         }
 
-        if (filter.getType() != null){
-            salesJPAQuery.leftJoin(QPlateNumber.plateNumber1).on(QPlateNumber.plateNumber1.eq(QSales.sales.vehicle.plateNumber))
-                    .where(QPlateNumber.plateNumber1.type.id.eq(filter.getType()));
+        if (filter.getPlateNumber() !=  null){
+            invoiceServiceTypeJPAQuery.leftJoin(QVehicle.vehicle).on(QVehicle.vehicle.eq(QInvoiceServiceType.invoiceServiceType.invoice.vehicle))
+                    .where(QVehicle.vehicle.plateNumber.plateNumber.eq(filter.getPlateNumber()));
         }
 
-        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
-        QueryResults<Sales> salesQueryResults = salesJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
-        return reportService.getSales(salesQueryResults.getResults());
+        if (filter.getType() !=  null){
+            invoiceServiceTypeJPAQuery.leftJoin(QVehicle.vehicle).on(QVehicle.vehicle.eq(QInvoiceServiceType.invoiceServiceType.invoice.vehicle))
+                    .where(QVehicle.vehicle.plateNumber.type.id.eq(filter.getType()));
+        }
+
+        if (filter.getZone() !=  null){
+            invoiceServiceTypeJPAQuery.leftJoin(QPortalUser.portalUser).on(QPortalUser.portalUser.eq(QInvoiceServiceType.invoiceServiceType.invoice.createdBy))
+                    .where(QPortalUser.portalUser.office.id.eq(filter.getZone()));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("PaymentDate"), QInvoiceServiceType.invoiceServiceType);
+        QueryResults<InvoiceServiceType> invoiceServiceTypeQueryResults = invoiceServiceTypeJPAQuery.select(QInvoiceServiceType.invoiceServiceType).distinct().orderBy(sortedColumn).fetchResults();
+        return reportService.getSales(invoiceServiceTypeQueryResults.getResults());
     }
 
     private List<VIOReportPojo> getVIOReportPojo(PortalUserSearchFilter filter){

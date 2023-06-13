@@ -49,26 +49,18 @@ public class ReportServiceImpl implements ReportService {
     private final AppConfigurationProperties appConfigurationProperties;
 
     @Override
-    public List<SalesReportDto> getSales(List<Sales> sales) {
+    public List<SalesReportDto> getSales(List<InvoiceServiceType> invoiceServiceTypes) {
         List<SalesReportDto> dtos = new ArrayList<>();
-        for (Sales salesList: sales){
+        for (InvoiceServiceType invoiceService: invoiceServiceTypes){
 
-            InvoiceServiceType invoiceService = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(salesList.getInvoice())
-                            .and(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER VEHICLE")
-                                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.startsWithIgnoreCase("PLATE NUMBER MOTORCYCLE"))))
-                    .fetchFirst();
-
-           if (invoiceService != null){
                SalesReportDto dto = new SalesReportDto();
-               dto.setMla(salesList.getCreatedBy().getDisplayName());
-               dto.setPlateNumber(salesList.getVehicle().getPlateNumber().getPlateNumber());
-               dto.setPlateType(salesList.getVehicle().getPlateNumber().getType().getName());
-               dto.setMlaStation(salesList.getCreatedBy().getOffice().getName());
-               dto.setDateSold(salesList.getInvoice().getPaymentDate().format(df));
+               dto.setMla(invoiceService.getInvoice().getCreatedBy().getDisplayName());
+               dto.setPlateNumber(invoiceService.getInvoice().getVehicle().getPlateNumber().getPlateNumber());
+               dto.setPlateType(invoiceService.getInvoice().getVehicle().getPlateNumber().getType().getName());
+               dto.setMlaStation(invoiceService.getInvoice().getCreatedBy().getOffice().getName());
+               dto.setDateSold(invoiceService.getInvoice().getPaymentDate().format(df));
                dto.setAmount(invoiceService.getServiceType().getPrice());
                dtos.add(dto);
-           }
         }
         return dtos;
     }
