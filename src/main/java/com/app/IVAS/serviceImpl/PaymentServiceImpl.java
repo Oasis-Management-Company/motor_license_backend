@@ -118,8 +118,8 @@ public class PaymentServiceImpl implements PaymentService {
 
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
                 ParentRequest dto = new ParentRequest();
-                dto.setAmount(invoiceServiceType.getAmount());
-                dto.setItemCode(invoiceServiceType.getRevenuecode());
+                dto.setAmount(invoiceServiceType.getServiceType().getPrice());
+                dto.setItemCode(invoiceServiceType.getServiceType().getRevenueCode());
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("2036644664");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
