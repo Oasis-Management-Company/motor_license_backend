@@ -296,7 +296,7 @@ public class VehicleServiceImpl implements VehicleService {
         Double totalAmount = 0.0;
 
         for (Long nid : ids) {
-            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            ServiceType serviceType = serviceTypeRepository.findById(nid).get();
             totalAmount += serviceType.getPrice();
         }
 
