@@ -536,6 +536,11 @@ public class ReportController {
             salesJPAQuery.where(QSales.sales.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
         }
 
+        if (filter.getType() != null){
+            salesJPAQuery.leftJoin(QPlateNumber.plateNumber1).on(QPlateNumber.plateNumber1.eq(QSales.sales.vehicle.plateNumber))
+                    .where(QPlateNumber.plateNumber1.type.id.eq(filter.getType()));
+        }
+
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QSales.sales);
         QueryResults<Sales> salesQueryResults = salesJPAQuery.select(QSales.sales).distinct().orderBy(sortedColumn).fetchResults();
         return reportService.getSales(salesQueryResults.getResults());
