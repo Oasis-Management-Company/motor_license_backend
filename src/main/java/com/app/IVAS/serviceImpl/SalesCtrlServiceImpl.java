@@ -286,7 +286,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         EditPortalUser edit = new EditPortalUser();
 
-        edit.setEmail(pojo.getFirstName());
+        edit.setEmail(pojo.getEmail());
 
         edit.setFirstName(pojo.getFirstName() != null ? pojo.getFirstName() : existing.getFirstName());
         edit.setLastName(pojo.getLastName() != null ? pojo.getLastName() : existing.getLastName());
