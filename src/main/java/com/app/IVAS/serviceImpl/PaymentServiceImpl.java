@@ -355,7 +355,6 @@ public class PaymentServiceImpl implements PaymentService {
                 personResultAsJsonStr.setInvoice(invoiceServiceType.getInvoice());
 
                 insuranceResponserepo.save(personResultAsJsonStr);
-
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {
                     @Override
                     public boolean hasError(ClientHttpResponse response) throws IOException {
