@@ -426,6 +426,12 @@ public class VehicleServiceImpl implements VehicleService {
             DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
             dto.setDateCreated(dateTime.format(outputFormatter));
 
+            if(user.getInvoice().getPaymentStatus() != null) {
+                dto.setPaymentStatus(user.getInvoice().getPaymentStatus());
+            }
+
+            dto.setInvoiceId(user.getInvoice().getId());
+
             return dto;
 
         }).collect(Collectors.toList());
