@@ -19,26 +19,26 @@
                   <div class="title mt-4">
                     <b>Name:</b>
                     <p class="mute">
-                      Anachuna Abuchi
+                      <span th:text="${#strings.toUpperCase(name)}"></span>
                     </p>
                   </div>
                   <div class="title">
                     <b>Email:</b>
                     <p class="mute">
-                      email
+                      <span th:text="${#strings.toUpperCase(email)}"></span>
                     </p>
                   </div>
 
                   <div class="title">
                     <b>Address:</b>
                     <p class="mute" *ngIf="previewDetail?.address">
-                      address
+                      <span th:text="${#strings.toUpperCase(address)}"></span>
                     </p>
                   </div>
                   <div class="title">
                     <b>Phone Number:</b>
                     <p class="mute">
-                      phone number
+                      <span th:text="${#strings.toUpperCase(phoneNumber)}"></span>
                     </p>
                   </div>
                 </div>
@@ -46,7 +46,7 @@
               <div class="card-box2">
                 <div>
                   <div class="text-end">
-                    Invoice No: AD678999876
+                    Invoice No: <span th:text="${#strings.toUpperCase(invoice)}"></span>
                     <br>
                   </div>
                 </div>
@@ -67,12 +67,12 @@
                   <td>Plate Type</td>
                 </tr>
                 <tr>
-                  <td>chasis</td>
-                  <td>make</td>
-                  <td>model</td>
-                  <td>category</td>
-                  <td>platenumber</td>
-                  <td>plate type</td>
+                  <td><span th:text="${#strings.toUpperCase(chasis)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(make)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(model)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(category)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(plate)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(platetype)}"></span></td>
                 </tr>
                 </tbody>
               </table>
@@ -90,14 +90,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let item of sales; let i = index">
+                <tr th:each="prod : ${serviceType}">
                   <td scope="row" style="text-align:center !important;">1</td>
-                  <td style="text-align:center !important;">service type name</td>
+                  <td style="text-align:center !important;" th:text="${prod.serviceType.name}">service type name</td>
                   <td style="text-align:center !important;">1</td>
-                  <td style="text-align:center !important;">service tpe price</td>
-                  <td style="text-align:center !important;">service type price</td>
+                  <td style="text-align:center !important;" th:text="${prod.serviceType.price}">service tpe price</td>
+                  <td style="text-align:center !important;" th:text="${prod.serviceType.price}">service type price</td>
                 </tr>
-
                 <tr>
                   <td colspan="3" style="text-align:center !important;"></td>
                   <td style="text-align: left; background-color: #f0d090 !important; font-weight: 600;">
@@ -121,8 +120,8 @@
                 </p>
               </h5>
 
-              <img src={{qrcode}} alt='qrcode' style="top: 13.625px; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
-              <img src={{qrcode}} alt='qrcode' style="top: 13.625px; left: ; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
+              <img src={{qrcode}} alt='qrcode' style="position:relative; top: 13.625px; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
+              <img  alt='qrcode' style="position:relative; top: 13.625px; left:350px ; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
 
             </div>
           </div>

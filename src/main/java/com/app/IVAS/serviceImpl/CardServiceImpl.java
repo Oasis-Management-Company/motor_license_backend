@@ -334,14 +334,16 @@ public class CardServiceImpl implements CardService {
                 return templateName = "sticker";
             case COMPUTERIZED:
                 return templateName = "npr";
-            case LEARNERS:
+            case LEARNER:
                 return templateName = "Referral_printout";
             case GENERAL:
-                return templateName = "GMR";
+                return templateName = "receipt";
             case HEAVY:
                 return templateName = "heavy_duty";
             case HACKNEY:
                 return templateName = "hackney_permit";
+            case RECIEPT:
+                return templateName = "receipt";
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }
@@ -363,25 +365,12 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("name", invoiceServiceType.getInvoice().getPayer().getDisplayName());
             extraParameter.put("address", invoiceServiceType.getInvoice().getPayer().getAddress());
             extraParameter.put("phoneNumber", invoiceServiceType.getInvoice().getPayer().getPhoneNumber());
-            extraParameter.put("dateCreated", invoiceServiceType.getInvoice().getCreatedAt().format(df));
-            extraParameter.put("chasis", invoiceServiceType.getInvoice().getVehicle().getChasisNumber());
-            extraParameter.put("engine", invoiceServiceType.getInvoice().getVehicle().getEngineNumber());
-            extraParameter.put("plate", invoiceServiceType.getInvoice().getVehicle().getPlateNumber().getPlateNumber());
-            extraParameter.put("make", invoiceServiceType.getInvoice().getVehicle().getVehicleModel().getVehicleMake().getName());
-            extraParameter.put("model", invoiceServiceType.getInvoice().getVehicle().getVehicleModel().getName());
-            extraParameter.put("year", invoiceServiceType.getInvoice().getVehicle().getYear());
-            extraParameter.put("category", invoiceServiceType.getInvoice().getVehicle().getVehicleCategory().getName());
-            extraParameter.put("type", invoiceServiceType.getInvoice().getVehicle().getPlateNumber().getType().getName());
-            extraParameter.put("color", invoiceServiceType.getInvoice().getVehicle().getColor());
+            extraParameter.put("dateCreated", invoiceServiceType.getInvoice().getPaymentDate().format(df));
             extraParameter.put("created", invoiceServiceType.getInvoice().getCreatedAt().format(df));
             extraParameter.put("barcode", qrCode);
-            extraParameter.put("capacity", invoiceServiceType.getInvoice().getVehicle().getPassengers());
-            extraParameter.put("weight", invoiceServiceType.getInvoice().getVehicle().getLoad());
-//            extraParameter.put("policy", invoiceServiceType.getInvoice().getVehicle().getInsurance().getName());
-//            extraParameter.put("insurance", invoiceServiceType.getInvoice().getVehicle().getInsuranceNumber());
-            extraParameter.put("permit", invoiceServiceType.getInvoice().getVehicle().getPermit());
+            extraParameter.put("permit", invoiceServiceType.getServiceType().getName());
             extraParameter.put("invoice", invoiceServiceType.getInvoice().getInvoiceNumber());
-//            extraParameter.put("expiry", invoiceServiceType.getExpiryDate());
+            extraParameter.put("expiry", invoiceServiceType.getExpiryDate().format(df));
 
 
             PdfDtoInvoice pojo = new PdfDtoInvoice();
@@ -398,6 +387,68 @@ public class CardServiceImpl implements CardService {
         pdfDtos.forEach(pdfPojo -> {
             try {
                 templates.add(htmlToPdfCreator.createPDFString(pdfPojo.getTemplateName(), htmlToPdfCreator.getContext(pdfPojo.getCard(), pdfPojo.getExtraParameter())));
+            } catch (IllegalAccessException | IOException | DocumentException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+        String fileName = pdfRenderToMultiplePages.multiPage(templates);
+
+        if (StringUtils.isBlank(fileName)) {
+            throw new Exception("file not found");
+        }
+
+        return pdfRenderToMultiplePages.loadFileAsResource(appConfigurationProperties.getPrintDirectory() +"/"+ fileName);
+    }
+
+
+    @Override
+    public Resource printReceipt(List<PrintDto> dtos) throws Exception {
+        List<PdfDtoInvoice> pdfDtos = dtos.stream().map(printDto -> {
+
+            Invoice invoice = invoiceRepository.findById(printDto.getId()).get();
+            List<InvoiceServiceType> invoiceServiceType = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+            Map<String, Object> extraParameter = new TreeMap<>();
+            String templateName = getTemplate(printDto.getType());
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
+
+            String dataValue = asin_verify+"="+invoice.getInvoiceNumber();
+            String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
+
+            extraParameter.put("name", invoice.getPayer().getDisplayName());
+            extraParameter.put("address", invoice.getPayer().getAddress());
+            extraParameter.put("phoneNumber", invoice.getPayer().getPhoneNumber());
+            extraParameter.put("email", invoice.getPayer().getUsername());
+            extraParameter.put("dateCreated",invoice.getPaymentDate().format(df));
+            extraParameter.put("created", invoice.getCreatedAt().format(df));
+            extraParameter.put("barcode", qrCode);
+            extraParameter.put("invoice", invoice.getInvoiceNumber());
+
+            extraParameter.put("chasis", invoice.getVehicle().getChasisNumber());
+            extraParameter.put("make", invoice.getVehicle().getVehicleModel().getVehicleMake().getName());
+            extraParameter.put("plate", invoice.getVehicle().getPlateNumber().getPlateNumber());
+            extraParameter.put("platetype", invoice.getVehicle().getPlateNumber().getType().getName());
+            extraParameter.put("category", invoice.getVehicle().getVehicleCategory().getName());
+            extraParameter.put("model", invoice.getVehicle().getVehicleModel().getName());
+            extraParameter.put("serviceType", invoiceServiceType);
+
+
+            PdfDtoInvoice pojo = new PdfDtoInvoice();
+            pojo.setTemplateName(templateName);
+            pojo.setExtraParameter(extraParameter);
+            pojo.setReceipt(invoice);
+
+            return pojo;
+
+        }).collect(Collectors.toList());
+
+        List<String> templates = new ArrayList();
+
+        pdfDtos.forEach(pdfPojo -> {
+            try {
+                templates.add(htmlToPdfCreator.createPDFString(pdfPojo.getTemplateName(), htmlToPdfCreator.getContext(pdfPojo.getReceipt(), pdfPojo.getExtraParameter())));
             } catch (IllegalAccessException | IOException | DocumentException e) {
                 e.printStackTrace();
             }

@@ -21,4 +21,5 @@ public class ParentRequest {
     private String name;
     private String invoiceNumber;
     private PaymentStatus status;
+    private long id;
 }

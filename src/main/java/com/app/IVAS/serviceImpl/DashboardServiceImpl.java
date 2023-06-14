@@ -79,11 +79,13 @@ public class DashboardServiceImpl implements DashboardCtrlService {
         JPAQuery<PortalUser> portalUserJPAQuery1 = appRepository.startJPAQuery(QPortalUser.portalUser).where(QPortalUser.portalUser.role.name.equalsIgnoreCase("GENERAL_USER"));
 
         JPAQuery<InvoiceServiceType> invoiceServiceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE")
+                        .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER MOTORCYCLE")))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         JPAQuery<InvoiceServiceType> pToday = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE")
+                    .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER MOTORCYCLE")))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(LocalDate.now().atStartOfDay()))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(LocalDate.now().atStartOfDay().plusHours(24)))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
@@ -91,17 +93,19 @@ public class DashboardServiceImpl implements DashboardCtrlService {
 
         LocalDate date = now.with(DayOfWeek.SUNDAY);
         JPAQuery<InvoiceServiceType> pThisWeek = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
-                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(date.minusDays(7).atStartOfDay()))
-                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(date.atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE")
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER MOTORCYCLE")))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(date.minusDays(7).atStartOfDay())
+                .and(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(date.atStartOfDay())))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         LocalDate month = now.withDayOfMonth(1);
         LocalDate end = now.withDayOfMonth(now.getMonth().length(now.isLeapYear()));
         JPAQuery<InvoiceServiceType> pThisMonth = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
-                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(month.atStartOfDay()))
-                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(end.plusDays(1).atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE")
+                .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER MOTORCYCLE")))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(month.atStartOfDay())
+                .and(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(end.plusDays(1).atStartOfDay())))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         Date d=new Date();
@@ -110,9 +114,10 @@ public class DashboardServiceImpl implements DashboardCtrlService {
         LocalDate startdate = startyear.atDay(1);
         LocalDate endYear = startyear.atDay(365);
         JPAQuery<InvoiceServiceType> pThisYear = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE"))
-                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(startdate.atStartOfDay()))
-                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(endYear.atStartOfDay()))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER VEHICLE")
+                        .or(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("PLATE NUMBER MOTORCYCLE")))
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.goe(startdate.atStartOfDay())
+                .and(QInvoiceServiceType.invoiceServiceType.invoice.paymentDate.loe(endYear.atStartOfDay())))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
 
@@ -121,22 +126,22 @@ public class DashboardServiceImpl implements DashboardCtrlService {
 
         JPAQuery<Invoice> Today = appRepository.startJPAQuery(QInvoice.invoice)
                 .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID))
-                .where(QInvoice.invoice.paymentDate.goe(LocalDate.now().atStartOfDay()))
-                .where(QInvoice.invoice.paymentDate.loe(LocalDate.now().atStartOfDay().plusHours(24)));
+                .where(QInvoice.invoice.paymentDate.goe(LocalDate.now().atStartOfDay())
+                .and(QInvoice.invoice.paymentDate.loe(LocalDate.now().atStartOfDay().plusHours(24))));
 
         JPAQuery<Invoice> ThisWeek = appRepository.startJPAQuery(QInvoice.invoice)
-                .where(QInvoice.invoice.paymentDate.goe(date.minusDays(7).atStartOfDay()))
-                .where(QInvoice.invoice.paymentDate.loe(date.atStartOfDay()))
+                .where(QInvoice.invoice.paymentDate.goe(date.minusDays(7).atStartOfDay())
+                .and(QInvoice.invoice.paymentDate.loe(date.atStartOfDay())))
                 .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         JPAQuery<Invoice> ThisMonth = appRepository.startJPAQuery(QInvoice.invoice)
-                .where(QInvoice.invoice.paymentDate.goe(month.atStartOfDay()))
-                .where(QInvoice.invoice.paymentDate.loe(end.plusDays(1).atStartOfDay()))
+                .where(QInvoice.invoice.paymentDate.goe(month.atStartOfDay())
+                .and(QInvoice.invoice.paymentDate.loe(end.plusDays(1).atStartOfDay())))
                 .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         JPAQuery<Invoice> ThisYear = appRepository.startJPAQuery(QInvoice.invoice)
-                .where(QInvoice.invoice.paymentDate.goe(startdate.atStartOfDay()))
-                .where(QInvoice.invoice.paymentDate.loe(endYear.atStartOfDay()))
+                .where(QInvoice.invoice.paymentDate.goe(startdate.atStartOfDay())
+                .and(QInvoice.invoice.paymentDate.loe(endYear.atStartOfDay())))
                 .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         if (jwtService.user.getRole().getName().equalsIgnoreCase("MLA")){

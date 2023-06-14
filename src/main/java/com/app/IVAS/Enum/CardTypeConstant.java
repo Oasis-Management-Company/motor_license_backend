@@ -5,7 +5,8 @@ public enum CardTypeConstant {
     STICKER,
     COMPUTERIZED,
     HEAVY,
-    LEARNERS,
+    LEARNER,
     GENERAL,
-    HACKNEY
+    HACKNEY,
+    RECIEPT
 }
