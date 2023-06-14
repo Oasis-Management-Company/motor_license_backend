@@ -58,7 +58,7 @@ public class ReportServiceImpl implements ReportService {
                dto.setPlateNumber(invoiceService.getInvoice().getVehicle().getPlateNumber().getPlateNumber());
                dto.setPlateType(invoiceService.getInvoice().getVehicle().getPlateNumber().getType().getName());
                dto.setMlaStation(invoiceService.getInvoice().getCreatedBy().getOffice().getName());
-               dto.setDateSold(invoiceService.getInvoice().getPaymentDate().format(df));
+               dto.setDateSold(invoiceService.getPaymentDate().format(df));
                dto.setAmount(invoiceService.getServiceType().getPrice());
                dtos.add(dto);
         }
