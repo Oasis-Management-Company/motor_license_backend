@@ -37,42 +37,96 @@ public class VerificationServiceImpl implements VerificationService {
         Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumberIgnoreCase(invoiceNumber);
         if (invoice.isPresent()) {
 
+            verificationDto.setInvoiceNumber(invoice.get().getInvoiceNumber());
+
+            verificationDto.setAmount(invoice.get().getAmount());
+
+            if (invoice.get().getPaymentDate() != null) {
+                verificationDto.setPaymentDate(invoice.get().getPaymentDate());
+            }
+
+            if (invoice.get().getPaymentStatus() != null) {
+                verificationDto.setPaymentStatus(invoice.get().getPaymentStatus().name());
+            }
+
+            if (invoice.get().getPaymentDate() != null) {
+                verificationDto.setExpiryDate(invoice.get().getPaymentDate().plusYears(1).minusDays(1));
+            }
+
+            PortalUser portalUser = portalUserRepository.findById(invoice.get().getPayer().getId()).get();
+
+            if (portalUser.getDisplayName() != null) {
+                verificationDto.setName(portalUser.getDisplayName());
+            }
+
+            if (portalUser.getPhoneNumber() != null) {
+                verificationDto.setPhoneNumber(portalUser.getPhoneNumber());
+            }
+
+            if (portalUser.getAddress() != null) {
+                verificationDto.setAddress(portalUser.getAddress());
+            }
+
+            if (portalUser.getEmail() != null) {
+                verificationDto.setEmail(portalUser.getEmail());
+            }
+
+            if (portalUser.getAsin() != null) {
+                verificationDto.setAsin(portalUser.getAsin());
+            }
+
+            Optional<List<InvoiceServiceType>> invoiceServiceTypes = invoiceServiceTypeRepository.findAllByInvoice(invoice.get());
+
+            List<InvoiceServiceTypeDto> invoiceServiceTypeDtos = new ArrayList<>();
+
+            if (invoiceServiceTypes.isPresent()) {
+                for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes.get()) {
+
+                    InvoiceServiceTypeDto invoiceServiceTypeDto = new InvoiceServiceTypeDto();
+
+                    if (invoiceServiceType.getServiceType().getName() != null) {
+                        invoiceServiceTypeDto.setName(invoiceServiceType.getServiceType().getName());
+                    }
+
+                    if (invoiceServiceType.getServiceType().getPrice() != null) {
+                        invoiceServiceTypeDto.setPrice(invoiceServiceType.getServiceType().getPrice());
+                    }
+
+                    if (invoiceServiceType.getServiceType().getDurationInMonth() != null) {
+                        invoiceServiceTypeDto.setDurationInMonth(invoiceServiceType.getServiceType().getDurationInMonth());
+                    }
+
+                    if (invoiceServiceType.getServiceType().getCategory() != null) {
+                        invoiceServiceTypeDto.setVehicleCategory(invoiceServiceType.getServiceType().getCategory().getName());
+                    }
+
+                    if (invoiceServiceType.getReference() != null) {
+                        invoiceServiceTypeDto.setReference(invoiceServiceType.getReference());
+                    }
+
+                    if (invoiceServiceType.getPaymentDate() != null) {
+                        invoiceServiceTypeDto.setPaymentDate(invoiceServiceType.getPaymentDate());
+                    }
+
+                    if (invoiceServiceType.getExpiryDate() != null) {
+                        invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getExpiryDate());
+                        invoiceServiceTypeDto.setExpiry(invoiceServiceType.getExpiryDate().format(formatter));
+                    }
+
+                    invoiceServiceTypeDtos.add(invoiceServiceTypeDto);
+                }
+
+                verificationDto.setInvoiceServices(invoiceServiceTypeDtos);
+            }
+
             if (invoice.get().getVehicle() != null) {
 
                 Optional<Vehicle> vehicle = vehicleRepository.findById(invoice.get().getVehicle().getId());
 
-                verificationDto.setInvoiceNumber(invoice.get().getInvoiceNumber());
-                verificationDto.setPaymentDate(invoice.get().getPaymentDate());
-                verificationDto.setAmount(invoice.get().getAmount());
-                verificationDto.setPaymentStatus(invoice.get().getPaymentStatus().name());
-                if (invoice.get().getPaymentDate() != null) {
-                    verificationDto.setExpiryDate(invoice.get().getPaymentDate().plusYears(1).minusDays(1));
-                }
-
-
-                PortalUser portalUser = portalUserRepository.findById(invoice.get().getPayer().getId()).get();
-
-                if (portalUser.getDisplayName() != null) {
-                    verificationDto.setName(portalUser.getDisplayName());
-                }
-
-                if (portalUser.getPhoneNumber() != null) {
-                    verificationDto.setPhoneNumber(portalUser.getPhoneNumber());
-                }
-
-                if (portalUser.getAddress() != null) {
-                    verificationDto.setAddress(portalUser.getAddress());
-                }
-
-                if (portalUser.getEmail() != null) {
-                    verificationDto.setEmail(portalUser.getEmail());
-                }
-
-                if (portalUser.getAsin() != null) {
-                    verificationDto.setAsin(portalUser.getAsin());
-                }
-
                 if (vehicle.isPresent()) {
+                    if (vehicle.get().getPlateNumber() != null) {
+                        verificationDto.setPlateType(vehicle.get().getPlateNumber().getType().getName());
+                    }
                     if (vehicle.get().getChasisNumber() != null) {
                         verificationDto.setChasis(vehicle.get().getChasisNumber());
                     }
@@ -108,57 +162,9 @@ public class VerificationServiceImpl implements VerificationService {
                 }
 
 
-                Optional<List<InvoiceServiceType>> invoiceServiceTypes = invoiceServiceTypeRepository.findAllByInvoice(invoice.get());
-
-                List<InvoiceServiceTypeDto> invoiceServiceTypeDtos = new ArrayList<>();
-
-                if (invoiceServiceTypes.isPresent()) {
-                    for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes.get()) {
-
-                        InvoiceServiceTypeDto invoiceServiceTypeDto = new InvoiceServiceTypeDto();
-
-                        if (invoiceServiceType.getServiceType().getName() != null) {
-                            invoiceServiceTypeDto.setName(invoiceServiceType.getServiceType().getName());
-                        }
-
-                        if (invoiceServiceType.getServiceType().getPrice() != null) {
-                            invoiceServiceTypeDto.setPrice(invoiceServiceType.getServiceType().getPrice());
-                        }
-
-                        if (invoiceServiceType.getServiceType().getDurationInMonth() != null) {
-                            invoiceServiceTypeDto.setDurationInMonth(invoiceServiceType.getServiceType().getDurationInMonth());
-                        }
-
-                        if (invoiceServiceType.getServiceType().getCategory() != null) {
-                            invoiceServiceTypeDto.setVehicleCategory(invoiceServiceType.getServiceType().getCategory().getName());
-                        }
-
-                        if (invoiceServiceType.getReference() != null) {
-                            invoiceServiceTypeDto.setReference(invoiceServiceType.getReference());
-                        }
-
-                        if (invoiceServiceType.getPaymentDate() != null) {
-                            invoiceServiceTypeDto.setPaymentDate(invoiceServiceType.getPaymentDate());
-                        }
-//                        if (invoiceServiceType.getExpiryDate() != null && invoiceServiceType.getPaymentDate() != null) {
-//                            invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getExpiryDate());
-//                        }
-
-                        if (invoiceServiceType.getExpiryDate() != null) {
-                            invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getExpiryDate());
-                            invoiceServiceTypeDto.setExpiry(invoiceServiceType.getExpiryDate().format(formatter));
-                        }
-
-                        invoiceServiceTypeDtos.add(invoiceServiceTypeDto);
-                    }
-                    System.out.println(invoiceServiceTypeDtos);
-
-                    verificationDto.setInvoiceServices(invoiceServiceTypeDtos);
-                }
-
-                return verificationDto;
-
             }
+
+            return verificationDto;
         }
         return null;
     }
@@ -177,6 +183,9 @@ public class VerificationServiceImpl implements VerificationService {
             Optional<Vehicle> vehicle = Optional.ofNullable(vehicleRepository.findVehicleByPlateNumberIdAndRegType(plate.get().getId(), RegType.REGISTRATION));
 
             if (vehicle.isPresent()) {
+                if (vehicle.get().getPlateNumber() != null) {
+                    verificationDto.setPlateType(vehicle.get().getPlateNumber().getType().getName());
+                }
 
                 if (vehicle.get().getChasisNumber() != null) {
                     verificationDto.setChasis(vehicle.get().getChasisNumber());
@@ -282,8 +291,7 @@ public class VerificationServiceImpl implements VerificationService {
                                 }
 
                                 if (invoiceServiceType.getExpiryDate() != null) {
-//                                    invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getPaymentDate().plusMonths(invoiceServiceType.getServiceType().getDurationInMonth()));
-
+//
                                     invoiceServiceTypeDto.setExpiryDate(invoiceServiceType.getExpiryDate());
                                     invoiceServiceTypeDto.setExpiry(invoiceServiceType.getExpiryDate().format(formatter));
 
