@@ -2,6 +2,7 @@ package com.app.IVAS.dto;
 
 
 import com.app.IVAS.Enum.GenericStatusConstant;
+import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.entity.userManagement.Role;
 import lombok.Data;
 
@@ -26,4 +27,6 @@ public class PortalUserPojo {
     private String otherNames;
     private Double amount;
     private String invoiceNo;
+    private PaymentStatus paymentStatus;
+    private Long invoiceId;
 }

@@ -117,6 +117,7 @@ public class CardController {
     @PostMapping("/document/print")
     @Transactional
     public ResponseEntity<Resource> printDocuments(@RequestBody List<PrintDto> dtos, HttpServletRequest request) throws Exception {
+        System.out.println(dtos);
         Resource resource = cardService.printDocuments(dtos);
         String contentType = null;
         try {
@@ -134,5 +135,25 @@ public class CardController {
                 .body(resource);
     }
 
+    @PostMapping("/receipt/print")
+    @Transactional
+    public ResponseEntity<Resource> printReceipt(@RequestBody List<PrintDto> dtos, HttpServletRequest request) throws Exception {
+        System.out.println(dtos);
+        Resource resource = cardService.printReceipt(dtos);
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.error("Could not determine file type.");
+        }
+        // Fallback to the default content type if type could not be determined
+        if (contentType == null) {
+            contentType = "application/pdf";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=card.pdf")
+                .body(resource);
+    }
 
 }
