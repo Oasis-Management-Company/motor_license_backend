@@ -245,7 +245,7 @@ public class CardServiceImpl implements CardService {
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
             Boolean insurance;
 
-            String dataValue = asin_verify+"="+card.getInvoice().getInvoiceNumber();
+            String dataValue = asin_verify+card.getInvoice().getInvoiceNumber();
             String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
 
             extraParameter.put("photo", card.getVehicle().getPortalUser().getImage());
