@@ -455,6 +455,9 @@ public class VehicleServiceImpl implements VehicleService {
             dto.setReference(invoice.getPaymentRef());
             dto.setId(invoice.getId());
             dto.setDateString(invoice.getCreatedAt().format(formatter));
+            if(invoice.getPaymentDate() != null) {
+                dto.setPaymentDateString(invoice.getPaymentDate().format(formatter));
+            }
             return dto;
         }).collect(Collectors.toList());
     }

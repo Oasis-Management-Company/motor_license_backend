@@ -35,4 +35,5 @@ public class InvoiceDto {
     private Long id;
     private String dateString;
     private String expiry;
+    private String paymentDateString;
 }
