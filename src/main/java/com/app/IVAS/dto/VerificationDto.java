@@ -38,6 +38,7 @@ public class VerificationDto {
     private String plate;
 
     private String referenceNumber;
+    private String plateType;
 
 
 }

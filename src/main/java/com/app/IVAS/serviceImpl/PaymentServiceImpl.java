@@ -98,6 +98,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             String result = restTemplate.postForObject(baseUrl, paymentLoginDto, String.class);
 
+            System.out.println(result);
             Gson gson = new Gson();
             PaymentRespondDto responseToken = gson.fromJson(result, PaymentRespondDto.class);
 
