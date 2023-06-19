@@ -164,7 +164,6 @@ public class ReportController {
         JPAQuery<PlateNumber> plateNumberJPAQuery = appRepository.startJPAQuery(QPlateNumber.plateNumber1)
                 .where(predicateExtractor.getPredicate(filter))
                 .where(QPlateNumber.plateNumber1.plateNumberStatus.ne(PlateNumberStatus.UNASSIGNED))
-                .where(QPlateNumber.plateNumber1.request.isNotNull())
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
