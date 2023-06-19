@@ -156,6 +156,14 @@ public class PlateNumberController {
         return ResponseEntity.ok("");
     }
 
+    @PostMapping("/change-stock-type")
+    @Transactional
+    public ResponseEntity<?> changeStockPlateNumberType(@RequestParam Long stockId,
+                                                        @RequestParam Long typeId ){
+        plateNumberService.changeStockPlateNumberType(stockId, typeId);
+        return ResponseEntity.ok("");
+    }
+
     @PostMapping("/recall-plate-number")
     @Transactional
     public ResponseEntity<?> recallPlateNumber(@RequestParam Long id){

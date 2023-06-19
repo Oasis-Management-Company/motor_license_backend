@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -178,6 +180,31 @@ public class PlateNumberServiceImpl implements PlateNumberService {
                     + stock.getEndRange() + " " + stock.getEndCode() + " of plate number type: " + stock.getType() + " was deleted"), ActivityStatusConstant.DELETE);
             stockRepository.delete(stock);
         }
+    }
+
+    @Override
+    @Transactional
+    public void changeStockPlateNumberType(Long stockId, Long typeId) {
+        Stock stock = stockRepository.findById(stockId).orElseThrow(RuntimeException::new);
+
+        List<PlateNumber> plateNumberList = plateNumberRepository.findByStock(stock);
+
+        PlateNumberType plateNumberType = plateNumberTypeRepository.findById(typeId).orElseThrow(RuntimeException::new);
+
+        for(PlateNumber plateNumber:plateNumberList){
+            plateNumber.setType(plateNumberType);
+            plateNumber.setSubType(null);
+            plateNumber.setLastUpdatedAt(LocalDateTime.now());
+            plateNumber.setLastUpdatedBy(jwtService.user);
+            plateNumberRepository.save(plateNumber);
+        }
+
+        stock.setType(plateNumberType);
+        stock.setSubType(null);
+        activityLogService.createActivityLog(("Plate number type of stock series: " + stock.getStartCode() + " " + stock.getStartRange() + "-"
+                + stock.getEndRange() + " " + stock.getEndCode() + " has been changed to: " + stock.getType()), ActivityStatusConstant.UPDATE);
+        stockRepository.save(stock);
+
     }
 
     @Override
