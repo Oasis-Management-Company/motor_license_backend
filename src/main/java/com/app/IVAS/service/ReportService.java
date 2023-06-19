@@ -15,7 +15,7 @@ import java.util.List;
 
 public interface ReportService {
 
-    List<SalesReportDto> getSales(List<Sales> sales);
+    List<SalesReportDto> getSales(List<InvoiceServiceType> invoiceServiceTypes);
 
     List<StockReportPojo> getStockReport(List<PortalUser> users);
 

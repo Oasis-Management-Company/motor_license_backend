@@ -608,7 +608,9 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         Invoice invoice = invoiceRepository.findById(invoiceId).get();
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
         List<ParentRequest> childRequests = new ArrayList<>();
-        List<InvoiceServiceType> invoiceServiceTypes = invoiceServiceTypeRepository.findByInvoice(invoice);
+
+        List<InvoiceServiceType> invoiceServiceTypes = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                .where(QInvoiceServiceType.invoiceServiceType.invoice.id.eq(invoice.getId())).fetch();
 
         for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
                 ParentRequest dto = new ParentRequest();
@@ -624,6 +626,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 dto.setStatus(invoiceServiceType.getPaymentStatus());
                 childRequests.add(dto);
                 dto.setInvoiceNumber(invoiceServiceType.getInvoice().getInvoiceNumber());
+                dto.setId(invoiceServiceType.getId());
         }
 
         TopParentRequest parentRequest = new TopParentRequest();

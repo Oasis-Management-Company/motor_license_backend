@@ -1,5 +1,6 @@
 package com.app.IVAS.dto.filters;
 
+import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.QSales;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,19 +12,19 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SalesReportSearchFilter extends BaseSearchDto implements QuerydslBinderCustomizer<QSales> {
+public class SalesReportSearchFilter extends BaseSearchDto implements QuerydslBinderCustomizer<QInvoiceServiceType> {
     private String createdAfter;
     private String createdBefore;
     private String downloadType;
+    private String plateNumber;
     private Long type;
+    private Long zone;
 
 
     @Override
-    public void customize(QuerydslBindings bindings, QSales root){
-        bindings.bind(root.createdBy.displayName).as("name").first((path, value) -> path.equalsIgnoreCase(value));
-        bindings.bind(root.createdBy.office.id).as("zone").first((path, value) -> path.eq(value));
-        bindings.bind(root.vehicle.plateNumber.plateNumber).as("plateNumber").first((path, value) -> path.equalsIgnoreCase(value));
+    public void customize(QuerydslBindings bindings, QInvoiceServiceType root){
+        bindings.bind(root.invoice.createdBy.displayName).as("name").first((path, value) -> path.equalsIgnoreCase(value));
 
-        bindings.including(root.createdBy, root.vehicle.plateNumber);
+        bindings.including(root.invoice.createdBy);
     }
 }

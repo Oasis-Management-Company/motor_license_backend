@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+</head>
+<body spellcheck="false">
+<div class="page-body-wrapper">
+  <div class="page-body" style="background-color: #fff;">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-center" style="background-color: #fff;">
+        <div class="card invoice-box bg-light text-dark" style="width: 100%;" >
+          <div id="print-section">
+            <div class="d-flex justify-content-between mx-5">
+              <div class="card-box2">
+                <div>
+                  <h6 class="card-box-header">Billed To</h6>
+                  <div class="title mt-4">
+                    <b>Name:</b>
+                    <p class="mute">
+                      <span th:text="${#strings.toUpperCase(name)}"></span>
+                    </p>
+                  </div>
+                  <div class="title">
+                    <b>Email:</b>
+                    <p class="mute">
+                      <span th:text="${#strings.toUpperCase(email)}"></span>
+                    </p>
+                  </div>
+
+                  <div class="title">
+                    <b>Address:</b>
+                    <p class="mute" *ngIf="previewDetail?.address">
+                      <span th:text="${#strings.toUpperCase(address)}"></span>
+                    </p>
+                  </div>
+                  <div class="title">
+                    <b>Phone Number:</b>
+                    <p class="mute">
+                      <span th:text="${#strings.toUpperCase(phoneNumber)}"></span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="card-box2">
+                <div>
+                  <div class="text-end">
+                    Invoice No: <span th:text="${#strings.toUpperCase(invoice)}"></span>
+                    <br>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <br>
+            <div class="">
+              <table class="" >
+                <h6>Vehicle Information</h6>
+                <tbody>
+                <tr style="background-color: #13cdea !important;">
+                  <td >Chasis No.</td>
+                  <td>Vehicle Make</td>
+                  <td>Vehicle Model</td>
+                  <td>Vehicle Category</td>
+                  <td>Plate Numbeer</td>
+                  <td>Plate Type</td>
+                </tr>
+                <tr>
+                  <td><span th:text="${#strings.toUpperCase(chasis)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(make)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(model)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(category)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(plate)}"></span></td>
+                  <td><span th:text="${#strings.toUpperCase(platetype)}"></span></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <br>
+            <div class="">
+              <table class="" style="width: 100%;">
+                <thead>
+                <tr  style="text-align:center; background-color: #f0d090 !important;">
+                  <th>S.NO</th>
+                  <th>Payment Description</th>
+                  <th>Quantity</th>
+                  <th>Unit Price</th>
+                  <th>Total Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="prod : ${serviceType}">
+                  <td scope="row" style="text-align:center !important;">1</td>
+                  <td style="text-align:center !important;" th:text="${prod.serviceType.name}">service type name</td>
+                  <td style="text-align:center !important;">1</td>
+                  <td style="text-align:center !important;" th:text="${prod.serviceType.price}">service tpe price</td>
+                  <td style="text-align:center !important;" th:text="${prod.serviceType.price}">service type price</td>
+                </tr>
+                <tr>
+                  <td colspan="3" style="text-align:center !important;"></td>
+                  <td style="text-align: left; background-color: #f0d090 !important; font-weight: 600;">
+                    Total</td>
+                  <td style="text-align:center !important;">total</td>
+                </tr>
+                </tbody>
+              </table>
+
+              <br>
+            </div>
+
+            <br>
+
+            <div class="ms-5 mb-5 d-flex justify-content-between" style="padding-right: 30px;">
+              <h5 class="title mt-4">
+                NOTICE: POLICE, FRSC, VIO AND OTHERS
+                <p class="mute">
+                  This receipt serves as temporary evidence of vehicle registration or renewal and is valid until: 12 - Jul - 2023. After this date,vehicle owners MUST possess their card-based license. Please note that you can verify the validity of this receipt by scanning the QR code or entering the receipt number of this receipt on https://ivas.services.an.gov.ng/verification.
+                  To verify the authenticity of this receipt visit: https://ivas.services.an.gov.ng/ and enter the invoice number to verify the receipt at no cost
+                </p>
+              </h5>
+
+              <img src={{qrcode}} alt='qrcode' style="position:relative; top: 13.625px; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
+              <img  alt='qrcode' style="position:relative; top: 13.625px; left:350px ; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

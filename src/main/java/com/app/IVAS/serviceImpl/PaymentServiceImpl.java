@@ -98,6 +98,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             String result = restTemplate.postForObject(baseUrl, paymentLoginDto, String.class);
 
+            System.out.println(result);
             Gson gson = new Gson();
             PaymentRespondDto responseToken = gson.fromJson(result, PaymentRespondDto.class);
 
@@ -118,15 +119,13 @@ public class PaymentServiceImpl implements PaymentService {
 
             for (InvoiceServiceType invoiceServiceType : invoiceServiceTypes) {
                 ParentRequest dto = new ParentRequest();
-                dto.setAmount(invoiceServiceType.getAmount());
-                dto.setItemCode(invoiceServiceType.getRevenuecode());
+                dto.setAmount(invoiceServiceType.getServiceType().getPrice());
+                dto.setItemCode(invoiceServiceType.getServiceType().getRevenueCode());
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("2036644664");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
-                dto.setFirstName(invoice1.getPayer().getFirstName());
-                if (invoice1.getPayer().getLastName() != null){
-                    dto.setLastName(invoice1.getPayer().getLastName());
-                }
+                dto.setFirstName(invoice1.getPayer().getDisplayName());
+                dto.setLastName("");
                 dto.setEmail(invoice1.getPayer().getEmail());
                 dto.setDateBooked(invoice1.getCreatedAt().format(df));
                 dto.setExtendedData(emptychildRequest);
@@ -355,7 +354,6 @@ public class PaymentServiceImpl implements PaymentService {
                 personResultAsJsonStr.setInvoice(invoiceServiceType.getInvoice());
 
                 insuranceResponserepo.save(personResultAsJsonStr);
-
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {
                     @Override
                     public boolean hasError(ClientHttpResponse response) throws IOException {

@@ -27,4 +27,6 @@ public interface CardService {
     List<Card> updateCardByPayment(@NonNull String invoiceNumber, @NonNull Double amount, @NonNull LocalDateTime paymentDate);
 
     Resource printDocuments(List<PrintDto> dtos) throws Exception;
+
+    Resource printReceipt(List<PrintDto> dtos) throws Exception;
 }

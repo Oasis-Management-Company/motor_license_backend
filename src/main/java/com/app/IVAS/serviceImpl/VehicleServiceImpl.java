@@ -74,8 +74,8 @@ public class VehicleServiceImpl implements VehicleService {
         VehicleDto dto = new VehicleDto();
         dto.setInvoices(invoice);
         dto.setVehicle(vehicle);
-        dto.setFirstname(user.getFirstName());
-        dto.setLastname(user.getLastName());
+        dto.setFirstname(user.getDisplayName());
+//        dto.setLastname(user.getLastName());
         dto.setAddress(user.getAddress());
         dto.setPhonenumber(user.getPhoneNumber());
         dto.setEmail(user.getEmail());
@@ -126,7 +126,7 @@ public class VehicleServiceImpl implements VehicleService {
 
         VehicleDto vehicleDto = new VehicleDto();
         vehicleDto.setVehicle(vehicle);
-        vehicleDto.setFirstname(vehicle.getPortalUser().getFirstName() + " " + vehicle.getPortalUser().getLastName());
+        vehicleDto.setFirstname(vehicle.getPortalUser().getDisplayName());
         vehicleDto.setEmail(vehicle.getPortalUser().getEmail());
         vehicleDto.setAddress(vehicle.getPortalUser().getAddress());
         vehicleDto.setPhonenumber(vehicle.getPortalUser().getPhoneNumber());
@@ -275,7 +275,7 @@ public class VehicleServiceImpl implements VehicleService {
         PortalUser portalUser = portalUserRepository.findFirstByPhoneNumber(phonenumber);
         AsinDto asinDto = new AsinDto();
         asinDto.setLastname(portalUser.getLastName());
-        asinDto.setFirstname(portalUser.getFirstName());
+        asinDto.setFirstname(portalUser.getDisplayName());
         asinDto.setAddress(portalUser.getAddress());
         asinDto.setPhoneNumber(portalUser.getPhoneNumber());
         asinDto.setEmail(portalUser.getEmail());
@@ -296,7 +296,7 @@ public class VehicleServiceImpl implements VehicleService {
         Double totalAmount = 0.0;
 
         for (Long nid : ids) {
-            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            ServiceType serviceType = serviceTypeRepository.findById(nid).get();
             totalAmount += serviceType.getPrice();
         }
 
