@@ -24,5 +24,7 @@ public interface PlateNumberService {
 
     void deleteStock(Long stockId);
 
+    void changeStockPlateNumberType(Long stockId, Long typeId);
+
     void recallPlateNumber(Long id);
 }
