@@ -33,8 +33,6 @@ public class PaymentCtrl {
     @PostMapping("/payment/send")
     public ResponseEntity<?> sendPaymentToCBS(@RequestParam String invoice){
         String dto = paymentService.sendPaymentTax(invoice);
-
-        System.out.println(dto);
         return ResponseEntity.ok(dto);
     }
 
