@@ -359,7 +359,7 @@ public class CardServiceImpl implements CardService {
             String templateName = getTemplate(printDto.getType());
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
 
-            String dataValue = asin_verify+"="+invoiceServiceType.getInvoice().getInvoiceNumber();
+            String dataValue = asin_verify+invoiceServiceType.getInvoice().getInvoiceNumber();
             String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
 
             extraParameter.put("name", invoiceServiceType.getInvoice().getPayer().getDisplayName());
@@ -414,7 +414,9 @@ public class CardServiceImpl implements CardService {
             String templateName = getTemplate(printDto.getType());
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
 
-            String dataValue = asin_verify+"="+invoice.getInvoiceNumber();
+            LocalDateTime expiry = invoice.getPaymentDate().plusMonths(1);
+
+            String dataValue = asin_verify+invoice.getInvoiceNumber();
             String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
 
             extraParameter.put("name", invoice.getPayer().getDisplayName());
@@ -425,6 +427,7 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("created", invoice.getCreatedAt().format(df));
             extraParameter.put("barcode", qrCode);
             extraParameter.put("invoice", invoice.getInvoiceNumber());
+            extraParameter.put("expiry", expiry);
 
             extraParameter.put("chasis", invoice.getVehicle().getChasisNumber());
             extraParameter.put("make", invoice.getVehicle().getVehicleModel().getVehicleMake().getName());
