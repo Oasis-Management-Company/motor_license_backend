@@ -17,27 +17,24 @@
                 <div>
                   <h6 class="card-box-header">Billed To</h6>
                   <div class="title mt-4">
-                    <b>Name:</b>
+
                     <p class="mute">
+                      <b>Name:</b>
                       <span th:text="${#strings.toUpperCase(name)}"></span>
                     </p>
-                  </div>
-                  <div class="title">
-                    <b>Email:</b>
+
                     <p class="mute">
+                      <b>Email:</b>
                       <span th:text="${#strings.toUpperCase(email)}"></span>
                     </p>
-                  </div>
 
-                  <div class="title">
-                    <b>Address:</b>
-                    <p class="mute" *ngIf="previewDetail?.address">
+                    <p class="mute">
+                      <b>Address:</b>
                       <span th:text="${#strings.toUpperCase(address)}"></span>
                     </p>
-                  </div>
-                  <div class="title">
-                    <b>Phone Number:</b>
+
                     <p class="mute">
+                      <b>Phone Number:</b>
                       <span th:text="${#strings.toUpperCase(phoneNumber)}"></span>
                     </p>
                   </div>
@@ -82,47 +79,36 @@
               <table class="" style="width: 100%;">
                 <thead>
                 <tr  style="text-align:center; background-color: #f0d090 !important;">
-                  <th>S.NO</th>
-                  <th>Payment Description</th>
-                  <th>Quantity</th>
+                  <th style="width:420px">Payment Description</th>
+                  <th>Expiry Date</th>
                   <th>Unit Price</th>
                   <th>Total Amount</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="prod : ${serviceType}">
-                  <td scope="row" style="text-align:center !important;">1</td>
                   <td style="text-align:center !important;" th:text="${prod.serviceType.name}">service type name</td>
-                  <td style="text-align:center !important;">1</td>
+                  <td style="text-align:center !important;" th:text="${#temporals.format(prod.expiryDate, 'dd-MMM-yyyy')}"></td>
                   <td style="text-align:center !important;" th:text="${prod.serviceType.price}">service tpe price</td>
                   <td style="text-align:center !important;" th:text="${prod.serviceType.price}">service type price</td>
-                </tr>
-                <tr>
-                  <td colspan="3" style="text-align:center !important;"></td>
-                  <td style="text-align: left; background-color: #f0d090 !important; font-weight: 600;">
-                    Total</td>
-                  <td style="text-align:center !important;">total</td>
                 </tr>
                 </tbody>
               </table>
 
               <br>
             </div>
-
-            <br>
-
+            <div  style="padding-right: 30px;">
+              <img th:src="${barcode}" alt='qrcode' style="position:relative;width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
+              <img  alt='qrcode' src="img/csignature.png" style="position:relative; top: 13.625px; left:350px ; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
+            </div>
             <div class="ms-5 mb-5 d-flex justify-content-between" style="padding-right: 30px;">
               <h5 class="title mt-4">
                 NOTICE: POLICE, FRSC, VIO AND OTHERS
                 <p class="mute">
-                  This receipt serves as temporary evidence of vehicle registration or renewal and is valid until: 12 - Jul - 2023. After this date,vehicle owners MUST possess their card-based license. Please note that you can verify the validity of this receipt by scanning the QR code or entering the receipt number of this receipt on https://ivas.services.an.gov.ng/verification.
-                  To verify the authenticity of this receipt visit: https://ivas.services.an.gov.ng/ and enter the invoice number to verify the receipt at no cost
+                  This receipt serves as temporary evidence of vehicle registration or renewal and is valid until: <span th:text="${#temporals.format(expiry, 'dd-MMM-yyyy')}"></span> After this date,vehicle owners MUST possess their card-based license. Please note that you can verify the validity of this receipt by scanning the QR code or entering the receipt number of this receipt on https://ivas.services.an.gov.ng/verification.
+                  To verify the authenticity of this receipt visit: https://ivas.services.an.gov.ng/verification/view/<span th:text="${#strings.toUpperCase(invoice)}"></span> and enter the invoice number to verify the receipt at no cost
                 </p>
               </h5>
-
-              <img src={{qrcode}} alt='qrcode' style="position:relative; top: 13.625px; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
-              <img  alt='qrcode' style="position:relative; top: 13.625px; left:350px ; width: 104px;height: 104px; box-sizing: border-box; text-align: center;"/>
-
             </div>
           </div>
         </div>
