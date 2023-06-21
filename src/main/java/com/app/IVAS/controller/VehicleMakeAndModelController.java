@@ -58,7 +58,7 @@ public class VehicleMakeAndModelController {
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
 
-        vehicleModelJPAQuery.where(QVehicleModel.vehicleModel.vehicleMake.name.equalsIgnoreCase(filter.getName()));
+        vehicleModelJPAQuery.where(QVehicleModel.vehicleModel.vehicleMake.name.equalsIgnoreCase(filter.getMake()));
 
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.ASC), filter.getOrderColumn().orElse("name"), QVehicleModel.vehicleModel);
         QueryResults<VehicleModel> vehicleModelQueryResults = vehicleModelJPAQuery.select(QVehicleModel.vehicleModel).distinct().orderBy(sortedColumn).fetchResults();
@@ -110,6 +110,7 @@ public class VehicleMakeAndModelController {
 
         return vehicleMakeAndModelService.fetchVehicleModel(id);
     }
+
 
 
 

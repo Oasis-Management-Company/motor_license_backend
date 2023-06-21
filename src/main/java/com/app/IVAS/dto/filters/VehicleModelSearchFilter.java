@@ -10,10 +10,11 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 @NoArgsConstructor
 public class VehicleModelSearchFilter extends BaseSearchDto implements QuerydslBinderCustomizer<QVehicleModel> {
 
-    private String name;
+    private String make;
 
     @Override
     public void customize(QuerydslBindings bindings, QVehicleModel root) {
-        bindings.including(root.vehicleMake.name);
+        bindings.bind(root.name).as("model").first((path, value) -> path.containsIgnoreCase(value));
+        bindings.including(root.vehicleMake.name, root.name);
     }
 }
