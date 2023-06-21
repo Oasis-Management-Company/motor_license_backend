@@ -39,7 +39,7 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
             activityLogService.createActivityLog((vehicleMake.getName() + " vehicle make was created"), ActivityStatusConstant.CREATE);
 
             vehicleModel.setName(vehicleMakeDto.getModelName());
-            vehicleModel.setYear(vehicleMakeDto.getModelYear());
+//            vehicleModel.setYear(vehicleMakeDto.getModelYear());
 
             Optional<VehicleMake> vehicleMakeOptional2 = vehicleMakeRepository.findByNameIgnoreCase(vehicleMakeDto.getMakeName());
 
@@ -54,12 +54,11 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
         } else {
 
             Optional<VehicleModel> vehicleModelOptional = vehicleModelRepository
-                    .findByNameIgnoreCaseAndYearAndVehicleMake(vehicleMakeDto.getModelName(),
-                            vehicleMakeDto.getModelYear(), vehicleMakeOptional.get());
+                    .findByNameIgnoreCaseAndVehicleMake(vehicleMakeDto.getModelName(), vehicleMakeOptional.get());
 
             if (!vehicleModelOptional.isPresent()) {
                 vehicleModel.setName(vehicleMakeDto.getModelName());
-                vehicleModel.setYear(vehicleMakeDto.getModelYear());
+//                vehicleModel.setYear(vehicleMakeDto.getModelYear());
                 vehicleModel.setVehicleMake(vehicleMakeOptional.get());
 
                 vehicleModelRepository.save(vehicleModel);
