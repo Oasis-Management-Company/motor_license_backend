@@ -98,6 +98,7 @@ public class VioCtrl {
         JPAQuery<Invoice> invoiceJPAQuery = appRepository.startJPAQuery(QInvoice.invoice)
                 .where(predicateExtractor.getPredicate(filter))
                 .where(QInvoice.invoice.vioApproval.eq(false))
+                .where(QInvoice.invoice.vehicle.isNotNull())
                 .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
