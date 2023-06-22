@@ -6,6 +6,7 @@ import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.PlateNumberRequestDto;
 import com.app.IVAS.dto.SalesDto;
+import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.dto.VioSalesDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QInvoice;
@@ -13,6 +14,8 @@ import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.filter.InvoiceSearchFilter;
 import com.app.IVAS.filter.SalesSearchFilter;
+import com.app.IVAS.repository.InvoiceRepository;
+import com.app.IVAS.repository.SalesRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VioService;
@@ -148,5 +151,9 @@ public class VioCtrl {
         return new QueryResults<>(vioService.get(invoiceQueryResults.getResults()), invoiceQueryResults.getLimit(), invoiceQueryResults.getOffset(), invoiceQueryResults.getTotal());
     }
 
+    @GetMapping("/getVehicle/vio")
+    public Vehicle getVehicle(@RequestParam  Long id){
+        return vioService.getVehicle(id);
+    }
 
 }
