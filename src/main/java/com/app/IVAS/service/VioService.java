@@ -1,6 +1,7 @@
 package com.app.IVAS.service;
 
 import com.app.IVAS.dto.SalesDto;
+import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.dto.VioSalesDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -21,4 +22,6 @@ public interface VioService {
     List<VioSalesDto> get(List<Invoice> invoices);
 
     Invoice approveInvoice (Long id);
+
+    Vehicle getVehicle(Long id);
 }
