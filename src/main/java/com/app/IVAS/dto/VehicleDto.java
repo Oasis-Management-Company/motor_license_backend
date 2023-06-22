@@ -38,4 +38,6 @@ public class VehicleDto {
     private String createdBy;
     private String asin;
 
+    private String displayName;
+
 }
