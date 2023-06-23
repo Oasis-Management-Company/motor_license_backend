@@ -3,6 +3,7 @@ package com.app.IVAS.serviceImpl;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.dto.SalesDto;
+import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.dto.VioSalesDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -173,6 +174,12 @@ public class VioServiceImpl implements VioService {
 
        return invoice.get();
 
+    }
+
+    @Override
+    public Vehicle getVehicle(Long id) {
+        Sales sales = salesRepository.findByInvoiceId(id).get();
+        return sales.getVehicle();
     }
 
 

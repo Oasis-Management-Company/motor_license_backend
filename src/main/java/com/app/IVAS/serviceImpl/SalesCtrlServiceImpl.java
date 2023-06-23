@@ -620,7 +620,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
                 dto.setReferenceNumber(invoiceServiceType.getReference());
                 dto.setCustReference("167371977051");
                 dto.setDescription(invoiceServiceType.getServiceType().getName());
-                if(invoiceServiceType.getExpiryDate() != null){
+                if(invoiceServiceType.getExpiryDate() != null && !(invoiceServiceType.getServiceType().getName().contains("PLATE NUMBER") || invoiceServiceType.getServiceType().getName().contains("VEHICLE REG"))){
                     dto.setDateExpired(invoiceServiceType.getExpiryDate().format(df));
                 }
                 dto.setStatus(invoiceServiceType.getPaymentStatus());
