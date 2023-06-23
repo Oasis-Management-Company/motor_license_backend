@@ -5,7 +5,7 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import javax.annotation.Generated;
+import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
@@ -43,6 +43,8 @@ public class QEditPortalUser extends EntityPathBase<EditPortalUser> {
     public final StringPath displayName = createString("displayName");
 
     public final StringPath email = createString("email");
+
+    public final StringPath enteredBy = createString("enteredBy");
 
     public final StringPath firstName = createString("firstName");
 

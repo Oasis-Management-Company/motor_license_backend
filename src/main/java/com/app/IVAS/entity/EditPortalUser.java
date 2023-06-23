@@ -1,12 +1,12 @@
 package com.app.IVAS.entity;
 
-import com.app.IVAS.Enum.RegType;
-import com.app.IVAS.entity.userManagement.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.app.IVAS.entity.userManagement.StatusEntity;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Data
 @Entity
@@ -67,5 +67,6 @@ public class EditPortalUser extends StatusEntity {
     private Long parentId;
     private String displayName;
     private String dateCreated;
+    private String enteredBy;
 
 }
