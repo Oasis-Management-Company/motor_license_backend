@@ -77,7 +77,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         VehicleModel model = vehicleModelRepository.findById(sales.getModelId()).get();
         PlateNumber number = plateNumberRepository.findById(sales.getPlatenumber()).get();
         VehicleCategory category = vehicleCategoryRepository.findById(sales.getCategoryId()).get();
-        Vehicle foundVehicle = vehicleRepository.findByChasisNumber(sales.getChasis());
+        Vehicle foundVehicle = vehicleRepository.findByChasisNumberAndRegTypeIsNot(sales.getChasis(), RegType.EDIT);
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(category, types, RegType.REGISTRATION, RegType.COMPULSARY);
 
         if(sales.getSelectInsurance().equalsIgnoreCase("Yes")){
