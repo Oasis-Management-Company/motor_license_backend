@@ -298,6 +298,7 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         edit.setCreatedBy(jwtService.user);
         edit.setCreatedAt(LocalDateTime.now());
+        edit.setEnteredBy(jwtService.user.getDisplayName());
 
         if (edit.getFirstName() != null && edit.getLastName() != null) {
             edit.setDisplayName(edit.getFirstName() + ' ' + edit.getLastName());

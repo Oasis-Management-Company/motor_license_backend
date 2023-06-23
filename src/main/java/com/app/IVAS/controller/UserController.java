@@ -34,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URISyntaxException;
