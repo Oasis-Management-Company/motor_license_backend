@@ -44,6 +44,8 @@ public class QEditPortalUser extends EntityPathBase<EditPortalUser> {
 
     public final StringPath email = createString("email");
 
+    public final StringPath enteredBy = createString("enteredBy");
+
     public final StringPath firstName = createString("firstName");
 
     //inherited

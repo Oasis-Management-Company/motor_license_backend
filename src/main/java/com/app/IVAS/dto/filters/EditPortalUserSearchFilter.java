@@ -1,7 +1,6 @@
 package com.app.IVAS.dto.filters;
 
 import com.app.IVAS.entity.QEditPortalUser;
-import com.app.IVAS.entity.userManagement.QPortalUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
