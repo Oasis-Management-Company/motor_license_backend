@@ -15,11 +15,17 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     Vehicle findByChasisNumber(String chasis);
 
+    Vehicle findByChasisNumberAndRegTypeIsNot(String chasis, RegType edit);
+
     Vehicle findByChasisNumberIgnoreCase(String chassis);
 
     List<Vehicle> findByPortalUser(PortalUser user);
 
+    List<Vehicle> findAllByPortalUserAndRegTypeIsNot(PortalUser user, RegType edit);
+
     Vehicle findFirstByPlateNumber(PlateNumber plateNumber);
+
+    Vehicle findByPlateNumberAndRegTypeIsNot(PlateNumber plateNumber, RegType edit);
 
     Vehicle findVehicleByPlateNumberId(Long id);
 
@@ -28,4 +34,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     Vehicle findFirstByParentId(Long id);
 
     Vehicle findFirstByPortalUser(PortalUser payer);
+
+    Vehicle findByPortalUserAndRegTypeIsNot(PortalUser payer, RegType edit);
 }

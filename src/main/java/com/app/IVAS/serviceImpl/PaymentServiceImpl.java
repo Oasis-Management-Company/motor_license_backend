@@ -316,7 +316,8 @@ public class PaymentServiceImpl implements PaymentService {
             String url ="https://ieiplcng.azurewebsites.net/api/Insurance/BuyInsurance";
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
-            Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+//            Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+            Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
             InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(invoiceNumber);
 
             String PhoneNumber = Utils.removeFirstChar(vehicle.getPortalUser().getPhoneNumber());

@@ -203,7 +203,7 @@ public class DataExportController {
                     log.info("============ taxpayer created ================" + owner.getDisplayName());
                 }
 
-                Vehicle vehicle = vehicleRepository.findFirstByChasisNumber(dto.getChassis_no());
+                Vehicle vehicle = vehicleRepository.findByChasisNumberAndRegTypeIsNot(dto.getChassis_no(), RegType.EDIT);
                 VehicleMake vehicleMake = vehicleMakeRepository.findFirstByNameIgnoreCase(dto.getMake());
                 VehicleModel vehicleModel = vehicleModelRepository.findFirstByVehicleMakeAndNameIgnoreCase(vehicleMake, dto.getModel());
                 PlateNumberType type = plateNumberTypeRepository.findByNameIgnoreCase(dto.getType());
@@ -263,7 +263,7 @@ public class DataExportController {
         Double amount;
         for(InvoiceDto dto: dtos) {
             PortalUser owner = portalUserRepository.findFirstByUsernameIgnoreCase(dto.getVehicle_owner_mobile_number());
-            Vehicle vehicle = vehicleRepository.findFirstByChasisNumber(dto.getChassis_no());
+            Vehicle vehicle = vehicleRepository.findByChasisNumberAndRegTypeIsNot(dto.getChassis_no(), RegType.EDIT);
             PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(dto.getPlate());
             InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
             Invoice invoice = new Invoice();
@@ -292,7 +292,7 @@ public class DataExportController {
         System.out.println(dtos);
         for (UploadDto dto : dtos) {
             PortalUser payer = portalUserRepository.findFirstByFirstNameIgnoreCase(dto.getFirst_name());
-            Vehicle vehicle = vehicleRepository.findFirstByPortalUser(payer);
+            Vehicle vehicle = vehicleRepository.findByPortalUserAndRegTypeIsNot(payer, RegType.EDIT);
             Invoice invoice = invoiceRepository.findFirstByVehicle(vehicle);
             ServiceType serviceType = serviceTypeRepository.findFirstByNameContains(dto.getDescription());
 
