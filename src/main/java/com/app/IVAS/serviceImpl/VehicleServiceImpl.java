@@ -48,7 +48,7 @@ public class VehicleServiceImpl implements VehicleService {
     public InvoiceDto getUserVehicleDetails(Long id) {
         InvoiceDto dto = new InvoiceDto();
         PortalUser user = portalUserRepository.findById(id).get();
-        List<Vehicle> vehicles = vehicleRepository.findByPortalUser(user);
+        List<Vehicle> vehicles = vehicleRepository.findAllByPortalUserAndRegTypeIsNot(user, RegType.EDIT);
         List<Invoice> invoices = invoiceRepository.findByPayer(user);
 
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
@@ -67,7 +67,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public VehicleDto getVehicleDetails(String chasis) {
-        Vehicle vehicle = vehicleRepository.findFirstByChasisNumber(chasis);
+        Vehicle vehicle = vehicleRepository.findByChasisNumberAndRegTypeIsNot(chasis, RegType.EDIT);
         List<Invoice> invoice = invoiceRepository.findByVehicle(vehicle);
         PortalUser user = portalUserRepository.findById(vehicle.getPortalUser().getId()).get();
 
@@ -122,7 +122,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     public VehicleDto getVehicleDetailsByPlate(String plate) {
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
-        Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+        Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
 
         VehicleDto vehicleDto = new VehicleDto();
         vehicleDto.setVehicle(vehicle);
@@ -138,7 +138,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<ServiceType> getServiceTypeByPlate(String plate) {
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
-        Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+        Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
 
         List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(vehicle.getVehicleCategory(),plateNumber.getType(), RegType.RENEWAL, RegType.COMPULSARY);
         return serviceTypes;
@@ -150,7 +150,7 @@ public class VehicleServiceImpl implements VehicleService {
 //        ids.add(479L);
 //        ids.add(481L);
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(myplate);
-        Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+        Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
         Double totalAmount = 0.0;
         Sales sales1 = new Sales();
 
