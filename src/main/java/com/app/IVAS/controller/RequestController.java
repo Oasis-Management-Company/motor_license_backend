@@ -6,6 +6,7 @@ import com.app.IVAS.dto.filters.PlateNumberRequestSearchFilter;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QOffense;
 import com.app.IVAS.entity.QPlateNumberRequest;
+import com.app.IVAS.entity.QPrefix;
 import com.app.IVAS.entity.QServiceType;
 import com.app.IVAS.entity.QWorkFlowStage;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -162,6 +163,12 @@ public class RequestController {
     @GetMapping("/prefix")
     public List<Prefix> getStartCodes(){
         return prefixRepository.findAll().stream().sorted(Comparator.comparing(Prefix::getCode)).collect(Collectors.toList());
+    }
+
+    @GetMapping("/prefix-subtype")
+    public List<Prefix> getStartCodesWithSubType(@RequestParam Long subTypeId){
+        return appRepository.startJPAQuery(QPrefix.prefix)
+                .where(QPrefix.prefix.subType.id.eq(subTypeId)).fetch();
     }
 
     @GetMapping("/get-mla")

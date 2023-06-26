@@ -20,4 +20,8 @@ public class Prefix {
 
     private String name;
     private String code;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SUBTYPE_ID", referencedColumnName = "id")
+    private PlateNumberSubType subType;
 }
