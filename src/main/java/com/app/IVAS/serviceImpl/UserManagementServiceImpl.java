@@ -374,7 +374,7 @@ public class UserManagementServiceImpl implements UserManagementService {
             pojo.setStatus(user.getStatus());
             pojo.setId(user.getId());
             pojo.setPhoneNumber(user.getPhoneNumber());
-
+            pojo.setEnteredBy(user.getEnteredBy());
             if(user.getParentId() != null) {
                 pojo.setParentId(user.getParentId());
             }

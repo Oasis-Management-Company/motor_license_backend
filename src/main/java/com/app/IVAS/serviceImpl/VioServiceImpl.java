@@ -45,7 +45,7 @@ public class VioServiceImpl implements VioService {
     @Transactional
     public Invoice saveOffenseTypeByPhonenumber(String phoneNumber, List<Long> ids) {
         PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(phoneNumber);
-        Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
+        Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
 
 
         Double totalAmount = 0.0;
