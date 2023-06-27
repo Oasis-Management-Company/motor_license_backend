@@ -8,5 +8,9 @@ public enum CardTypeConstant {
     LEARNER,
     GENERAL,
     HACKNEY,
-    RECIEPT
+    RECIEPT,
+    ROADWORTHINESS,
+    NUMBERPLATE,
+    OWNERSHIP
+
 }

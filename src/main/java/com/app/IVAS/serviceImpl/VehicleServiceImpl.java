@@ -43,6 +43,7 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleModelRepository vehicleModelRepository;
     private final VehicleMakeRepository vehicleMakeRepository;
     private final CardRepository cardRepository;
+    private final LegacyAssessmentRepo legacyAssessmentRepo;
 
     @Override
     public InvoiceDto getUserVehicleDetails(Long id) {
@@ -180,6 +181,7 @@ public class VehicleServiceImpl implements VehicleService {
             invoiceServiceType.setReference(rrrGenerationService.generateNewRrrNumber());
             invoiceServiceType.setRegType(RegType.RENEWAL);
             invoiceServiceType.setAmount(serviceType.getPrice());
+            invoiceServiceType.setPaymentStatus(PaymentStatus.NOT_PAID);
             invoiceServiceTypeRepository.save(invoiceServiceType);
         }
 
@@ -592,5 +594,80 @@ public class VehicleServiceImpl implements VehicleService {
             vehicleRepository.delete(news);
             return HttpStatus.OK;
         }
+    }
+
+    @Override
+    public List<ServiceType> getServiceTypeByPlateandType(String plate, String type) {
+        PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
+        Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
+
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllByCategoryAndPlateNumberTypeAndRegTypeOrRegType(vehicle.getVehicleCategory(),plateNumber.getType(), RegType.valueOf(type.toUpperCase()), RegType.COMPULSARY);
+        return serviceTypes;
+    }
+
+    @Override
+    public Invoice saveServiceTypeByPlateLegacy(String myplate, List<Long> ids, String type, String paymentDate) {
+
+        System.out.println(paymentDate.substring(0, 10));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateTime = LocalDate.parse(paymentDate.substring(0, 10), formatter);
+
+        PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(myplate);
+        Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
+        Double totalAmount = 0.0;
+        LegacyAssessment legacyAssessment = new LegacyAssessment();
+
+        for (Long id : ids) {
+            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            totalAmount += serviceType.getPrice();
+        }
+        String invoiceNumber = rrrGenerationService.generateNewRrrNumber();
+
+        Invoice invoice = new Invoice();
+        invoice.setVehicle(vehicle);
+        invoice.setPayer(vehicle.getPortalUser());
+        invoice.setInvoiceNumber(invoiceNumber);
+        invoice.setPayer(vehicle.getPortalUser());
+        invoice.setAmount(totalAmount);
+        invoice.setPaymentStatus(PaymentStatus.PAID);
+        invoice.setPaymentDate(dateTime.atStartOfDay());
+        invoice.setCreatedBy(jwtService.user);
+
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+
+        for (Long id : ids) {
+            InvoiceServiceType invoiceServiceType = new InvoiceServiceType();
+            ServiceType serviceType = serviceTypeRepository.findById(id).get();
+            invoiceServiceType.setServiceType(serviceType);
+            invoiceServiceType.setInvoice(savedInvoice);
+            invoiceServiceType.setRevenuecode(serviceType.getCode());
+            invoiceServiceType.setReference(rrrGenerationService.generateNewRrrNumber());
+            invoiceServiceType.setRegType(RegType.LEGACY);
+            invoiceServiceType.setAmount(serviceType.getPrice());
+            invoiceServiceType.setPaymentStatus(PaymentStatus.PAID);
+            invoiceServiceType.setPaymentDate(dateTime.atStartOfDay());
+
+            if (serviceType.getName().contains("ROADWORTHINESS")) {
+                if(plateNumber.getType().getName().equalsIgnoreCase("COMMERCIAL")){
+                    invoiceServiceType.setExpiryDate(dateTime.atStartOfDay().plusMonths(6).minusDays(1));
+                }else{
+                    invoiceServiceType.setExpiryDate(dateTime.atStartOfDay().plusYears(1).minusDays(1));
+                }
+            }else{
+                invoiceServiceType.setExpiryDate(dateTime.atStartOfDay().plusYears(1).minusDays(1));
+            }
+
+
+            invoiceServiceTypeRepository.save(invoiceServiceType);
+
+        }
+
+        legacyAssessment.setVehicle(vehicle);
+        legacyAssessment.setInvoice(savedInvoice);
+        legacyAssessment.setCreatedBy(jwtService.user);
+        legacyAssessment.setPlateType(RegType.valueOf(type.toUpperCase()));
+        legacyAssessmentRepo.save(legacyAssessment);
+
+        return savedInvoice;
     }
 }

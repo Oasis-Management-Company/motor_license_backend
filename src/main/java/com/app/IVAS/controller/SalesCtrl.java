@@ -4,6 +4,7 @@ import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.PredicateExtractor;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QLegacyAssessment;
 import com.app.IVAS.entity.QSales;
 import com.app.IVAS.entity.QVehicle;
 import com.app.IVAS.entity.userManagement.PortalUser;
@@ -297,5 +298,32 @@ public class SalesCtrl {
     @PostMapping("/phone/validate")
     public ResponseEntity<PortalUserPojo> ValidatPhoneNumber(@RequestParam String phone){
         return ResponseEntity.ok(service.ValidatPhoneNumber(phone));
+    }
+
+
+    @GetMapping("/get/sales/legacy")
+    public QueryResults<SalesDto> searchAllSalesLegacy(SalesSearchFilter filter) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        JPAQuery<LegacyAssessment> userJPAQuery = appRepository.startJPAQuery(QLegacyAssessment.legacyAssessment)
+                .where(predicateExtractor.getPredicate(filter))
+                .offset(filter.getOffset().orElse(0))
+                .limit(filter.getLimit().orElse(10));
+
+        if (jwtService.user.getRole().getName().equals("MLA")){
+            userJPAQuery.where(QLegacyAssessment.legacyAssessment.createdBy.id.eq(jwtService.user.getId()));
+        }
+        if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
+            LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
+            userJPAQuery.where(QLegacyAssessment.legacyAssessment.createdAt.goe(startDate.atStartOfDay()));
+        }
+        if (filter.getBefore() != null && !filter.getBefore().equals("")) {
+            LocalDate endDate = LocalDate.parse(filter.getBefore(), formatter);
+            userJPAQuery.where(QLegacyAssessment.legacyAssessment.createdAt.loe(endDate.atTime(LocalTime.MAX)));
+        }
+
+        OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QLegacyAssessment.legacyAssessment);
+        QueryResults<LegacyAssessment> userQueryResults = userJPAQuery.select(QLegacyAssessment.legacyAssessment).distinct().orderBy(sortedColumn).fetchResults();
+        return new QueryResults<>(service.GetSalesLegacy(userQueryResults.getResults()), userQueryResults.getLimit(), userQueryResults.getOffset(), userQueryResults.getTotal());
     }
 }
