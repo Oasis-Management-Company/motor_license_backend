@@ -333,7 +333,7 @@ public class CardServiceImpl implements CardService {
             case STICKER:
                 return templateName = "sticker";
             case COMPUTERIZED:
-                return templateName = "npr";
+                return templateName = "Referral_Printout";
             case LEARNER:
                 return templateName = "Referral_printout";
             case GENERAL:
@@ -344,6 +344,12 @@ public class CardServiceImpl implements CardService {
                 return templateName = "hackney_permit";
             case RECIEPT:
                 return templateName = "receipt";
+            case OWNERSHIP:
+                return templateName = "Proof_of_ownership";
+            case ROADWORTHINESS:
+                return templateName = "Proof_of_ownership";
+            case NUMBERPLATE:
+                return templateName = "npr";
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }

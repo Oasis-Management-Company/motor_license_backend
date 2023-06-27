@@ -9,5 +9,6 @@ public enum RegType {
     OFFENCE,
     EDIT,
     INSURANCE,
-    DELETE
+    DELETE,
+    LEGACY
 }

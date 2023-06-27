@@ -63,4 +63,7 @@ public interface SalesCtrlService {
     PortalUserPojo ValidatPhoneNumber(String phone);
 
 //    Void editSalesInvoice(SalesDto dto);
+
+    List<SalesDto> GetSalesLegacy(List<LegacyAssessment> results);
+
 }
