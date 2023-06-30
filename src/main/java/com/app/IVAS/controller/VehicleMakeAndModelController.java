@@ -9,7 +9,6 @@ import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QVehicleMake;
 import com.app.IVAS.entity.QVehicleModel;
 import com.app.IVAS.repository.VehicleCategoryRepository;
-import com.app.IVAS.repository.VehicleModelRepository;
 import com.app.IVAS.repository.VehicleRepository;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.service.SalesCtrlService;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -109,6 +107,12 @@ public class VehicleMakeAndModelController {
     public List<VehicleModel> listVehicleModel(@RequestParam Long id){
 
         return vehicleMakeAndModelService.fetchVehicleModel(id);
+    }
+
+    @PostMapping("/replace-vehicle-model")
+    public String replaceVehicleModel(@RequestParam Long oldId, @RequestParam Long newId){
+
+        return vehicleMakeAndModelService.replaceVehickeModel(oldId, newId);
     }
 
 

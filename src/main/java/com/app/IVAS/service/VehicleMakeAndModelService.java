@@ -6,6 +6,7 @@ import com.app.IVAS.dto.VehicleMakeAndModelDto;
 import com.app.IVAS.entity.Card;
 import com.app.IVAS.entity.VehicleMake;
 import com.app.IVAS.entity.VehicleModel;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -21,4 +22,5 @@ public interface VehicleMakeAndModelService {
 
     List<VehicleModel> fetchVehicleModel(Long id);
 
+    String replaceVehickeModel(Long oldId, Long newId);
 }
