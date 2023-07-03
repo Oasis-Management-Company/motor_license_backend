@@ -23,4 +23,5 @@ public class AppConfigurationProperties {
     private String vansoSender;
     private String vansoPassword;
     private String vansoUrl;
+    private String token;
 }
