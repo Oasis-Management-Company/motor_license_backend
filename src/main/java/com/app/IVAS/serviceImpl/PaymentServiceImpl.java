@@ -242,15 +242,26 @@ public class PaymentServiceImpl implements PaymentService {
                 }
 
                 if (invoiceServiceType.getServiceType().getName().contains("HACKNEY PERMIT")) {
-                    Vehicle vehicle = invoiceServiceType.getInvoice().getVehicle();
-                    vehicle.setPermit("HACKNEY");
-                    vehicleRepository.save(vehicle);
+                    Vehicle vehicle = invoiceServiceType.getInvoice() != null ? invoiceServiceType.getInvoice().getVehicle() : null;
+                    if (vehicle != null) {
+                        vehicle.setPermit("HACKNEY");
+                        vehicleRepository.save(vehicle);
+                    }
                 }
 
                 if (invoiceServiceType.getServiceType().getName().contains("HEAVY DUTY")) {
-                    Vehicle vehicle = invoiceServiceType.getInvoice().getVehicle();
-                    vehicle.setPermit("HEAVY DUTY");
-                    vehicleRepository.save(vehicle);
+                    Vehicle vehicle = invoiceServiceType.getInvoice() != null ? invoiceServiceType.getInvoice().getVehicle() : null;
+                    if (vehicle != null) {
+                        vehicle.setPermit("HEAVY DUTY");
+                        vehicleRepository.save(vehicle);
+                    }
+                }
+                if (invoiceServiceType.getServiceType().getName().contains("PROOF OF OWNERSHIP")) {
+                    try{
+                        SendPOWC(invoiceServiceType.getInvoice().getVehicle().getPlateNumber().getPlateNumber(), invoiceServiceType.getReference());
+                    }catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
                 }
 
 
@@ -442,7 +453,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         HttpEntity entity = new HttpEntity(new Gson().toJson(dto), headersAuth);
         try {
-            PowcDto personResultAsJsonStr = restTemplate.postForObject(url, entity, PowcDto.class);
+            AssessmentResponse personResultAsJsonStr = restTemplate.postForObject(url, entity, AssessmentResponse.class);
             restTemplate.setErrorHandler(new ResponseErrorHandler() {
                 @Override
                 public boolean hasError(ClientHttpResponse response) throws IOException {
@@ -454,8 +465,7 @@ public class PaymentServiceImpl implements PaymentService {
                     // do nothing, or something
                 }
             });
-            System.out.println("Here is the response:::" + personResultAsJsonStr);
-            return null;
+            return personResultAsJsonStr;
         } catch (Exception e) {
             e.printStackTrace();
         }
