@@ -238,6 +238,18 @@ public class PaymentServiceImpl implements PaymentService {
                     invoiceServiceType.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
                 }
 
+                if (invoiceServiceType.getServiceType().getName().contains("HACKNEY PERMIT")) {
+                    Vehicle vehicle = invoiceServiceType.getInvoice().getVehicle();
+                    vehicle.setPermit("HACKNEY");
+                    vehicleRepository.save(vehicle);
+                }
+
+                if (invoiceServiceType.getServiceType().getName().contains("HEAVY DUTY")) {
+                    Vehicle vehicle = invoiceServiceType.getInvoice().getVehicle();
+                    vehicle.setPermit("HEAVY DUTY");
+                    vehicleRepository.save(vehicle);
+                }
+
 
                 invoiceServiceTypeRepository.save(invoiceServiceType);
                 List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoiceServiceType.getInvoice());
