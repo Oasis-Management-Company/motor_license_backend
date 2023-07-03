@@ -56,7 +56,6 @@ public class PaymentCtrl {
 
     @PostMapping(value = "/respondse/payment", consumes = "application/json", produces = "application/json")
     public ResponseEntity<AssessmentResponse> PaymentReturn(@RequestBody PaymentResponse respondDto) {
-        System.out.println("Entry into IVAS FROM PAYMENT");
         AssessmentResponse assessmentResponse = paymentService.PaymentReturn(respondDto);
         return new ResponseEntity<>(assessmentResponse, HttpStatus.OK);
     }
@@ -65,5 +64,11 @@ public class PaymentCtrl {
     public ResponseEntity<?> sendInsuranceToVendor(@RequestParam String plate,@RequestParam String invoiceNumber){
         InsuranceResponse dto = paymentService.sendInsuranceToVendor(plate,invoiceNumber);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping(value = "/respondse/payment", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<AssessmentResponse> SendPOWC(@RequestParam String plate,@RequestParam String invoiceNumber) {
+        AssessmentResponse assessmentResponse = paymentService.SendPOWC(plate, invoiceNumber);
+        return new ResponseEntity<>(assessmentResponse, HttpStatus.OK);
     }
 }
