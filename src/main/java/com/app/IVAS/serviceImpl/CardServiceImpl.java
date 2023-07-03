@@ -251,7 +251,7 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("photo", card.getVehicle().getPortalUser().getImage());
             extraParameter.put("asin", card.getVehicle().getPortalUser().getAsin());
             extraParameter.put("name", card.getVehicle().getPortalUser().getDisplayName());
-            extraParameter.put("address", card.getVehicle().getPortalUser().getAddress().length() > 44 ? card.getVehicle().getPortalUser().getAddress().substring(0, 42)+"...": card.getVehicle().getPortalUser().getAddress());
+            extraParameter.put("address", card.getVehicle().getPortalUser().getAddress().length() > 60 ? card.getVehicle().getPortalUser().getAddress().substring(0, 59)+"...": card.getVehicle().getPortalUser().getAddress());
             extraParameter.put("phoneNumber", card.getVehicle().getPortalUser().getPhoneNumber());
             extraParameter.put("zone", card.getVehicle().getCreatedBy().getOffice().getName());
             extraParameter.put("dateCreated", card.getCreatedAt().format(df));
@@ -262,7 +262,7 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("model", card.getVehicle().getVehicleModel().getName());
             extraParameter.put("year", card.getVehicle().getYear());
             extraParameter.put("category", card.getVehicle().getVehicleCategory().getName());
-            extraParameter.put("type", card.getVehicle().getPlateNumber().getType().getName().length() > 16 ? card.getVehicle().getPlateNumber().getType().getName().substring(0, 15)+"..." : card.getVehicle().getPlateNumber().getType().getName() );
+            extraParameter.put("type", card.getVehicle().getPlateNumber().getType().getName());
             extraParameter.put("color", card.getVehicle().getColor());
             extraParameter.put("created", card.getInvoice().getPaymentDate().format(df));
             extraParameter.put("barcode", qrCode);
