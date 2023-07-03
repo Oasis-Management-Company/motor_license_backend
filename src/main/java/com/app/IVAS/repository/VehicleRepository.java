@@ -36,8 +36,4 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     Vehicle findFirstByPortalUser(PortalUser payer);
 
     Vehicle findByPortalUserAndRegTypeIsNot(PortalUser payer, RegType edit);
-
-    List<Vehicle> findAllByVehicleModel_Id(Long id);
-
-
 }

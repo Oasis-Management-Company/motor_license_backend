@@ -23,6 +23,8 @@ public interface VehicleService {
 
     Invoice saveServiceTypeByPlate(String myplate, List<Long> ids);
 
+    Invoice saveServiceTypeByPlateLegacy(String myplate, List<Long> ids, String type, String paymentDate);
+
     InvoiceDto getTypeByInvoiceIdEdit(Long invoiceId);
 
     List<ServiceType> getTypeByInvoiceTaxpayer();
@@ -48,4 +50,6 @@ public interface VehicleService {
     VehicleEditDto getAllEditVehicle(Long id);
 
     HttpStatus approveEdittedVehicle(Long id, String type);
+
+    List<ServiceType> getServiceTypeByPlateandType(String plate, String type);
 }
