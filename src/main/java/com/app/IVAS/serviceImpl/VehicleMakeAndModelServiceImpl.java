@@ -2,10 +2,12 @@ package com.app.IVAS.serviceImpl;
 
 import com.app.IVAS.Enum.ActivityStatusConstant;
 import com.app.IVAS.dto.VehicleMakeAndModelDto;
+import com.app.IVAS.entity.Vehicle;
 import com.app.IVAS.entity.VehicleMake;
 import com.app.IVAS.entity.VehicleModel;
 import com.app.IVAS.repository.VehicleMakeRepository;
 import com.app.IVAS.repository.VehicleModelRepository;
+import com.app.IVAS.repository.VehicleRepository;
 import com.app.IVAS.service.ActivityLogService;
 import com.app.IVAS.service.VehicleMakeAndModelService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +26,7 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
     private final VehicleMakeRepository vehicleMakeRepository;
     private final VehicleModelRepository vehicleModelRepository;
     private final ActivityLogService activityLogService;
+    private final VehicleRepository vehicleRepository;
 
     @Override
     public VehicleMakeAndModelDto createVehicleMake(VehicleMakeAndModelDto vehicleMakeDto) {
@@ -97,6 +101,40 @@ public class VehicleMakeAndModelServiceImpl implements VehicleMakeAndModelServic
         Optional<VehicleMake> vehicleMake = vehicleMakeRepository.findById(id);
 
         return vehicleModelRepository.findAllByVehicleMake(vehicleMake.get());
+    }
+
+    @Override
+    public String replaceVehickeModel(Long oldId, Long newId) {
+
+
+
+        Optional<List<Vehicle>> vehicles = Optional.ofNullable(vehicleRepository.findAllByVehicleModel_Id(oldId));
+
+        VehicleModel replacementVehicleModel = vehicleModelRepository.findById(newId).get();
+
+        VehicleModel old = vehicleModelRepository.findById(oldId).get();
+
+
+
+
+        if (vehicles.isPresent()){
+
+            List<Vehicle> replacementVehicles = new ArrayList<>();
+
+            for (Vehicle vehicle: vehicles.get()) {
+                vehicle.setVehicleModel(replacementVehicleModel);
+
+                replacementVehicles.add(vehicle);
+            }
+
+            vehicleRepository.saveAll(replacementVehicles);
+
+            vehicleModelRepository.delete(old);
+
+            return "successful";
+        }
+
+        return "Unable to perform Operation";
     }
 
 

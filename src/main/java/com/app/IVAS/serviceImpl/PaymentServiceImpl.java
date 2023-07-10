@@ -6,6 +6,7 @@ import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.Enum.RegType;
 import com.app.IVAS.Utils.OkHttp3Util;
 import com.app.IVAS.Utils.Utils;
+import com.app.IVAS.configuration.AppConfigurationProperties;
 import com.app.IVAS.dto.*;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.repository.*;
@@ -15,6 +16,7 @@ import com.app.IVAS.service.PaymentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.math3.analysis.function.Pow;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -66,6 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final VehicleRepository vehicleRepository;
     private final PlateNumberRepository plateNumberRepository;
     private final InsuranceResponserepo insuranceResponserepo;
+    private final AppConfigurationProperties appConfigurationProperties;
 
     @Value("${payment.domain}")
     private String paymentDomain;
@@ -133,10 +136,11 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             TopParentRequest parentRequest = new TopParentRequest();
-            parentRequest.setData(childRequests);
+            parentRequest.setChildRequestSingle(childRequests);
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
             HttpEntity entity = new HttpEntity(new Gson().toJson(parentRequest), headersAuth);
             try {
+                System.out.println(entity.getBody());
                 String personResultAsJsonStr = restTemplate.postForObject(url, entity, String.class);
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {
                     @Override
@@ -238,6 +242,29 @@ public class PaymentServiceImpl implements PaymentService {
                     invoiceServiceType.setExpiryDate(LocalDateTime.now().plusYears(1).minusDays(1));
                 }
 
+                if (invoiceServiceType.getServiceType().getName().contains("HACKNEY PERMIT")) {
+                    Vehicle vehicle = invoiceServiceType.getInvoice() != null ? invoiceServiceType.getInvoice().getVehicle() : null;
+                    if (vehicle != null) {
+                        vehicle.setPermit("HACKNEY");
+                        vehicleRepository.save(vehicle);
+                    }
+                }
+
+                if (invoiceServiceType.getServiceType().getName().contains("HEAVY DUTY")) {
+                    Vehicle vehicle = invoiceServiceType.getInvoice() != null ? invoiceServiceType.getInvoice().getVehicle() : null;
+                    if (vehicle != null) {
+                        vehicle.setPermit("HEAVY DUTY");
+                        vehicleRepository.save(vehicle);
+                    }
+                }
+                if (invoiceServiceType.getServiceType().getName().contains("PROOF OF OWNERSHIP")) {
+                    try{
+                        SendPOWC(invoiceServiceType.getInvoice().getVehicle().getPlateNumber().getPlateNumber(), invoiceServiceType.getReference());
+                    }catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
+                }
+
 
                 invoiceServiceTypeRepository.save(invoiceServiceType);
                 List<InvoiceServiceType> invoiceServiceTypeList = invoiceServiceTypeRepository.findByInvoice(invoiceServiceType.getInvoice());
@@ -316,7 +343,6 @@ public class PaymentServiceImpl implements PaymentService {
             String url ="https://ieiplcng.azurewebsites.net/api/Insurance/BuyInsurance";
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
-//            Vehicle vehicle = vehicleRepository.findFirstByPlateNumber(plateNumber);
             Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
             InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(invoiceNumber);
 
@@ -374,5 +400,76 @@ public class PaymentServiceImpl implements PaymentService {
         }catch(Exception e){
             return null;
         }
+    }
+
+    @Override
+    public AssessmentResponse SendPOWC(String plate, String invoiceNumber) {
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
+        headers.add("Content-Type", "application/json");
+
+        MultiValueMap<String, String> headersAuth = new LinkedMultiValueMap<String, String>();
+        Map map = new HashMap<String, String>();
+        map.put("Content-Type", "application/json");
+        map.put("Authorization", "Bearer "+appConfigurationProperties.getToken());
+        headersAuth.setAll(map);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String url ="https://staging.mva.ng/api/services";
+
+        PlateNumber plateNumber = plateNumberRepository.findFirstByPlateNumberIgnoreCase(plate);
+        Vehicle vehicle = vehicleRepository.findByPlateNumberAndRegTypeIsNot(plateNumber, RegType.EDIT);
+        InvoiceServiceType invoiceServiceType = invoiceServiceTypeRepository.findFirstByReference(invoiceNumber);
+        PowcDto dto = new PowcDto();
+        dto.setCentre(vehicle.getCreatedBy().getOffice().getName());
+        dto.setCost(invoiceServiceType.getAmount().toString());
+        dto.setCustomerName(vehicle.getPortalUser().getDisplayName());
+        dto.setPaidAt(invoiceServiceType.getPaymentDate().format(formatter));
+        dto.setExpiry(invoiceServiceType.getExpiryDate().format(formatter));
+        dto.setCustomerAddress(vehicle.getPortalUser().getAddress());
+        dto.setCurrency("NGN");
+        dto.setChassisNumber(vehicle.getChasisNumber());
+        dto.setEngineNumber(vehicle.getEngineNumber());
+        dto.setCustomerPhone(vehicle.getPortalUser().getPhoneNumber());
+        dto.setDataSource("Anambra");
+        dto.setDurationInMonth(12);
+        dto.setLoadWeight(vehicle.getLoad());
+        dto.setNetWeight(vehicle.getCapacity());
+        dto.setPlateNumber(plateNumber.getPlateNumber());
+        dto.setPaymentMode("recurring");
+        dto.setStatus("PAID");
+        dto.setTx(invoiceServiceType.getReference());
+        dto.setVehicleType(plateNumber.getType().getName());
+        dto.setVehicleCategory(vehicle.getVehicleCategory().getName());
+        dto.setVehicleMake(vehicle.getVehicleModel().getVehicleMake().getName());
+        dto.setVehicleModel(vehicle.getVehicleModel().getName());
+        dto.setServiceCategory(plateNumber.getType().getName());
+        dto.setServiceName(invoiceServiceType.getServiceType().getName());
+        dto.setServiceType(plateNumber.getType().getName());
+        dto.setServiceCode(invoiceServiceType.getServiceType().getCode());
+        dto.setPaymentType("online");
+
+
+        HttpEntity entity = new HttpEntity(new Gson().toJson(dto), headersAuth);
+        try {
+            AssessmentResponse personResultAsJsonStr = restTemplate.postForObject(url, entity, AssessmentResponse.class);
+            restTemplate.setErrorHandler(new ResponseErrorHandler() {
+                @Override
+                public boolean hasError(ClientHttpResponse response) throws IOException {
+                    return false;
+                }
+
+                @Override
+                public void handleError(ClientHttpResponse response) throws IOException {
+                    // do nothing, or something
+                }
+            });
+            return personResultAsJsonStr;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

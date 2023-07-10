@@ -14,4 +14,6 @@ public interface PaymentService {
     AssessmentResponse PaymentReturn(PaymentResponse respondDto);
 
     InsuranceResponse sendInsuranceToVendor(String plate, String invoiceNumber);
+
+    AssessmentResponse SendPOWC(String plate, String invoiceNumber);
 }

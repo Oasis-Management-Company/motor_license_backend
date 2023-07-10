@@ -79,9 +79,21 @@ public class vehicleCtrl {
         return ResponseEntity.ok(dto);
     }
 
+    @PostMapping("/get/all/service-type/plate-number/type")
+    public ResponseEntity<List<ServiceType>> getServiceTypeByPlateandType(@RequestParam String plate, @RequestParam String type){
+        List<ServiceType> dto = vehicleService.getServiceTypeByPlateandType(plate, type);
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping("/save/all/service-type/plate-number")
     public ResponseEntity<?> saveServiceTypeByPlate(@RequestParam String myplate, @RequestParam List<Long> ids){
         Invoice dto = vehicleService.saveServiceTypeByPlate(myplate, ids);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/save/all/service-type/plate-number/legacy")
+    public ResponseEntity<?> saveServiceTypeByPlateLegacy(@RequestParam String myplate, @RequestParam String type, @RequestParam String paymentDate, @RequestParam List<Long> ids){
+        Invoice dto = vehicleService.saveServiceTypeByPlateLegacy(myplate, ids, type, paymentDate);
         return ResponseEntity.ok(dto);
     }
 

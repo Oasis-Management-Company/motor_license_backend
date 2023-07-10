@@ -251,7 +251,7 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("photo", card.getVehicle().getPortalUser().getImage());
             extraParameter.put("asin", card.getVehicle().getPortalUser().getAsin());
             extraParameter.put("name", card.getVehicle().getPortalUser().getDisplayName());
-            extraParameter.put("address", card.getVehicle().getPortalUser().getAddress());
+            extraParameter.put("address", card.getVehicle().getPortalUser().getAddress().length() > 60 ? card.getVehicle().getPortalUser().getAddress().substring(0, 59)+"...": card.getVehicle().getPortalUser().getAddress());
             extraParameter.put("phoneNumber", card.getVehicle().getPortalUser().getPhoneNumber());
             extraParameter.put("zone", card.getVehicle().getCreatedBy().getOffice().getName());
             extraParameter.put("dateCreated", card.getCreatedAt().format(df));
@@ -333,7 +333,7 @@ public class CardServiceImpl implements CardService {
             case STICKER:
                 return templateName = "sticker";
             case COMPUTERIZED:
-                return templateName = "npr";
+                return templateName = "Referral_Printout";
             case LEARNER:
                 return templateName = "Referral_printout";
             case GENERAL:
@@ -344,6 +344,12 @@ public class CardServiceImpl implements CardService {
                 return templateName = "hackney_permit";
             case RECIEPT:
                 return templateName = "receipt";
+            case OWNERSHIP:
+                return templateName = "Proof_of_ownership";
+            case ROADWORTHINESS:
+                return templateName = "Proof_of_ownership";
+            case NUMBERPLATE:
+                return templateName = "npr";
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }
@@ -359,7 +365,7 @@ public class CardServiceImpl implements CardService {
             String templateName = getTemplate(printDto.getType());
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
 
-            String dataValue = asin_verify+"="+invoiceServiceType.getInvoice().getInvoiceNumber();
+            String dataValue = asin_verify+invoiceServiceType.getInvoice().getInvoiceNumber();
             String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
 
             extraParameter.put("name", invoiceServiceType.getInvoice().getPayer().getDisplayName());
@@ -414,7 +420,9 @@ public class CardServiceImpl implements CardService {
             String templateName = getTemplate(printDto.getType());
             DateTimeFormatter df = DateTimeFormatter.ofPattern("dd - MMM - yyyy");
 
-            String dataValue = asin_verify+"="+invoice.getInvoiceNumber();
+            LocalDateTime expiry = invoice.getPaymentDate().plusMonths(1);
+
+            String dataValue = asin_verify+invoice.getInvoiceNumber();
             String qrCode = qrCodeServices.base64CertificateQrCode(dataValue);
 
             extraParameter.put("name", invoice.getPayer().getDisplayName());
@@ -425,6 +433,7 @@ public class CardServiceImpl implements CardService {
             extraParameter.put("created", invoice.getCreatedAt().format(df));
             extraParameter.put("barcode", qrCode);
             extraParameter.put("invoice", invoice.getInvoiceNumber());
+            extraParameter.put("expiry", expiry);
 
             extraParameter.put("chasis", invoice.getVehicle().getChasisNumber());
             extraParameter.put("make", invoice.getVehicle().getVehicleModel().getVehicleMake().getName());

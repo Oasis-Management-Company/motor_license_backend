@@ -765,4 +765,38 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
 
         return savedInvoice;
     }
+
+    @Override
+    public List<SalesDto> GetSalesLegacy(List<LegacyAssessment> results) {
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy/hh:mm:ss");
+        return results.stream().map(sales -> {
+            SalesDto dto = new SalesDto();
+            dto.setFirstname(sales.getVehicle().getPortalUser().getDisplayName());
+            dto.setAddress(sales.getVehicle().getPortalUser().getAddress());
+            dto.setAsin(sales.getVehicle().getPortalUser().getAsin());
+            dto.setEmail(sales.getVehicle().getPortalUser().getEmail());
+            dto.setChasis(sales.getVehicle().getChasisNumber());
+            dto.setEngine(sales.getVehicle().getEngineNumber());
+            dto.setColor(sales.getVehicle().getColor());
+            dto.setModel(sales.getVehicle().getVehicleModel().getName());
+            dto.setMake(sales.getVehicle().getVehicleModel().getVehicleMake().getName());
+            dto.setCategory(sales.getVehicle().getVehicleCategory().getName());
+            dto.setPlate(sales.getVehicle().getPlateNumber().getPlateNumber());
+            dto.setMla(sales.getCreatedBy().getDisplayName());
+            dto.setDate(sales.getCreatedAt());
+            dto.setMyDate(sales.getCreatedAt().format(df));
+            dto.setAmount(sales.getInvoice().getAmount());
+            dto.setStatus(sales.getInvoice().getPaymentStatus());
+            dto.setApprovalStatus(sales.getApprovalStatus());
+            dto.setCategoryId(sales.getVehicle().getVehicleCategory().getId());
+            dto.setId(sales.getId());
+            dto.setInvoice(sales.getInvoice().getId());
+            dto.setPlatecat(sales.getVehicle().getPlateNumber().getType().getName());
+            dto.setInvoiceNo(sales.getInvoice().getInvoiceNumber());
+            return dto;
+
+        }).collect(Collectors.toList());
+
+    }
 }
