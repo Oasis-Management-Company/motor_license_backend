@@ -87,6 +87,9 @@ public class CardController {
         if (filter.getCreatedBefore() != null){
             cardJPAQuery.where(QCard.card.createdAt.loe(LocalDate.parse(filter.getCreatedBefore(), formatter).atTime(LocalTime.MAX)));
         }
+        if (filter.getPlate() != null){
+            cardJPAQuery.where(QCard.card.vehicle.plateNumber.plateNumber.equalsIgnoreCase(filter.getPlate()));
+        }
 
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QCard.card);
         QueryResults<Card> cardQueryResults = cardJPAQuery.select(QCard.card).distinct().orderBy(sortedColumn).fetchResults();
