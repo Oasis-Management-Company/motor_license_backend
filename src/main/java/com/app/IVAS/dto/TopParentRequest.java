@@ -8,5 +8,6 @@ import java.util.List;
 public class TopParentRequest
 {
     private ParentRequest parentRequest;
+    private List<ParentRequest> childRequestSingle;
     private List<ParentRequest> data;
 }

@@ -136,10 +136,11 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             TopParentRequest parentRequest = new TopParentRequest();
-            parentRequest.setData(childRequests);
+            parentRequest.setChildRequestSingle(childRequests);
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
             HttpEntity entity = new HttpEntity(new Gson().toJson(parentRequest), headersAuth);
             try {
+                System.out.println(entity.getBody());
                 String personResultAsJsonStr = restTemplate.postForObject(url, entity, String.class);
                 restTemplate.setErrorHandler(new ResponseErrorHandler() {
                     @Override

@@ -13,6 +13,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 public class CardSearchFilter extends BaseSearchDto implements QuerydslBinderCustomizer<QCard> {
     private String createdAfter;
     private String createdBefore;
+    private String plate;
 
     @Override
     public void customize(QuerydslBindings bindings, QCard root) {
