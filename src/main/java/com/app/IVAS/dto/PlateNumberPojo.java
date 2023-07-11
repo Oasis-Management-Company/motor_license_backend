@@ -13,4 +13,5 @@ public class PlateNumberPojo {
     private PlateNumberStatus status;
     private String agent;
     private String owner;
+    private String ministry;
 }
