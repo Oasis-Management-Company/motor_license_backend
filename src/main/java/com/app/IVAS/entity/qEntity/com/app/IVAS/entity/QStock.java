@@ -61,7 +61,7 @@ public class QStock extends EntityPathBase<Stock> {
     public QStock(Class<? extends Stock> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.createdBy = inits.isInitialized("createdBy") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("createdBy"), inits.get("createdBy")) : null;
-        this.startCode = inits.isInitialized("startCode") ? new QPrefix(forProperty("startCode")) : null;
+        this.startCode = inits.isInitialized("startCode") ? new QPrefix(forProperty("startCode"), inits.get("startCode")) : null;
         this.subType = inits.isInitialized("subType") ? new QPlateNumberSubType(forProperty("subType"), inits.get("subType")) : null;
         this.type = inits.isInitialized("type") ? new QPlateNumberType(forProperty("type")) : null;
     }

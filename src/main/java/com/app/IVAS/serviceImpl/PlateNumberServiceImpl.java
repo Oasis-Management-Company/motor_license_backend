@@ -95,6 +95,9 @@ public class PlateNumberServiceImpl implements PlateNumberService {
             pojo.setStatus(plateNumber.getPlateNumberStatus());
             pojo.setAgent(plateNumber.getAgent() != null ? plateNumber.getAgent().getDisplayName() : null);
             pojo.setOwner(plateNumber.getOwner() != null ? plateNumber.getOwner().getDisplayName() : null);
+            if (plateNumber.getType().getName().startsWith("GOVT/")){
+                pojo.setMinistry(plateNumber.getStock().getStartCode().getName());
+            }
             return pojo;
 
         }).collect(Collectors.toList());
@@ -119,6 +122,9 @@ public class PlateNumberServiceImpl implements PlateNumberService {
             pojo.setInitialQuantity(stock.getEndRange() - stock.getStartRange() + 1);
             pojo.setAssigned(((long) plateNumberRepository.findByStockAndPlateNumberStatus(stock, PlateNumberStatus.ASSIGNED).size()) + sold);
             pojo.setSold(sold);
+            if (stock.getType().getName().startsWith("GOVT/")){
+                pojo.setMinistry(stock.getStartCode().getName());
+            }
             return pojo;
 
         }).collect(Collectors.toList());

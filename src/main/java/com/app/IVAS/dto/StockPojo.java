@@ -16,4 +16,5 @@ public class StockPojo {
     private String createdBy;
     private Long assigned;
     private Long sold;
+    private String ministry;
 }
