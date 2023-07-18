@@ -439,22 +439,30 @@ public class PaymentServiceImpl implements PaymentService {
         dto.setNetWeight(vehicle.getCapacity());
         dto.setPlateNumber(plateNumber.getPlateNumber());
         dto.setPaymentMode("recurring");
-        dto.setStatus("PAID");
+        dto.setStatus("paid");
         dto.setTx(invoiceServiceType.getReference());
         dto.setVehicleType(plateNumber.getType().getName());
         dto.setVehicleCategory(vehicle.getVehicleCategory().getName());
         dto.setVehicleMake(vehicle.getVehicleModel().getVehicleMake().getName());
         dto.setVehicleModel(vehicle.getVehicleModel().getName());
-        dto.setServiceCategory(plateNumber.getType().getName());
+        dto.setServiceCategory("vehicle");
         dto.setServiceName(invoiceServiceType.getServiceType().getName());
-        dto.setServiceType(plateNumber.getType().getName());
-        dto.setServiceCode(invoiceServiceType.getServiceType().getCode());
+        dto.setServiceType("vehicle");
+        dto.setServiceCode("4");
         dto.setPaymentType("online");
 
 
         HttpEntity entity = new HttpEntity(new Gson().toJson(dto), headersAuth);
         try {
             AssessmentResponse personResultAsJsonStr = restTemplate.postForObject(url, entity, AssessmentResponse.class);
+
+            if (Objects.equals(Objects.requireNonNull(personResultAsJsonStr).getStatus(), "1")){
+                InvoiceServiceType invoiceServiceType1 = invoiceServiceTypeRepository.findFirstByReference(invoiceNumber);
+                invoiceServiceType1.setSentToPWC(true);
+                invoiceServiceTypeRepository.save(invoiceServiceType1);
+            }
+
+
             restTemplate.setErrorHandler(new ResponseErrorHandler() {
                 @Override
                 public boolean hasError(ClientHttpResponse response) throws IOException {

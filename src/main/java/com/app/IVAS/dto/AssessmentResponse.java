@@ -9,6 +9,7 @@ public class AssessmentResponse {
     private String message;
     private String paymentReference;
     private String description;
+    private String status;
 
 
 

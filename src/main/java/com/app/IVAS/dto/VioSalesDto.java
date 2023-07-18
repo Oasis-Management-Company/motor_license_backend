@@ -1,8 +1,10 @@
 package com.app.IVAS.dto;
 
+import com.app.IVAS.entity.InvoiceServiceType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class VioSalesDto {
@@ -21,6 +23,8 @@ public class VioSalesDto {
     private String date;
     private String mla;
     private String category;
+    private List<InvoiceServiceType> invoiceServiceTypeList;
+    private String approvedBy;
 
 
 }

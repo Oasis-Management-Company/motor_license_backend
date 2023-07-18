@@ -1,10 +1,12 @@
 package com.app.IVAS.serviceImpl;
 
+import com.app.IVAS.Enum.ApprovalStatus;
 import com.app.IVAS.Enum.PaymentStatus;
 import com.app.IVAS.dto.VioDashboardDto;
 import com.app.IVAS.entity.*;
 import com.app.IVAS.entity.QInvoiceOffenseType;
 import com.app.IVAS.entity.QInvoiceServiceType;
+import com.app.IVAS.entity.QSales;
 import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VioDashboardService;
@@ -26,7 +28,6 @@ public class VioDashboardServiceImpl implements VioDashboardService {
         Double dtt = 0.0;
         Double permit = 0.0;
         Long vehicles = 0L;
-        Long approval  = 0L;
         Double offense = 0.0;
 
 
@@ -35,15 +36,22 @@ public class VioDashboardServiceImpl implements VioDashboardService {
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         JPAQuery<InvoiceServiceType> lpJpa = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("LEARNERS PERMIT"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("LEARNERS"))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         JPAQuery<InvoiceServiceType> dttJpa = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
-                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("DRIVERS TEST THEORY"))
+                .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.contains("DRIVERS"))
                 .where(QInvoiceServiceType.invoiceServiceType.invoice.paymentStatus.eq(PaymentStatus.PAID));
 
         JPAQuery<InvoiceOffenseType> offenseJPA = appRepository.startJPAQuery(QInvoiceOffenseType.invoiceOffenseType)
                 .where(QInvoiceOffenseType.invoiceOffenseType.invoice.paymentStatus.eq(PaymentStatus.PAID));
+
+        JPAQuery<Sales> salesApproval = appRepository.startJPAQuery(QSales.sales)
+                .where(QSales.sales.approvalStatus.eq(ApprovalStatus.APPROVED));
+
+        if (jwtService.user.getRole().getName().equals("VIO")){
+            salesApproval.where(QSales.sales.approvedBy.isNotNull().and(QSales.sales.approvedBy.email.eq(jwtService.user.getEmail())));
+        }
 
         for (InvoiceServiceType fetch : rwJpa.fetch()) rw += fetch.getAmount();
         for (InvoiceServiceType fetch : lpJpa.fetch()) permit += fetch.getAmount();
@@ -53,7 +61,7 @@ public class VioDashboardServiceImpl implements VioDashboardService {
         var vio = VioDashboardDto.builder()
                 .rw(rw)
                 .offence(offense)
-                .approvals(approval)
+                .approvals(salesApproval.stream().count())
                 .dtt(dtt)
                 .permit(permit)
                 .vehicles(vehicles)

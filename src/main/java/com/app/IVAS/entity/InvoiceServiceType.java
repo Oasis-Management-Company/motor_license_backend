@@ -42,4 +42,6 @@ public class InvoiceServiceType {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    private Boolean sentToPWC;
 }

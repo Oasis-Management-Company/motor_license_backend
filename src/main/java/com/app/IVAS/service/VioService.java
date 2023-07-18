@@ -21,7 +21,7 @@ public interface VioService {
 
     List<VioSalesDto> get(List<Invoice> invoices);
 
-    Invoice approveInvoice (Long id);
+    Invoice approveInvoice (Long id, String type);
 
     Vehicle getVehicle(Long id);
 }

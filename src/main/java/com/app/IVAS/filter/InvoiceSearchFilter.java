@@ -11,6 +11,7 @@ public class InvoiceSearchFilter extends BaseSearchDto implements QuerydslBinder
 
     private String after;
     private String before;
+    private String status;
 
     @Override
     public void customize(QuerydslBindings bindings, QInvoice root) {
