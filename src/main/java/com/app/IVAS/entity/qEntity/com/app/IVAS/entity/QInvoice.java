@@ -26,6 +26,8 @@ public class QInvoice extends EntityPathBase<Invoice> {
 
     public final NumberPath<Double> amount = createNumber("amount", Double.class);
 
+    public final com.app.IVAS.entity.userManagement.QPortalUser approvedBy;
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt;
 
@@ -89,6 +91,7 @@ public class QInvoice extends EntityPathBase<Invoice> {
     public QInvoice(Class<? extends Invoice> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new com.app.IVAS.entity.userManagement.QStatusEntity(type, metadata, inits);
+        this.approvedBy = inits.isInitialized("approvedBy") ? new com.app.IVAS.entity.userManagement.QPortalUser(forProperty("approvedBy"), inits.get("approvedBy")) : null;
         this.createdAt = _super.createdAt;
         this.createdBy = _super.createdBy;
         this.dateDeactivated = _super.dateDeactivated;

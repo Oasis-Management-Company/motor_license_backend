@@ -40,6 +40,8 @@ public class QInvoiceServiceType extends EntityPathBase<InvoiceServiceType> {
 
     public final StringPath revenuecode = createString("revenuecode");
 
+    public final BooleanPath sentToPWC = createBoolean("sentToPWC");
+
     public final QServiceType serviceType;
 
     public QInvoiceServiceType(String variable) {

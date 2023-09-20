@@ -6,10 +6,13 @@ import com.app.IVAS.dto.SalesDto;
 import com.app.IVAS.dto.VehicleDto;
 import com.app.IVAS.dto.VioSalesDto;
 import com.app.IVAS.entity.*;
+import com.app.IVAS.entity.QInvoiceServiceType;
 import com.app.IVAS.entity.userManagement.PortalUser;
 import com.app.IVAS.repository.*;
+import com.app.IVAS.repository.app.AppRepository;
 import com.app.IVAS.security.JwtService;
 import com.app.IVAS.service.VioService;
+import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +37,7 @@ public class VioServiceImpl implements VioService {
     private final VehicleRepository vehicleRepository;
     private final PlateNumberRepository plateNumberRepository;
     private final PaymentServiceImpl paymentService;
+    private final AppRepository appRepository;
 
 
     @Override
@@ -151,12 +155,19 @@ public class VioServiceImpl implements VioService {
             dto.setModel(invoice.getVehicle().getVehicleModel().getName());
             dto.setPhoneNumber(invoice.getPayer().getPhoneNumber());
             dto.setDate(invoice.getCreatedAt().format(df));
+
+            JPAQuery<InvoiceServiceType> serviceTypeJPAQuery = appRepository.startJPAQuery(QInvoiceServiceType.invoiceServiceType)
+                    .where(QInvoiceServiceType.invoiceServiceType.invoice.eq(invoice))
+                    .where(QInvoiceServiceType.invoiceServiceType.serviceType.name.containsIgnoreCase("ROADWORTHINESS"));
+
+            dto.setInvoiceServiceTypeList(serviceTypeJPAQuery.fetch());
             dto.setInvoiceNumber(invoice.getInvoiceNumber());
             dto.setAmount(invoice.getAmount());
             dto.setPaymentStatus(invoice.getPaymentStatus().toString());
             dto.setVioApproved(invoice.getVioApproval().toString());
             dto.setMla(invoice.getCreatedBy().getDisplayName());
             dto.setCategory(invoice.getVehicle().getVehicleCategory().getName());
+            dto.setApprovedBy(invoice.getApprovedBy() != null ? invoice.getApprovedBy().getDisplayName() : null);
 
             return dto;
 
@@ -164,16 +175,14 @@ public class VioServiceImpl implements VioService {
     }
 
     @Override
-    public Invoice approveInvoice(Long id) {
-
-       Optional<Invoice> invoice = invoiceRepository.findById(id);
-
-       invoice.get().setVioApproval(true);
-
-       invoiceRepository.save(invoice.get());
-
+    public Invoice approveInvoice(Long id, String type) {
+        Optional<Invoice> invoice = invoiceRepository.findById(id);
+        if (type == "APPROVAL"){
+            invoice.get().setVioApproval(true);
+            invoice.get().setApprovedBy(jwtService.user);
+            invoiceRepository.save(invoice.get());
+        }
        return invoice.get();
-
     }
 
     @Override

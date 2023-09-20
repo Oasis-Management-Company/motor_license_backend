@@ -42,4 +42,9 @@ public class Invoice extends StatusEntity {
     private Boolean sentToTax;
     private Boolean vioApproval = false;
 
+    @JsonIgnore
+    @JoinColumn(name = "APPROVAL_ID", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private PortalUser approvedBy;
+
 }

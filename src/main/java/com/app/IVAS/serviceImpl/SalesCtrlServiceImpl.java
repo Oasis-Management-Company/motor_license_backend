@@ -165,11 +165,11 @@ public class SalesCtrlServiceImpl implements SalesCtrlService {
         sales1.setInvoice(savedInvoice);
         sales1.setCreatedBy(jwtService.user);
         sales1.setPlateType(RegType.REGISTRATION);
+        Sales saved = salesRepository.save(sales1);
 
         number.setOwner(portalUser);
         number.setPlateNumberStatus(PlateNumberStatus.SOLD);
         plateNumberRepository.save(number);
-        Sales saved = salesRepository.save(sales1);
         cardService.createCard(savedInvoice, savedVehicle, RegType.REGISTRATION);
 
         try {

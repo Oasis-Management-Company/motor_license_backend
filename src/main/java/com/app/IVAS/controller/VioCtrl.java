@@ -100,11 +100,17 @@ public class VioCtrl {
 
         JPAQuery<Invoice> invoiceJPAQuery = appRepository.startJPAQuery(QInvoice.invoice)
                 .where(predicateExtractor.getPredicate(filter))
-                .where(QInvoice.invoice.vioApproval.eq(false))
                 .where(QInvoice.invoice.vehicle.isNotNull())
                 .where(QInvoice.invoice.paymentStatus.eq(PaymentStatus.PAID))
                 .offset(filter.getOffset().orElse(0))
                 .limit(filter.getLimit().orElse(10));
+
+
+        if (jwtService.user.getRole().getName().equalsIgnoreCase("VIO")){
+            invoiceJPAQuery.where(QInvoice.invoice.createdBy.office.eq(jwtService.user.getOffice()));
+        }
+
+
 
         if (filter.getAfter()!= null && !filter.getAfter().equals("")) {
             LocalDate startDate =  LocalDate.parse(filter.getAfter(), formatter);
@@ -115,14 +121,23 @@ public class VioCtrl {
             invoiceJPAQuery.where(QInvoice.invoice.createdAt.loe(endDate.atTime(LocalTime.MAX)));
         }
 
+        if (filter.getStatus() != null && !filter.getStatus().equals("")) {
+            if (filter.getStatus().equalsIgnoreCase("PENDING")){
+                invoiceJPAQuery.where(QInvoice.invoice.vioApproval.eq(false));
+            }else{
+                invoiceJPAQuery.where(QInvoice.invoice.vioApproval.eq(true));
+            }
+
+        }
+
         OrderSpecifier<?> sortedColumn = appRepository.getSortedColumn(filter.getOrder().orElse(Order.DESC), filter.getOrderColumn().orElse("createdAt"), QInvoice.invoice);
         QueryResults<Invoice> invoiceQueryResults = invoiceJPAQuery.select(QInvoice.invoice).distinct().orderBy(sortedColumn).fetchResults();
         return new QueryResults<>(vioService.get(invoiceQueryResults.getResults()), invoiceQueryResults.getLimit(), invoiceQueryResults.getOffset(), invoiceQueryResults.getTotal());
     }
 
     @PostMapping("/approve-sale")
-    public ResponseEntity<?> approveSale(@RequestParam Long id){
-        vioService.approveInvoice(id);
+    public ResponseEntity<?> approveSale(@RequestParam Long id, @RequestParam String type){
+        vioService.approveInvoice(id, type);
         return ResponseEntity.ok("");
     }
 

@@ -473,7 +473,9 @@ public class VehicleServiceImpl implements VehicleService {
             dto.setPhonenumber(vehicle.getPortalUser().getPhoneNumber());
             dto.setEmail(vehicle.getPortalUser().getEmail());
             dto.setDate(vehicle.getCreatedAt());
-            dto.setCreatedBy(vehicle.getCreatedBy().getDisplayName());
+            if(vehicle.getCreatedBy() != null) {
+                dto.setCreatedBy(vehicle.getCreatedBy().getDisplayName());
+            }
             dto.setChasis(vehicle.getChasisNumber());
             dto.setParent(vehicle.getParentId());
             dto.setPlateType(vehicle.getPlateNumber().getType().getName());

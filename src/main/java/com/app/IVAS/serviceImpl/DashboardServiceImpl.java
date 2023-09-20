@@ -37,18 +37,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardCtrlService {
 
-    private final StockRepository stockRepository;
-    private final PlateNumberRepository plateNumberRepository;
-    private final SalesRepository salesRepository;
-    private final PlateNumberRequestRepository plateNumberRequestRepository;
-    private final PortalUserRepository portalUserRepository;
-    private final ZonalOfficeRepository zonalOfficeRepository;
-    private final RoleRepository roleRepository;
     private final JwtService jwtService;
     private final AppRepository appRepository;
-    private final PredicateExtractor predicateExtractor;
-    private final InvoiceRepository invoiceRepository;
-    private final InvoiceServiceTypeRepository invoiceServiceTypeRepository;
 
 
     @Override
